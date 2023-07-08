@@ -172,7 +172,9 @@ private func hideKeyboard() {
 struct CustomRulesListView: View {
     @ObservedObject var ruleList: RuleList
     @Binding var selectedRule: Rule?
-    @State private var isDarkMode = false
+    @AppStorage("isDarkMode") var isDarkMode = false
+
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -233,7 +235,3 @@ struct CustomRulesListView: View {
             }
         }
     }
-
-
-
-

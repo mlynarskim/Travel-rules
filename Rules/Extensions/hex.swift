@@ -1,10 +1,3 @@
-//
-//  hex.swift
-//  Rules
-//
-//  Created by Mateusz Mlynarski on 04/07/2023.
-//
-
 import SwiftUI
 import Foundation
 import AVFoundation
@@ -37,3 +30,4 @@ extension Color {
         )
     }
 }
+

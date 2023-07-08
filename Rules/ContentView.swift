@@ -294,13 +294,60 @@ struct NextView: View {
         }
     }
     func shareRule() {
-        let activityViewController = UIActivityViewController(activityItems: [randomRule], applicationActivities: nil)
+         guard let image = generateImage() else {
+             print("Failed to generate image")
+             return
+         }
+         
+         let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+         
+         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let viewController = windowScene.windows.first?.rootViewController {
+             viewController.present(activityViewController, animated: true, completion: nil)
+         }
+     }
+     
+   
+    func generateImage() -> UIImage? {
+        let maxWidth: CGFloat = 300
+        let maxHeight: CGFloat = 200
         
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let viewController = windowScene.windows.first?.rootViewController {
-            viewController.present(activityViewController, animated: true, completion: nil)
+        let textAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 20),
+            .foregroundColor: UIColor.black
+        ]
+        let attributedText = NSAttributedString(string: randomRule, attributes: textAttributes)
+        
+        let textRect = attributedText.boundingRect(with: CGSize(width: maxWidth, height: .greatestFiniteMagnitude), options: .usesLineFragmentOrigin, context: nil)
+        let imageSize = CGSize(width: max(textRect.width + 40, maxWidth), height: max(textRect.height + 40, maxHeight))
+        
+        let generatedImage = UIGraphicsImageRenderer(size: imageSize).image { context in
+            // Ustawienie koloru tła
+            UIColor(Color(hex: "#DDAA4F")).setFill()
+            context.fill(CGRect(origin: .zero, size: imageSize))
+            
+            attributedText.draw(in: CGRect(x: 20, y: 20, width: imageSize.width - 40, height: imageSize.height - 40))
+            
+            // Dodanie tekstu "[TRAVEL RULES APP]" w prawym dolnym rogu
+            let watermarkText = "TRAVEL RULES"
+            let watermarkAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 12),
+                .foregroundColor: UIColor(Color(hex: "#29606D"))
+            ]
+            let watermarkSize = watermarkText.size(withAttributes: watermarkAttributes)
+            let watermarkRect = CGRect(x: imageSize.width - watermarkSize.width - 10, y: imageSize.height - watermarkSize.height - 10, width: watermarkSize.width, height: watermarkSize.height)
+            watermarkText.draw(in: watermarkRect, withAttributes: watermarkAttributes)
         }
+        
+        return generatedImage
     }
+
+
+
+
+
+
+ 
 
         func getRandomRule() {
             if savedRules.count == 365 {
