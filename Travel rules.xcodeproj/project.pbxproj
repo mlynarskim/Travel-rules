@@ -18,6 +18,7 @@
 		076EAFCA2A3A3E2E0021DA4C /* lofi-ambient-pianoline-116134.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 076EAFC72A3A3E2E0021DA4C /* lofi-ambient-pianoline-116134.mp3 */; };
 		076EAFCB2A3A3E2E0021DA4C /* ambient-wave-48-tribute-17243.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 076EAFC82A3A3E2E0021DA4C /* ambient-wave-48-tribute-17243.mp3 */; };
 		0780433E2A231CDD004BCE3D /* Property List.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0780433D2A231CDD004BCE3D /* Property List.plist */; };
+		07835FE12A5A1151008CE8F7 /* pushView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07835FE02A5A1151008CE8F7 /* pushView.swift */; };
 		0791905C2A1FA20E00C94BE3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079190592A1FA1F200C94BE3 /* SwiftUI.framework */; };
 		07A7C9122A546EA10017E850 /* GPSlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9112A546EA10017E850 /* GPSlistView.swift */; };
 		07A7C9142A546FB10017E850 /* hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9132A546FB10017E850 /* hex.swift */; };
@@ -88,6 +89,7 @@
 		076EAFC72A3A3E2E0021DA4C /* lofi-ambient-pianoline-116134.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "lofi-ambient-pianoline-116134.mp3"; sourceTree = "<group>"; };
 		076EAFC82A3A3E2E0021DA4C /* ambient-wave-48-tribute-17243.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ambient-wave-48-tribute-17243.mp3"; sourceTree = "<group>"; };
 		0780433D2A231CDD004BCE3D /* Property List.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Property List.plist"; sourceTree = "<group>"; };
+		07835FE02A5A1151008CE8F7 /* pushView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pushView.swift; sourceTree = "<group>"; };
 		079190592A1FA1F200C94BE3 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		0791905B2A1FA20600C94BE3 /* libswiftAVFoundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftAVFoundation.tbd; path = usr/lib/swift/libswiftAVFoundation.tbd; sourceTree = SDKROOT; };
 		079190602A1FA23900C94BE3 /* libswiftFoundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftFoundation.tbd; path = usr/lib/swift/libswiftFoundation.tbd; sourceTree = SDKROOT; };
@@ -248,6 +250,7 @@
 			isa = PBXGroup;
 			children = (
 				07E14C7F2A320EA400B5062C /* travelChecklist.swift */,
+				07835FE02A5A1151008CE8F7 /* pushView.swift */,
 				07E14CA72A33317300B5062C /* customRule.swift */,
 				07E14CA92A33320B00B5062C /* locationGps.swift */,
 				07E14CAB2A33336F00B5062C /* savedRuleList.swift */,
@@ -414,6 +417,7 @@
 				0707D9A52A1453D800186248 /* RulesApp.swift in Sources */,
 				07A7C9122A546EA10017E850 /* GPSlistView.swift in Sources */,
 				07FD9C572A2B8B2E009809F0 /* RulesList.swift in Sources */,
+				07835FE12A5A1151008CE8F7 /* pushView.swift in Sources */,
 				07E14CAE2A33344B00B5062C /* myChecklist.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

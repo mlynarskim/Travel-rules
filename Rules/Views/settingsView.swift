@@ -68,9 +68,6 @@ struct SettingsView: View {
                                 stopBackgroundMusic()
                             }
                         }
-
-                    
-                    // Reset all user settings
                     Button(action: {
                         resetApplication()
                     }) {
@@ -83,20 +80,6 @@ struct SettingsView: View {
                             .cornerRadius(15)
                             .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
                     }
-                    
-//                    // Stop music button
-//                    Button(action: {
-//                        stopBackgroundMusic()
-//                    }) {
-//                        Text("Stop Music")
-//                            .foregroundColor(.black)
-//                            .font(.custom("Lato Bold", size: 20))
-//                            .padding(5)
-//                            .frame(width: 200, height: 50)
-//                            .background(Color(hex: "#fc2c03"))
-//                            .cornerRadius(15)
-//                            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-//                    }
                 }
             }
         }

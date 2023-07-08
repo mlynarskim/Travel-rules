@@ -8,7 +8,8 @@ import CoreMotion
 //Top Bbar menu, main view
 struct TopMenuView: View {
     @Binding var showSettings: Bool
-    
+    @Binding var showPushView: Bool
+
     var body: some View {
         HStack {
             Button(action: {
@@ -21,17 +22,21 @@ struct TopMenuView: View {
             Spacer()
             
             Button(action: {
-                // Akcja dla ikony dzwonka
+                showPushView = true
             }) {
                 Image(systemName: "bell")
                     .font(.system(size: 24))
                     .foregroundColor(.black)
             }
+
         }
         .padding(.horizontal, 30)
-        .padding(.vertical, 5)
-        .sheet(isPresented: $showSettings) {
-            SettingsView(showSettings: $showSettings)
+               .padding(.vertical, 5)
+               .sheet(isPresented: $showSettings) {
+                   SettingsView(showSettings: $showSettings)
+               }
+               .sheet(isPresented: $showPushView) { // Dodaj sheet dla showPushView
+                   pushView()
         }
     }
 }
@@ -43,6 +48,7 @@ struct ContentView: View {
     @State private var animateTravel = false
     @AppStorage("isDarkMode") var isDarkMode = false
     @AppStorage("isMusicEnabled") var isMusicEnabled = true
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -127,15 +133,18 @@ struct NextView: View {
     @State private var savedRules: [String] = []
     @State private var buttonPressCount: Int = 0
     @State private var showSettings = false
+    @State private var showPushView = false
+
     @AppStorage("isDarkMode") var isDarkMode = false
     let RulesList = rulesList
+    
     var body: some View {
             ZStack {
                 Image(isDarkMode ? "imageDark" : "Image")
                     .resizable()
                     .edgesIgnoringSafeArea(.all)
                     VStack {
-                        TopMenuView(showSettings: $showSettings)
+                        TopMenuView(showSettings: $showSettings, showPushView: $showPushView)
                     VStack {
                         Text("The rule for today is:")
                             .font(.title2)
