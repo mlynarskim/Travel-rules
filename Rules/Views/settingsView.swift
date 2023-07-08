@@ -1,4 +1,27 @@
 import SwiftUI
+import Foundation
+import AVFoundation
+
+var audioPlayer: AVAudioPlayer?
+
+func playBackgroundMusic() {
+    guard let musicURL = Bundle.main.url(forResource: "lofi-ambient-pianoline-116134", withExtension: "mp3") else {
+        return
+    }
+    
+    do {
+        audioPlayer = try AVAudioPlayer(contentsOf: musicURL)
+        audioPlayer?.numberOfLoops = -1
+        audioPlayer?.play()
+    } catch {
+        print("Failed to play background music.")
+    }
+}
+
+func stopBackgroundMusic() {
+    audioPlayer?.stop()
+    audioPlayer?.currentTime = 0
+}
 
 struct SettingsView: View {
     @Binding var showSettings: Bool
@@ -32,13 +55,20 @@ struct SettingsView: View {
                     .frame(maxHeight: .infinity, alignment: .top)
                     
                     Toggle("Dark Mode", isOn: $isDarkMode)
-                    
                         .padding()
                         .foregroundColor(.black)
                     
                     Toggle("Music", isOn: $isMusicEnabled)
-                                           .padding()
-                                           .foregroundColor(.black)
+                        .padding()
+                        .foregroundColor(.black)
+                        .onChange(of: isMusicEnabled) { newValue in
+                            if newValue {
+                                playBackgroundMusic()
+                            } else {
+                                stopBackgroundMusic()
+                            }
+                        }
+
                     
                     // Reset all user settings
                     Button(action: {
@@ -53,6 +83,20 @@ struct SettingsView: View {
                             .cornerRadius(15)
                             .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
                     }
+                    
+//                    // Stop music button
+//                    Button(action: {
+//                        stopBackgroundMusic()
+//                    }) {
+//                        Text("Stop Music")
+//                            .foregroundColor(.black)
+//                            .font(.custom("Lato Bold", size: 20))
+//                            .padding(5)
+//                            .frame(width: 200, height: 50)
+//                            .background(Color(hex: "#fc2c03"))
+//                            .cornerRadius(15)
+//                            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+//                    }
                 }
             }
         }

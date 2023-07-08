@@ -3,23 +3,7 @@ import Foundation
 import AVFoundation
 import CoreLocation
 import MapKit
-
-var sound: AVAudioPlayer!
-
-func playSound() {
-    let musicURL = Bundle.main.url(forResource: "lofi-ambient-pianoline-116134", withExtension: "mp3")
-    
-    guard musicURL != nil else {
-        return
-    }
-    do {
-        sound = try AVAudioPlayer(contentsOf: musicURL!)
-        sound.numberOfLoops = -1
-        sound?.play()
-    } catch {
-        print("error")
-    }
-}
+import CoreMotion
 
 //Top Bbar menu, main view
 struct TopMenuView: View {
@@ -52,24 +36,19 @@ struct TopMenuView: View {
     }
 }
 
-
-
-
 // Start screen
-
 struct ContentView: View {
     @State private var isPulsating = false
     @State private var animateRules = false
     @State private var animateTravel = false
     @AppStorage("isDarkMode") var isDarkMode = false
-
+    @AppStorage("isMusicEnabled") var isMusicEnabled = true
     var body: some View {
         NavigationView {
             ZStack {
                 Image(isDarkMode ? "imageDark" : "Image")
                     .resizable()
                     .edgesIgnoringSafeArea(.all)
-                
                 VStack {
                     Spacer()
                     Text("TRAVEL")
@@ -87,7 +66,6 @@ struct ContentView: View {
                                 animateTravel = true
                             }
                         }
-                    
                     Text("RULES")
                         .foregroundColor(.black)
                         .multilineTextAlignment(.trailing)
@@ -102,8 +80,6 @@ struct ContentView: View {
                                 animateRules = true
                             }
                         }
-                
-                    
                     VStack{
                         Spacer()
                         Text("An app for everyone who loves the lifestyle of living on wheels. You will find 365 rules to help you prepare for life in an RV or caravan.")
@@ -112,7 +88,6 @@ struct ContentView: View {
                             .multilineTextAlignment(.center)
                             .padding()
                         //                            .frame(maxWidth: .infinity)
-                        
                         NavigationLink(destination: NextView()) {
                             RoundedRectangle(cornerRadius: 15)
                                 .foregroundColor(Color(hex: "#DDAA4F"))
@@ -128,21 +103,24 @@ struct ContentView: View {
                                 .onAppear {
                                     withAnimation(Animation.easeInOut(duration: 0.8).repeatForever()) {
                                         isPulsating = true
-                                    }
                                 }
+                            }
                         }
                     }
                 }
             }
-//                            .onAppear{playSound()}
-                    
+            .onAppear{
+                if isMusicEnabled {
+                    playBackgroundMusic()
                 }
+                
             }
         }
+    }
+}
     
     
 // Main screen, view rules, draw, save, bottom menu
-
 struct NextView: View {
     @State private var randomRule: String = ""
     @State private var nextRuleAvailable: Bool = true
@@ -150,19 +128,14 @@ struct NextView: View {
     @State private var buttonPressCount: Int = 0
     @State private var showSettings = false
     @AppStorage("isDarkMode") var isDarkMode = false
-
     let RulesList = rulesList
     var body: some View {
-        
             ZStack {
                 Image(isDarkMode ? "imageDark" : "Image")
                     .resizable()
                     .edgesIgnoringSafeArea(.all)
-
-                
                     VStack {
                         TopMenuView(showSettings: $showSettings)
-                        
                     VStack {
                         Text("The rule for today is:")
                             .font(.title2)
@@ -170,7 +143,6 @@ struct NextView: View {
                             .frame(width: 340, height: 40)
                             .background(Color(hex: "#29606D"))
                             .cornerRadius(15)
-                        
                         Text(randomRule)
                             .font(.body)
                             .multilineTextAlignment(.center)
@@ -189,7 +161,6 @@ struct NextView: View {
                                 }
                                 .offset(x: 140, y: 70) // Adjust the offset as needed
                             )
-
 
                         HStack {
                             if nextRuleAvailable {
@@ -279,7 +250,7 @@ struct NextView: View {
                                     Image(systemName: "list.star")
                                         .foregroundColor(.black)
                                         .font(.system(size: 40))
-                                )
+                            )
                         }
                     }
                     .frame(maxHeight:
@@ -307,7 +278,6 @@ struct NextView: View {
          }
      }
      
-   
     func generateImage() -> UIImage? {
         let maxWidth: CGFloat = 300
         let maxHeight: CGFloat = 200
@@ -341,13 +311,6 @@ struct NextView: View {
         
         return generatedImage
     }
-
-
-
-
-
-
- 
 
         func getRandomRule() {
             if savedRules.count == 365 {
@@ -398,10 +361,6 @@ struct NextView: View {
             }
         }
     }
-
-
-
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
