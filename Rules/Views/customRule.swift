@@ -144,17 +144,19 @@ struct AddRuleView: View {
                 }
                 .padding(.bottom, 100)
                 if isRuleListVisible {
-                    CustomRulesListView(ruleList: ruleList, selectedRule: $selectedRule)
-                        .padding(.top, 40)
-
+                                    NavigationView {
+                                        CustomRulesListView(ruleList: ruleList, selectedRule: $selectedRule)
+                                            .navigationBarItems(trailing: Button(action: {
+                                                isRuleListVisible = false
+                                            }) {
+                                            })
+                                    }
+                                }
+                            }
+                        }
+                        .navigationTitle("Your rules")
+                    }
                 }
-            }
-        }
-        .navigationTitle("Your rules")
-    }
-}
-
-
 
 struct Rule: Identifiable, Codable, Hashable {
     var id = UUID()
@@ -231,6 +233,7 @@ struct CustomRulesListView: View {
             }
         }
     }
+
 
 
 

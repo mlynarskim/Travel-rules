@@ -3,7 +3,8 @@ import SwiftUI
 struct SettingsView: View {
     @Binding var showSettings: Bool
     @AppStorage("isDarkMode") var isDarkMode = false
-
+    @AppStorage("isMusicEnabled") var isMusicEnabled = true
+    
     var body: some View {
         NavigationView {
             ZStack{
@@ -34,6 +35,10 @@ struct SettingsView: View {
                     
                         .padding()
                         .foregroundColor(.black)
+                    
+                    Toggle("Music", isOn: $isMusicEnabled)
+                                           .padding()
+                                           .foregroundColor(.black)
                     
                     // Reset all user settings
                     Button(action: {

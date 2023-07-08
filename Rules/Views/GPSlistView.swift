@@ -1,6 +1,3 @@
-
-//  Created by Mateusz Mlynarski
-//
 import SwiftUI
 import Foundation
 import CoreLocation

@@ -4,7 +4,6 @@ import AVFoundation
 import CoreLocation
 import MapKit
 
-
 var sound: AVAudioPlayer!
 
 func playSound() {

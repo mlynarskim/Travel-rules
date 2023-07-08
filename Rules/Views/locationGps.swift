@@ -68,17 +68,19 @@ struct GPSView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var description = ""
     @State private var currentLocation: CLLocation?
+    @State private var region = MKCoordinateRegion()
+
     @AppStorage("isDarkMode") var isDarkMode = false
 
     var body: some View {
-        
         ZStack {
             Image(isDarkMode ? "imageDark" : "Image")
                 .resizable()
                 .edgesIgnoringSafeArea(.all)
-
+            
             VStack {
                 Spacer()
+                
                 VStack {
                     Text("Current Location:")
                         .font(.headline)
@@ -90,8 +92,12 @@ struct GPSView: View {
                         Text("Waiting for location...")
                     }
                 }
-                Spacer()
-                Spacer()
+                
+                Map(coordinateRegion: $region, showsUserLocation: true)
+                    .frame(height: 300)
+                    .cornerRadius(15)
+                    .padding(.horizontal)
+                                Spacer()
                 
                 VStack {
                     TextField("Description", text: $description)
@@ -119,6 +125,7 @@ struct GPSView: View {
                                 .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
                                 .padding()
                         }
+                        
                         NavigationLink(destination: SavedLocationsView(locationData: locationManager.locationData, deleteAction: locationManager.deleteLocation)) {
                             Text("Locations")
                                 .font(.headline)
@@ -135,8 +142,8 @@ struct GPSView: View {
                 .frame(width: 340)
                 .background(Color.white.opacity(0.7))
                 .cornerRadius(15)
-                
             }
+            .padding(.horizontal)
         }
         .onAppear {
             locationManager.startUpdatingLocation()
@@ -153,6 +160,8 @@ struct GPSView: View {
         .onReceive(locationManager.$locationData) { locations in
             if let lastLocation = locations.last {
                 currentLocation = CLLocation(latitude: lastLocation.latitude, longitude: lastLocation.longitude)
+                let coordinate = CLLocationCoordinate2D(latitude: lastLocation.latitude, longitude: lastLocation.longitude)
+                region = MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02))
             }
         }
     }
