@@ -3,6 +3,7 @@ import Foundation
 import CoreLocation
 import MapKit
 
+
 struct LocationData: Identifiable, Codable {
     var id = UUID()
     let latitude: Double

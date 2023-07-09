@@ -31,6 +31,7 @@
 		07E14CAE2A33344B00B5062C /* myChecklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14CAD2A33344B00B5062C /* myChecklist.swift */; };
 		07FD9C572A2B8B2E009809F0 /* RulesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FD9C562A2B8B2E009809F0 /* RulesList.swift */; };
 		07FE35572A36100800C93577 /* colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FE35562A36100700C93577 /* colors.swift */; };
+		2D83FDE71ED7D5A3B5244A92 /* Pods_Rules.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8ACC94B25CA2B570A6DD2173 /* Pods_Rules.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +97,7 @@
 		07A7C9112A546EA10017E850 /* GPSlistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSlistView.swift; sourceTree = "<group>"; };
 		07A7C9132A546FB10017E850 /* hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hex.swift; sourceTree = "<group>"; };
 		07A7C9152A54702C0017E850 /* settingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settingsView.swift; sourceTree = "<group>"; };
+		07CB8A262A5B17BD005C5FA7 /* Rules.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Rules.entitlements; sourceTree = "<group>"; };
 		07E14C7C2A320E5C00B5062C /* ListItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListItem.swift; sourceTree = "<group>"; };
 		07E14C7F2A320EA400B5062C /* travelChecklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = travelChecklist.swift; sourceTree = "<group>"; };
 		07E14C812A3289C700B5062C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -106,6 +108,9 @@
 		07E14CAD2A33344B00B5062C /* myChecklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myChecklist.swift; sourceTree = "<group>"; };
 		07FD9C562A2B8B2E009809F0 /* RulesList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulesList.swift; sourceTree = "<group>"; };
 		07FE35562A36100700C93577 /* colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colors.swift; sourceTree = "<group>"; };
+		8ACC94B25CA2B570A6DD2173 /* Pods_Rules.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Rules.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0BCF67D7ABF63F476636D3A /* Pods-Rules.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rules.release.xcconfig"; path = "Target Support Files/Pods-Rules/Pods-Rules.release.xcconfig"; sourceTree = "<group>"; };
+		B51D3DF14693F84870966DB0 /* Pods-Rules.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rules.debug.xcconfig"; path = "Target Support Files/Pods-Rules/Pods-Rules.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +119,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0791905C2A1FA20E00C94BE3 /* SwiftUI.framework in Frameworks */,
+				2D83FDE71ED7D5A3B5244A92 /* Pods_Rules.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +151,7 @@
 				0707D9BE2A1453D900186248 /* RulesUITests */,
 				0707D9A22A1453D800186248 /* Products */,
 				079190582A1FA1F100C94BE3 /* Frameworks */,
+				6472A902C802B2ACC6ADFD97 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -161,6 +168,7 @@
 		0707D9A32A1453D800186248 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				07CB8A262A5B17BD005C5FA7 /* Rules.entitlements */,
 				07E14C812A3289C700B5062C /* Info.plist */,
 				07FE35552A360FE100C93577 /* Extensions */,
 				07E14C7E2A320E6600B5062C /* Views */,
@@ -233,6 +241,7 @@
 				079190602A1FA23900C94BE3 /* libswiftFoundation.tbd */,
 				0791905B2A1FA20600C94BE3 /* libswiftAVFoundation.tbd */,
 				079190592A1FA1F200C94BE3 /* SwiftUI.framework */,
+				8ACC94B25CA2B570A6DD2173 /* Pods_Rules.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -270,6 +279,15 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		6472A902C802B2ACC6ADFD97 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				B51D3DF14693F84870966DB0 /* Pods-Rules.debug.xcconfig */,
+				B0BCF67D7ABF63F476636D3A /* Pods-Rules.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -277,10 +295,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0707D9C52A1453D900186248 /* Build configuration list for PBXNativeTarget "Rules" */;
 			buildPhases = (
+				26BB42B8DCAD7F6DDEC0ACA5 /* [CP] Check Pods Manifest.lock */,
 				0707D99D2A1453D800186248 /* Sources */,
 				0707D99E2A1453D800186248 /* Frameworks */,
 				0707D99F2A1453D800186248 /* Resources */,
 				07E14CA12A3289EF00B5062C /* Embed Frameworks */,
+				A4367FB5D3D57359F09D1155 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -399,6 +419,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		26BB42B8DCAD7F6DDEC0ACA5 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Rules-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A4367FB5D3D57359F09D1155 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Rules/Pods-Rules-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Rules/Pods-Rules-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Rules/Pods-Rules-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0707D99D2A1453D800186248 /* Sources */ = {
@@ -571,9 +633,11 @@
 		};
 		0707D9C62A1453D900186248 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B51D3DF14693F84870966DB0 /* Pods-Rules.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Rules/Rules.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "Rules/Preview\\ Content Rules/Assets.xcassets";
@@ -613,9 +677,11 @@
 		};
 		0707D9C72A1453D900186248 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B0BCF67D7ABF63F476636D3A /* Pods-Rules.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Rules/Rules.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "Rules/Preview\\ Content Rules/Assets.xcassets";

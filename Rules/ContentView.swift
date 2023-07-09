@@ -3,7 +3,6 @@ import Foundation
 import AVFoundation
 import CoreLocation
 import MapKit
-import CoreMotion
 
 //Top Bbar menu, main view
 struct TopMenuView: View {
@@ -32,11 +31,12 @@ struct TopMenuView: View {
         }
         .padding(.horizontal, 30)
                .padding(.vertical, 5)
+        
                .sheet(isPresented: $showSettings) {
                    SettingsView(showSettings: $showSettings)
                }
                .sheet(isPresented: $showPushView) { // Dodaj sheet dla showPushView
-                   pushView()
+                   pushView(showPushView: $showPushView)
         }
     }
 }
