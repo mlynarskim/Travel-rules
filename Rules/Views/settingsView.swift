@@ -94,12 +94,18 @@ struct SettingsView: View {
                 UserDefaults.standard.removePersistentDomain(forName: bundleIdentifier)
                 
                 // Reset the root view of the main window
-                UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: ContentView())
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                   let mainWindow = windowScene.windows.first {
+                    if let rootViewController = mainWindow.rootViewController {
+                        rootViewController.present(UIHostingController(rootView: ContentView()), animated: true, completion: nil)
+                    }
+                }
             }
         }))
         
         // Present the alert
-        if let topViewController = UIApplication.shared.windows.first?.rootViewController?.topmostViewController() {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let topViewController = windowScene.windows.first?.rootViewController?.topmostViewController() {
             topViewController.present(confirmReset, animated: true, completion: nil)
         }
     }

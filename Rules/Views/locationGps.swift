@@ -77,7 +77,9 @@ struct GPSView: View {
         ZStack {
             Image(isDarkMode ? "imageDark" : "Image")
                 .resizable()
-                .edgesIgnoringSafeArea(.all)
+//                       .aspectRatio(contentMode: .fill)
+//                       .frame(minWidth: 0, maxWidth: .infinity)
+                       .edgesIgnoringSafeArea(.all)
             
             VStack {
                 Spacer()
@@ -95,11 +97,12 @@ struct GPSView: View {
                 }
                 
                 Map(coordinateRegion: $region, showsUserLocation: true)
-                    .frame(height: 300)
+                    .frame(height: 240)
+                    .frame(width: 340)
+
                     .cornerRadius(15)
                     .padding(.horizontal)
                                 Spacer()
-                
                 VStack {
                     TextField("Description", text: $description)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -119,7 +122,6 @@ struct GPSView: View {
                             Text("Save")
                                 .font(.headline)
                                 .foregroundColor(.white)
-                                .padding()
                                 .frame(width: 120, height: 50)
                                 .background(Color(hex: "#29606D"))
                                 .cornerRadius(15)
@@ -131,7 +133,6 @@ struct GPSView: View {
                             Text("Locations")
                                 .font(.headline)
                                 .foregroundColor(.white)
-                                .padding()
                                 .frame(width: 120, height: 50)
                                 .background(Color(hex: "#29606D"))
                                 .cornerRadius(15)
@@ -143,8 +144,8 @@ struct GPSView: View {
                 .frame(width: 340)
                 .background(Color.white.opacity(0.7))
                 .cornerRadius(15)
+                .padding(.bottom, 20)
             }
-            .padding(.horizontal)
         }
         .onAppear {
             locationManager.startUpdatingLocation()

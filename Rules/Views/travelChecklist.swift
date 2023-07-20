@@ -92,6 +92,8 @@ struct TravelChecklist: View {
                                     .foregroundColor(Color.white)
                                     .cornerRadius(15)
                                     .frame(maxWidth: 340)
+                                    .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+
                                     
 
                                     
@@ -201,6 +203,7 @@ struct TravelChecklist_Previews: PreviewProvider {
         TravelChecklist()
     }
 }
+
 
 struct ScrollViewOffsetPreferenceKey: PreferenceKey {
     typealias Value = CGFloat

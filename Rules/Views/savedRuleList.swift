@@ -12,7 +12,9 @@ struct RulesListView: View {
         ZStack {
             Image(isDarkMode ? "imageDark" : "Image")
                 .resizable()
-                .edgesIgnoringSafeArea(.all)
+                       .aspectRatio(contentMode: .fill)
+                       .frame(minWidth: 0, maxWidth: .infinity)
+                       .edgesIgnoringSafeArea(.all)
 
                     
             VStack {
@@ -86,3 +88,8 @@ func openRule(_ rule: String) {
     }
 }
 
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//    }
+//}

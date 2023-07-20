@@ -1,4 +1,3 @@
-
 import Foundation
 import SwiftUI
 
@@ -64,7 +63,9 @@ struct AddRuleView: View {
             ZStack {
                 Image(isDarkMode ? "imageDark" : "Image")
                     .resizable()
-                    .edgesIgnoringSafeArea(.all)
+                           .aspectRatio(contentMode: .fill)
+                           .frame(minWidth: 0, maxWidth: .infinity)
+                           .edgesIgnoringSafeArea(.all)
                 
                 VStack {
                     TextField("", text: $ruleName, onEditingChanged: { isActive in
@@ -73,7 +74,7 @@ struct AddRuleView: View {
                     .font(.custom("Lato Bold", size: 20))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
-//                    .padding(.all, 10)
+                    //                    .padding(.all, 10)
                     .frame(width: 340, height: 40)
                     .background(Color(hex: "#29606D"))
                     .cornerRadius(15)
@@ -137,10 +138,7 @@ struct AddRuleView: View {
                                 .cornerRadius(15)
                                 .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
                         }
-//                        .disabled(ruleList.rules.isEmpty)
-                        
                     }
-
                 }
                 .padding(.bottom, 100)
                 if isRuleListVisible {
@@ -180,7 +178,9 @@ struct CustomRulesListView: View {
             ZStack {
                 Image(isDarkMode ? "imageDark" : "Image")
                     .resizable()
-                    .edgesIgnoringSafeArea(.all)
+                           .aspectRatio(contentMode: .fill)
+                           .frame(minWidth: 0, maxWidth: .infinity)
+                           .edgesIgnoringSafeArea(.all)
                 
                 ScrollView(.vertical) {
                     VStack {
@@ -235,3 +235,10 @@ struct CustomRulesListView: View {
             }
         }
     }
+
+//
+//struct CustomRulesListView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        AddRuleView()
+//    }
+//}

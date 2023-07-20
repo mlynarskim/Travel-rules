@@ -32,11 +32,11 @@ struct TravelListView: View {
             ZStack {
                 Image(isDarkMode ? "imageDark" : "Image")
                     .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(minWidth: 0, maxWidth: .infinity)
                     .edgesIgnoringSafeArea(.all)
-                
-                
                 VStack {
-                    HStack(spacing: 20) {
+                    HStack {
                         Button(action: {
                             selectedTab = 0
                         }) {
@@ -98,7 +98,7 @@ struct TravelListView: View {
                                         toggleCompletion(for: item)
                                     }) {
                                         Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(item.isCompleted ? .green : .gray)
+                                            .foregroundColor(item.isCompleted ? .green : .white)
                                             .padding(.horizontal, 10)
                                         
                                     }
@@ -130,7 +130,7 @@ struct TravelListView: View {
                                 
                             }
                             .listStyle(PlainListStyle())
-                            .padding(.bottom, 20)
+//                            .padding(.bottom, 0)
                             
                         }
                     } else if selectedTab == 1 {
@@ -138,9 +138,6 @@ struct TravelListView: View {
                     }
                 }
             }
-            .navigationTitle("Travel Checklist")
-            .foregroundColor(.black)
-            
             .onAppear {
                 loadItems()
             }
@@ -148,6 +145,7 @@ struct TravelListView: View {
                 saveItems()
             }
         }
+        .navigationTitle("Travel Checklist")
     }
         func addItem() {
             guard !newItemName.isEmpty else { return }
@@ -186,3 +184,8 @@ struct TravelListView: View {
     }
 
 
+struct TravelListView_Previews: PreviewProvider {
+    static var previews: some View {
+        TravelListView()
+    }
+}

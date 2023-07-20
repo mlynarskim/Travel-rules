@@ -2,8 +2,6 @@ import SwiftUI
 import Foundation
 import CoreLocation
 import MapKit
-import Foundation
-
 
 struct SavedLocationsView: View {
     var locationData: [LocationData]
@@ -18,9 +16,10 @@ struct SavedLocationsView: View {
             ZStack {
                 Image(isDarkMode ? "imageDark" : "Image")
                     .resizable()
-                    .edgesIgnoringSafeArea(.all)
-
-                
+                           .aspectRatio(contentMode: .fill)
+                           .frame(minWidth: 0, maxWidth: .infinity)
+                           .edgesIgnoringSafeArea(.all)
+                Spacer()
                 List {
                     ForEach(locationData) { location in
                         VStack(alignment: .leading) {
@@ -42,10 +41,10 @@ struct SavedLocationsView: View {
                     .onDelete(perform: deleteLocation)
                 }
                 .listStyle(PlainListStyle())
-                .navigationTitle("Saved Locations")
-                .foregroundColor(.black)
             }
         }
+        .navigationTitle("Saved Locations")
+
         .actionSheet(isPresented: $showActionSheet) {
             ActionSheet(title: Text("Open in Maps"), buttons: [
                 .default(Text("Google Maps")) {
@@ -108,3 +107,11 @@ enum MapProvider {
         }
     }
 }
+
+
+
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//    }
+//}
