@@ -44,11 +44,11 @@ struct TopMenuView: View {
     
 struct NextView: View {
         @State private var randomRule: String = ""
-        @State private var nextRuleAvailable: Bool = true
-        @State private var savedRules: [String] = []
+         @State private var savedRules: [String] = []
         @State private var buttonPressCount: Int = 0
         @State private var showSettings = false
         @State private var showPushView = false
+        @State private var showRulesList = false
         @AppStorage("isDarkMode") var isDarkMode = false
         let RulesList = rulesList
         
@@ -56,8 +56,8 @@ struct NextView: View {
         ZStack {
             Image(isDarkMode ? "imageDark" : "Image")
                 .resizable()
-//                .aspectRatio(contentMode: .fill)
-//                .frame(minWidth: 0, maxWidth: .infinity)
+            //                .aspectRatio(contentMode: .fill)
+            //                .frame(minWidth: 0, maxWidth: .infinity)
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
@@ -89,7 +89,6 @@ struct NextView: View {
                         )
                     
                     HStack {
-                        if nextRuleAvailable {
                             Button("Draw") {
                                 buttonPressCount += 2
                                 if buttonPressCount <= 5 {
@@ -107,10 +106,11 @@ struct NextView: View {
                             .cornerRadius(15)
                             .disabled(savedRules.contains(randomRule))
                             .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-                        }
-                        
+                                                
                         Button("Save") {
                             saveRule()
+                            showRulesList = true
+
                         }
                         .foregroundColor(.white)
                         .font(.custom("Lato Bold", size: 20))
@@ -119,22 +119,82 @@ struct NextView: View {
                         .background(Color(hex: "#29606D"))
                         .cornerRadius(15)
                         .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                        .background(
+                            // Przekierowanie do widoku RulesListView po zapisaniu zasady
+                            NavigationLink(destination: RulesListView(savedRules: $savedRules), isActive: $showRulesList) {
+                                EmptyView()
+                            }
+                            )
                     }
                 }
                 Spacer()
+                HStack {
+                    NavigationLink(destination: AddRuleView()) {
+                        RoundedRectangle(cornerRadius: 15)
+                            .padding(.all, 5)
+                            .foregroundColor(Color(hex: "#DDAA4F"))
+                            .frame(width: 80, height: 80)
+                            .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                            .overlay(
+                                Image(systemName: "plus")
+                                    .foregroundColor(.black)
+                                    .font(.system(size: 40))
+                            )        }
+                    NavigationLink(destination: TravelListView()) {
+                        RoundedRectangle(cornerRadius: 15)
+                            .padding(.all, 5)
+                            .foregroundColor(Color(hex: "#DDAA4F"))
+                            .frame(width: 80, height: 80)
+                            .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                            .overlay(
+                                Image(systemName: "checkmark.circle")
+                                    .foregroundColor(.black)
+                                    .font(.system(size: 40))
+                            )        }
+                    //                NavigationLink(destination: NextView()) {
+                    //                    RoundedRectangle(cornerRadius: 15)
+                    //                        .padding(.all, 5)
+                    //                        .foregroundColor(Color(hex: "#DDAA4F"))
+                    //                        .frame(width: 80, height: 80)
+                    //                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                    //                        .overlay(
+                    //                            Image(systemName: "house")
+                    //                                .foregroundColor(.black)
+                    //                                .font(.system(size: 40))
+                    //                        )
+                    //                }
+                    NavigationLink(destination: GPSView()) {
+                        RoundedRectangle(cornerRadius: 15)
+                            .padding(.all, 5)
+                            .foregroundColor(Color(hex: "#DDAA4F"))
+                            .frame(width: 80, height: 80)
+                            .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                            .overlay(
+                                Image(systemName: "signpost.right.and.left")
+                                    .foregroundColor(.black)
+                                    .font(.system(size: 40))
+                            )        }
+                    NavigationLink(destination: RulesListView(savedRules: $savedRules)) {
+                        RoundedRectangle(cornerRadius: 15)
+                            .padding(.all, 5)
+                            .foregroundColor(Color(hex: "#DDAA4F"))
+                            .frame(width: 80, height: 80)
+                            .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                            .overlay(
+                                Image(systemName: "list.star")
+                                    .foregroundColor(.black)
+                                    .font(.system(size: 40))
+                            )
+                    }
+                    .onAppear {
+                        loadSavedRules()
+                        getRandomRule()
 
-                downMenuBar()
+                    }
+                }
             }
-            
-            .onAppear {
-                getRandomRule()
-                limitRuleCount()
-                loadSavedRules()
-            }
-    
         }
     }
-    
 
     
         func shareRule() {
@@ -171,8 +231,8 @@ struct NextView: View {
                 
                 attributedText.draw(in: CGRect(x: 20, y: 20, width: imageSize.width - 40, height: imageSize.height - 40))
                 
-                // Dodanie tekstu "[TRAVEL RULES APP]" w prawym dolnym rogu
                 let watermarkText = "TRAVEL RULES"
+                
                 let watermarkAttributes: [NSAttributedString.Key: Any] = [
                     .font: UIFont.systemFont(ofSize: 12),
                     .foregroundColor: UIColor(Color(hex: "#29606D"))
@@ -186,25 +246,15 @@ struct NextView: View {
         }
         
         func getRandomRule() {
-            if savedRules.count == 365 {
-                nextRuleAvailable = false
-                return
-            }
             repeat {
                 randomRule = RulesList.randomElement() ?? ""
             } while savedRules.contains(randomRule)
         }
         
-        func limitRuleCount() {
-            if savedRules.count == 365 {
-                nextRuleAvailable = false
-            }
-        }
-        
+   
         func saveRule() {
             if !savedRules.contains(randomRule) {
                 savedRules.append(randomRule)
-                limitRuleCount()
                 saveRules()
             }
         }

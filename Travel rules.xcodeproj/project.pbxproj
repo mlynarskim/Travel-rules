@@ -24,7 +24,6 @@
 		07A7C9142A546FB10017E850 /* hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9132A546FB10017E850 /* hex.swift */; };
 		07A7C9162A54702C0017E850 /* settingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9152A54702C0017E850 /* settingsView.swift */; };
 		07C717312A6435DA0014F2A8 /* startScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C717302A6435DA0014F2A8 /* startScreen.swift */; };
-		07C717342A644ADB0014F2A8 /* downMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C717332A644ADB0014F2A8 /* downMenuBar.swift */; };
 		07E14C7D2A320E5C00B5062C /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14C7C2A320E5C00B5062C /* ListItem.swift */; };
 		07E14C802A320EA400B5062C /* travelChecklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14C7F2A320EA400B5062C /* travelChecklist.swift */; };
 		07E14CA82A33317300B5062C /* customRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14CA72A33317300B5062C /* customRule.swift */; };
@@ -422,7 +421,6 @@
 				07C717312A6435DA0014F2A8 /* startScreen.swift in Sources */,
 				07FD9C572A2B8B2E009809F0 /* RulesList.swift in Sources */,
 				07835FE12A5A1151008CE8F7 /* pushView.swift in Sources */,
-				07C717342A644ADB0014F2A8 /* downMenuBar.swift in Sources */,
 				07E14CAE2A33344B00B5062C /* myChecklist.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

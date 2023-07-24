@@ -3,7 +3,9 @@ import SwiftUI
 
 
 struct downMenuBar: View {
-    @State private var savedRules: [String] = []
+    
+    @Binding var savedRules: [String]
+
     
     var body: some View {
             VStack {
@@ -53,7 +55,7 @@ struct downMenuBar: View {
                                 .foregroundColor(.black)
                                 .font(.system(size: 40))
                         )        }
-                NavigationLink(destination: RulesListView(savedRules: savedRules)) {
+                        NavigationLink(destination: RulesListView(savedRules: $savedRules)) {
                     RoundedRectangle(cornerRadius: 15)
                         .padding(.all, 5)
                         .foregroundColor(Color(hex: "#DDAA4F"))

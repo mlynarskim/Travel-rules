@@ -2,21 +2,18 @@ import SwiftUI
 import Foundation
 
 struct RulesListView: View {
-    @State public var savedRules: [String]
     @State private var selectedRule: String?
     @State private var showAlert = false
+    @Binding var savedRules: [String]
     @AppStorage("isDarkMode") var isDarkMode = false
-
-    
     var body: some View {
+        
         ZStack {
             Image(isDarkMode ? "imageDark" : "Image")
                 .resizable()
                        .aspectRatio(contentMode: .fill)
                        .frame(minWidth: 0, maxWidth: .infinity)
                        .edgesIgnoringSafeArea(.all)
-
-                    
             VStack {
                 ScrollView(.vertical) {
             VStack(spacing: 8) {
@@ -31,6 +28,7 @@ struct RulesListView: View {
                                     .lineLimit(1)
                                     .padding(.horizontal, 10.0)
                             }
+                            Spacer()
                             Button(action: {
                                 deleteRule(rule)
                             }) {
@@ -51,7 +49,7 @@ struct RulesListView: View {
             .navigationBarTitle("Saved rules")
             .padding(.bottom)
             .listStyle(PlainListStyle())
-            .frame(maxHeight: 630) // Determining the maximum height of the list
+            .frame(maxHeight: 540) // Determining the maximum height of the list
         }
         .alert(isPresented: $showAlert) {
             if let rule = selectedRule {

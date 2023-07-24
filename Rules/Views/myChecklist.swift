@@ -1,5 +1,28 @@
 import Foundation
 import SwiftUI
+import Combine
+
+class KeyboardResponder: ObservableObject {
+    @Published var currentHeight: CGFloat = 0
+    
+    var _center: NotificationCenter
+    var _keyboardShow: AnyCancellable?
+    var _keyboardHide: AnyCancellable?
+    
+    init(center: NotificationCenter = .default) {
+        _center = center
+        _keyboardShow = _center.publisher(for: UIResponder.keyboardWillShowNotification)
+            .compactMap { $0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect }
+            .map { $0.height }
+            .subscribe(on: DispatchQueue.main)
+            .assign(to: \.currentHeight, on: self)
+        
+        _keyboardHide = _center.publisher(for: UIResponder.keyboardWillHideNotification)
+            .map { _ in CGFloat.zero }
+            .subscribe(on: DispatchQueue.main)
+            .assign(to: \.currentHeight, on: self)
+    }
+}
 
 struct TravelItem: Identifiable, Codable {
     var id: UUID
@@ -26,16 +49,19 @@ struct TravelListView: View {
     @State private var showToolsItems = false
     @State private var showOtherItems = false
     @AppStorage("isDarkMode") var isDarkMode = false
+    @ObservedObject private var keyboard = KeyboardResponder()
+
     
     var body: some View {
         NavigationView {
             ZStack {
                 Image(isDarkMode ? "imageDark" : "Image")
+                
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(minWidth: 0, maxWidth: .infinity)
+                    .scaledToFill()
                     .edgesIgnoringSafeArea(.all)
                 VStack {
+                    Spacer()
                     HStack {
                         Button(action: {
                             selectedTab = 0
@@ -43,23 +69,17 @@ struct TravelListView: View {
                             Text("My Checklist")
                                 .font(.headline)
                                 .foregroundColor(selectedTab == 0 ? .white : .black)
-                            
                         }
                         .padding(.vertical, 10)
                         .padding(.horizontal, 20)
                         .background(selectedTab == 0 ? Color(hex: "#29606D") : Color.clear)
                         .cornerRadius(15)
-                        
-                        
                         Button(action: {
                             selectedTab = 1
                         }) {
                             Text("Packing List")
                                 .font(.headline)
                                 .foregroundColor(selectedTab == 1 ? .white : .black)
-                            
-                            
-                            
                         }
                         .padding(.vertical, 10)
                         .padding(.horizontal)
@@ -68,7 +88,6 @@ struct TravelListView: View {
                         
                     }
                     .padding(.top, 20)
-                    
                     if selectedTab == 0 {
                         VStack {
                             HStack {
@@ -100,7 +119,6 @@ struct TravelListView: View {
                                         Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
                                             .foregroundColor(item.isCompleted ? .green : .white)
                                             .padding(.horizontal, 10)
-                                        
                                     }
                                     Text(item.name)
                                         .strikethrough(item.isCompleted)
@@ -114,24 +132,18 @@ struct TravelListView: View {
                                     }) {
                                         Image(systemName: "trash")
                                             .foregroundColor(.red)
-                                        
                                     }
                                     .buttonStyle(BorderlessButtonStyle())
                                     .padding(.horizontal, 10)
                                     .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-                                    
-                                    
                                 }
                                 .frame(height: 40)
                                 .background(Color(hex: "#29606D"))
                                 .cornerRadius(15)
                                 .listRowBackground(Color.clear)
                                 .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-                                
                             }
                             .listStyle(PlainListStyle())
-//                            .padding(.bottom, 0)
-                            
                         }
                     } else if selectedTab == 1 {
                         TravelChecklist()
@@ -144,6 +156,8 @@ struct TravelListView: View {
             .onDisappear {
                 saveItems()
             }
+            .padding(.top, keyboard.currentHeight) // Dodajemy padding na dole w zależności od wysokości klawiatury
+            .animation(.easeInOut(duration: 0.1))
         }
         .navigationTitle("Travel Checklist")
     }

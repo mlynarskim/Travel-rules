@@ -12,51 +12,59 @@ struct SavedLocationsView: View {
     @AppStorage("isDarkMode") var isDarkMode = false
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                Image(isDarkMode ? "imageDark" : "Image")
-                    .resizable()
-                           .aspectRatio(contentMode: .fill)
-                           .frame(minWidth: 0, maxWidth: .infinity)
-                           .edgesIgnoringSafeArea(.all)
-                Spacer()
-                List {
-                    ForEach(locationData) { location in
-                        VStack(alignment: .leading) {
-                            Text(formatCoordinates(latitude: location.latitude, longitude: location.longitude))
-                                .foregroundColor(Color.black)
-                                .padding(.vertical, 5)
-                            Text("Description: \(location.description)")
-                                .foregroundColor(Color.gray)
-                                .padding(.bottom, 5)
-                        }
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .padding(.vertical, 5)
-                        .onTapGesture {
-                            selectedLocation = location
-                            showActionSheet = true
+            NavigationView {
+                ZStack {
+                    Image(isDarkMode ? "imageDark" : "Image")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .edgesIgnoringSafeArea(.all)
+                        Spacer()
+                        HStack {
+                            ScrollView {
+                                Spacer()
+                                ForEach(locationData) { location in
+                                    VStack {
+                                        Text(formatCoordinates(latitude: location.latitude, longitude: location.longitude))
+                                            .foregroundColor(Color.white)
+                                            .padding(.vertical, 5)
+                                            .fixedSize(horizontal: false, vertical: true) // Dodane fixedSize, aby tekst w pełni wyświetlał się w pasku
+
+                                        Text("Description: \(location.description)")
+                                            .foregroundColor(Color.white)
+                                            .padding(.bottom, 5)
+                                            .fixedSize(horizontal: false, vertical: true) // Dodane fixedSize, aby tekst w pełni wyświetlał się w pasku
+
+                                    }
+                                    .frame(width: 340, height: 80.0)
+                                    .background(Color(hex: "#29606D"))
+                                    .cornerRadius(15)
+                                    .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                                    .onTapGesture {
+                                        selectedLocation = location
+                                        showActionSheet = true
+                                    }
+                                }
+                                .onDelete(perform: deleteLocation)
+                            }
+                            .listStyle(PlainListStyle())
+                            .padding(20)
                         }
                     }
-                    .onDelete(perform: deleteLocation)
                 }
-                .listStyle(PlainListStyle())
+                .navigationTitle("Saved Locations")
+                .actionSheet(isPresented: $showActionSheet) {
+                    ActionSheet(title: Text("Open in Maps"), buttons: [
+                        .default(Text("Google Maps")) {
+                            openMapsApp(with: .googleMaps, location: selectedLocation)
+                        },
+                        .default(Text("Apple Maps")) {
+                            openMapsApp(with: .appleMaps, location: selectedLocation)
+                        },
+                        .cancel()
+                ])
             }
         }
-        .navigationTitle("Saved Locations")
-
-        .actionSheet(isPresented: $showActionSheet) {
-            ActionSheet(title: Text("Open in Maps"), buttons: [
-                .default(Text("Google Maps")) {
-                    openMapsApp(with: .googleMaps, location: selectedLocation)
-                },
-                .default(Text("Apple Maps")) {
-                    openMapsApp(with: .appleMaps, location: selectedLocation)
-                },
-                .cancel()
-            ])
-        }
-    }
     
     private func deleteLocation(at offsets: IndexSet) {
         for index in offsets {

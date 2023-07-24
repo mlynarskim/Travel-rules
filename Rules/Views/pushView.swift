@@ -59,10 +59,8 @@ struct pushView: View {
                         Text("Notification Settings")
                             .font(.title)
                             .padding()
-                            Spacer()
-                        
-                        // Close button in view
-                        Button(action: {
+                        Spacer()
+                            Button(action: {
                             showPushView = false
                         }) {
                             Image(systemName: "xmark.circle")
@@ -71,23 +69,29 @@ struct pushView: View {
                                 .padding()
                         }
                     }
-                    .frame(maxHeight: .infinity, alignment: .top)
-                    
-                    Toggle("Enable Notifications", isOn: $isNotificationEnabled)
-                        .onChange(of: isNotificationEnabled) { newValue in
-                            if newValue {
-                                NotificationManager.instance.requestAuthorization()
-                                isCountingDown = true // Ustawienie isCountingDown na true, gdy użytkownik włącza powiadomienia
-                                NotificationManager.instance.scheduleNotification() // Uruchomienie odliczania po zgodzie na powiadomienia
-                            } else {
-                                isCountingDown = false // Ustawienie isCountingDown na false, gdy użytkownik wyłącza powiadomienia
+                        
+                    HStack {
+                        Toggle("Enable Notifications", isOn: $isNotificationEnabled)
+                            .onChange(of: isNotificationEnabled) { newValue in
+                                if newValue {
+                                    NotificationManager.instance.requestAuthorization()
+                                    isCountingDown = true // Ustawienie isCountingDown na true, gdy użytkownik włącza powiadomienia
+                                    NotificationManager.instance.scheduleNotification() // Uruchomienie odliczania po zgodzie na powiadomienia
+                                } else {
+                                    isCountingDown = false // Ustawienie isCountingDown na false, gdy użytkownik wyłącza powiadomienia
+                                }
                             }
-                        }
-                }
-                .onAppear {
-                    UIApplication.shared.applicationIconBadgeNumber = 0
+                            .padding(20)
+
+                    }
+                            Spacer()
+                        
+                    }
+                    .onAppear {
+                        UIApplication.shared.applicationIconBadgeNumber = 0
+                    }
                 }
             }
         }
     }
-}
+

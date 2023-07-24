@@ -140,7 +140,7 @@ struct AddRuleView: View {
                         }
                     }
                 }
-                .padding(.bottom, 100)
+                .padding(.bottom, 50)
                 if isRuleListVisible {
                                     NavigationView {
                                         CustomRulesListView(ruleList: ruleList, selectedRule: $selectedRule)
@@ -183,20 +183,21 @@ struct CustomRulesListView: View {
                            .edgesIgnoringSafeArea(.all)
                 
                 ScrollView(.vertical) {
-                    VStack {
-                        ForEach(ruleList.rules) { rule in
-                            HStack {
-                                Button(action: {
-                                    selectedRule = rule
-                                }) {
-                                    Text(rule.name)
-                                        .font(.custom("Lato Bold", size: 20))
-                                        .foregroundColor(.white)
-                                        .lineLimit(1)
-                                        .padding(.horizontal, 20.0)
-                                }
-                                Spacer()
-                                    .padding(.horizontal, 10.0)
+                                   VStack {
+                                       ForEach(ruleList.rules) { rule in
+                                           HStack {
+                                               VStack(alignment: .leading, spacing: 5) {
+                                                   Button(action: {
+                                                       selectedRule = rule
+                                                   }) {
+                                                       Text(limitTitle(rule.name))                                                           .font(.custom("Lato Bold", size: 20))
+                                                           .foregroundColor(.white)
+                                                           .padding(.horizontal, 20.0)
+                                                           .fixedSize(horizontal: true, vertical: false) // Zwiększenie liczby linii
+                                                   }
+                                                   .frame(height: 40.0) // Zachowaj wysokość przycisku
+                                               }
+                                               Spacer()
                                 
                                 Image(systemName: "trash")
                                     .foregroundColor(.red)
@@ -236,6 +237,14 @@ struct CustomRulesListView: View {
         }
     }
 
+func limitTitle(_ title: String) -> String {
+    let maxTitleLength = 25
+    if title.count > maxTitleLength {
+        let endIndex = title.index(title.startIndex, offsetBy: maxTitleLength)
+        return String(title[..<endIndex])
+    }
+    return title
+}
 //
 //struct CustomRulesListView_Previews: PreviewProvider {
 //    static var previews: some View {

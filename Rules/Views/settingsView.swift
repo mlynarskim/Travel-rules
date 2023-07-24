@@ -35,14 +35,10 @@ struct SettingsView: View {
                 VStack {
                     HStack {
                         Spacer()
-                        
                         Text("Settings")
                             .font(.title)
                             .padding()
-                        
                         Spacer()
-                        
-                        // Close button in view
                         Button(action: {
                             showSettings = false
                         }) {
@@ -52,39 +48,43 @@ struct SettingsView: View {
                                 .padding()
                         }
                     }
-                    .frame(maxHeight: .infinity, alignment: .top)
-                    
-                    Toggle("Dark Mode", isOn: $isDarkMode)
-                        .padding()
-                        .foregroundColor(.black)
-                    
-                    Toggle("Music", isOn: $isMusicEnabled)
-                        .padding()
-                        .foregroundColor(.black)
-                        .onChange(of: isMusicEnabled) { newValue in
-                            if newValue {
-                                playBackgroundMusic()
-                            } else {
-                                stopBackgroundMusic()
+                    HStack {
+                        VStack {
+                            Toggle("Dark Mode", isOn: $isDarkMode)
+                                .padding()
+                                .foregroundColor(.black)
+                            
+                            Toggle("Music", isOn: $isMusicEnabled)
+                                .padding()
+                                .foregroundColor(.black)
+                                .onChange(of: isMusicEnabled) { newValue in
+                                    if newValue {
+                                        playBackgroundMusic()
+                                    } else {
+                                        stopBackgroundMusic()
+                                    }
+                                }
+                            Button(action: {
+                                resetApplication()
+                            }) {
+                                Text("Reset all settings!")
+                                    .foregroundColor(.white)
+                                    .font(.custom("Lato Bold", size: 20))
+                                    .padding(5)
+                                    .frame(width: 200, height: 50)
+                                    .background(Color(hex: "#fc2c03"))
+                                    .cornerRadius(15)
+                                    .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                                
                             }
                         }
-                    Button(action: {
-                        resetApplication()
-                    }) {
-                        Text("Reset all settings!")
-                            .foregroundColor(.white)
-                            .font(.custom("Lato Bold", size: 20))
-                            .padding(5)
-                            .frame(width: 200, height: 50)
-                            .background(Color(hex: "#fc2c03"))
-                            .cornerRadius(15)
-                            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                        .padding(20)
                     }
+                    Spacer()
                 }
             }
         }
     }
-    
     func resetApplication() {
         let confirmReset = UIAlertController(title: "Reset All Settings", message: "Are you sure you want to reset all settings?", preferredStyle: .alert)
         
