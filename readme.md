@@ -76,4 +76,4 @@ The "Travel Rules" application offers a convenient and informative way for users
 
 Please note that this documentation provides a general overview of the application's features and usage. For more detailed information, please refer to the application itself and any accompanying documentation.
 
-All Rights Reserved 2023
+All Rights Reserved 2025
