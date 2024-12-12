@@ -40,7 +40,7 @@ The "Travel Rules" application offers the following key features:
 The GPS data retrieval and location saving function allows the user to read the current location from the GPS device and save it within the application. This enables the user to easily track and store their geographic location.
 
 ## Usage
-Here's a step-by-step guide on how to use the "365 Rules of Vanlife" application:
+Here's a step-by-step guide on how to use the "Travel Rules" application:
 
 1. Upon launching the app, users are presented with the main screen.
 2. The main screen displays the current rule, including its name and description.
