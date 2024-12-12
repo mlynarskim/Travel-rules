@@ -1,10 +1,10 @@
-# 365 Rules of Vanlife
+# Travel Rules
 
 ## Introduction
-The "365 Rules of Vanlife" application is designed to provide users with a collection of daily rules and guidelines for living the vanlife lifestyle. With this application, users can explore a new rule every day, add custom rules, and view a list of saved rules. The app offers an intuitive and visually appealing user interface, making it easy to navigate and interact with the rules.
+The "Travel Rules" application is designed to provide users with a collection of daily rules and guidelines for living the vanlife lifestyle. With this application, users can explore a new rule every day, add custom rules, and view a list of saved rules. The app offers an intuitive and visually appealing user interface, making it easy to navigate and interact with the rules.
 
 ## Features
-The "365 Rules of Vanlife" application offers the following key features:
+The "Travel Rules" application offers the following key features:
 
 ### Rule Display
 - The application presents users with a new rule, providing insights and recommendations for living the vanlife lifestyle.
@@ -63,7 +63,7 @@ Here's a step-by-step guide on how to use the "365 Rules of Vanlife" application
 19. This feature allows users to inspire others with their favorite rules and foster a sense of community among vanlife enthusiasts.
 
 ## Conclusion
-The "365 Rules of Vanlife" application offers a convenient and informative way for users to explore daily rules and guidelines related to the vanlife lifestyle. With its user-friendly interface and customizable features, the app provides a valuable resource for vanlife enthusiasts to enhance their experience and make the most out of their journey.
+The "Travel Rules" application offers a convenient and informative way for users to explore daily rules and guidelines related to the vanlife lifestyle. With its user-friendly interface and customizable features, the app provides a valuable resource for vanlife enthusiasts to enhance their experience and make the most out of their journey.
 
 <div style="display: flex;">
   <img src="https://github.com/mlynarskim/Rules/blob/main/Screenshots/Simulator%20screenshots1.png" width="400" alt="Screenshot1">
