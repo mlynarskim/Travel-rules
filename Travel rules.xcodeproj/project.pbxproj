@@ -25,6 +25,7 @@
 		07A7C9142A546FB10017E850 /* hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9132A546FB10017E850 /* hex.swift */; };
 		07A7C9162A54702C0017E850 /* settingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9152A54702C0017E850 /* settingsView.swift */; };
 		07C717312A6435DA0014F2A8 /* startScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C717302A6435DA0014F2A8 /* startScreen.swift */; };
+		07D111862D1C98D70020C518 /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07D111852D1C98CE0020C518 /* LocationData.swift */; };
 		07E14C7D2A320E5C00B5062C /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14C7C2A320E5C00B5062C /* ListItem.swift */; };
 		07E14C802A320EA400B5062C /* travelChecklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14C7F2A320EA400B5062C /* travelChecklist.swift */; };
 		07E14CA82A33317300B5062C /* customRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14CA72A33317300B5062C /* customRule.swift */; };
@@ -89,6 +90,8 @@
 		07C717302A6435DA0014F2A8 /* startScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = startScreen.swift; sourceTree = "<group>"; };
 		07C717332A644ADB0014F2A8 /* downMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = downMenuBar.swift; sourceTree = "<group>"; };
 		07CB8A262A5B17BD005C5FA7 /* Rules.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Rules.entitlements; sourceTree = "<group>"; };
+		07D111832D16BCCA0020C518 /* RulesRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RulesRelease.entitlements; sourceTree = "<group>"; };
+		07D111852D1C98CE0020C518 /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
 		07E14C7C2A320E5C00B5062C /* ListItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListItem.swift; sourceTree = "<group>"; };
 		07E14C7F2A320EA400B5062C /* travelChecklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = travelChecklist.swift; sourceTree = "<group>"; };
 		07E14C812A3289C700B5062C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -155,8 +158,10 @@
 		0707D9A32A1453D800186248 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				07D111832D16BCCA0020C518 /* RulesRelease.entitlements */,
 				07CB8A262A5B17BD005C5FA7 /* Rules.entitlements */,
 				07E14C812A3289C700B5062C /* Info.plist */,
+				07D111842D1C98500020C518 /* Models */,
 				07FE35552A360FE100C93577 /* Extensions */,
 				07E14C7E2A320E6600B5062C /* Views */,
 				07E14C7B2A320E1100B5062C /* Lists */,
@@ -230,6 +235,14 @@
 				079190592A1FA1F200C94BE3 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		07D111842D1C98500020C518 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				07D111852D1C98CE0020C518 /* LocationData.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		07E14C7B2A320E1100B5062C /* Lists */ = {
@@ -339,7 +352,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					0707D9A02A1453D800186248 = {
 						CreatedOnToolsVersion = 14.3;
@@ -421,6 +434,7 @@
 				07A7C9162A54702C0017E850 /* settingsView.swift in Sources */,
 				0707D9A52A1453D800186248 /* RulesApp.swift in Sources */,
 				07A7C9122A546EA10017E850 /* GPSlistView.swift in Sources */,
+				07D111862D1C98D70020C518 /* LocationData.swift in Sources */,
 				07C717312A6435DA0014F2A8 /* startScreen.swift in Sources */,
 				07FD9C572A2B8B2E009809F0 /* RulesList.swift in Sources */,
 				07835FE12A5A1151008CE8F7 /* pushView.swift in Sources */,
@@ -586,10 +600,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Rules/Rules.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "Rules/Preview\\ Content Rules/Assets.xcassets";
-				DEVELOPMENT_TEAM = 3Y79SF4PL3;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rules/Info.plist;
@@ -602,7 +616,7 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = NO;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -614,6 +628,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -629,11 +644,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Rules/Rules.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = Rules/RulesRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "Rules/Preview\\ Content Rules/Assets.xcassets";
-				DEVELOPMENT_TEAM = 3Y79SF4PL3;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rules/Info.plist;
@@ -646,7 +662,7 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = NO;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -658,6 +674,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -671,7 +688,6 @@
 		0707D9C92A1453D900186248 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -691,7 +707,6 @@
 		0707D9CA2A1453D900186248 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -711,7 +726,6 @@
 		0707D9CC2A1453D900186248 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3Y79SF4PL3;
@@ -729,7 +743,6 @@
 		0707D9CD2A1453D900186248 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3Y79SF4PL3;

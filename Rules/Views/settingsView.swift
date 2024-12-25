@@ -1,6 +1,7 @@
 import SwiftUI
 import Foundation
 import AVFoundation
+import UIKit
 
 var audioPlayer: AVAudioPlayer?
 
@@ -30,8 +31,8 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationView {
-            ZStack{
-                Color(hex: "#DDAA4F")
+            ZStack {
+                Color(.init(red: 0.87, green: 0.67, blue: 0.31))
                 VStack {
                     HStack {
                         Spacer()
@@ -57,7 +58,7 @@ struct SettingsView: View {
                             Toggle("Music", isOn: $isMusicEnabled)
                                 .padding()
                                 .foregroundColor(.black)
-                                .onChange(of: isMusicEnabled) { newValue in
+                                .onChange(of: isMusicEnabled) { oldValue, newValue in
                                     if newValue {
                                         playBackgroundMusic()
                                     } else {
@@ -86,24 +87,28 @@ struct SettingsView: View {
         }
     }
     func resetApplication() {
-        let confirmReset = UIAlertController(title: "Reset All Settings", message: "Are you sure you want to reset all settings?", preferredStyle: .alert)
+        let confirmReset = UIAlertController(
+            title: "Reset All Settings",
+            message: "Are you sure you want to reset all settings?",
+            preferredStyle: .alert
+        )
         
-        confirmReset.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         confirmReset.addAction(UIAlertAction(title: "Reset", style: .destructive, handler: { _ in
             if let bundleIdentifier = Bundle.main.bundleIdentifier {
                 UserDefaults.standard.removePersistentDomain(forName: bundleIdentifier)
+                UserDefaults.standard.synchronize()
                 
                 // Reset the root view of the main window
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                    let mainWindow = windowScene.windows.first {
-                    if let rootViewController = mainWindow.rootViewController {
-                        rootViewController.present(UIHostingController(rootView: ContentView()), animated: true, completion: nil)
-                    }
+                    mainWindow.rootViewController = UIHostingController(rootView: ContentView())
+                    mainWindow.makeKeyAndVisible()
                 }
             }
         }))
         
-        // Present the alert
+        confirmReset.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let topViewController = windowScene.windows.first?.rootViewController?.topmostViewController() {
             topViewController.present(confirmReset, animated: true, completion: nil)

@@ -3,7 +3,7 @@
 
 import Foundation
 
-let rulesList: [String] = [
+let rulesList = [
     "1. Invest in a good mattress - sleep is very important for your health and well-being.",
     "2. It's a good idea to have a basic tool case in your car - even if you can't fix your car yourself, someone can help you.",
     "3. Prepare a list of things you need to take with you before every trip.",

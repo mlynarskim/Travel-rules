@@ -1,13 +1,21 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Model
+struct Rule: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var name: String
+    var description: String
+}
 
+// MARK: - ViewModel
 class RuleList: ObservableObject {
     @Published var rules = [Rule]() {
         didSet {
             saveRules()
         }
     }
+    
     init() {
         loadRules()
     }
@@ -39,6 +47,7 @@ class RuleList: ObservableObject {
     }
 }
 
+// MARK: - Views
 struct AddRuleView: View {
     @State private var ruleName = ""
     @State private var ruleDescription = ""
@@ -48,8 +57,56 @@ struct AddRuleView: View {
     @State private var isTextEditorActive = false
     @ObservedObject private var ruleList = RuleList()
     @AppStorage("isDarkMode") var isDarkMode = false
-
-    func addRule() {
+    
+    var body: some View {
+        ZStack {
+            Image(isDarkMode ? "imageDark" : "Image")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 20) {
+                // Rule Name Input
+                CustomTextField(
+                    text: $ruleName,
+                    isActive: $isTextFieldActive,
+                    placeholder: "Name of your rule..."
+                )
+                
+                // Rule Description Input
+                CustomTextEditor(
+                    text: $ruleDescription,
+                    isActive: $isTextEditorActive
+                )
+                
+                // Action Buttons
+                HStack(spacing: 20) {
+                    ActionButton(title: "ADD") {
+                        addRule()
+                    }
+                    
+                    ActionButton(title: "Show Rules") {
+                        isRuleListVisible = true
+                    }
+                }
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 50)
+            
+            // Rules List Sheet
+            if isRuleListVisible {
+                CustomRulesListView(
+                    ruleList: ruleList,
+                    selectedRule: $selectedRule,
+                    isVisible: $isRuleListVisible
+                )
+            }
+        }
+        .navigationTitle("Your rules")
+    }
+    
+    private func addRule() {
         if !ruleName.isEmpty && !ruleDescription.isEmpty {
             ruleList.addRule(name: ruleName, description: ruleDescription)
             ruleName = ""
@@ -57,197 +114,165 @@ struct AddRuleView: View {
             isRuleListVisible = true
         }
     }
-    
-    var body: some View {
-        NavigationView {
-            ZStack {
-                Image(isDarkMode ? "imageDark" : "Image")
-                    .resizable()
-                           .aspectRatio(contentMode: .fill)
-                           .frame(minWidth: 0, maxWidth: .infinity)
-                           .edgesIgnoringSafeArea(.all)
-                
-                VStack {
-                    TextField("", text: $ruleName, onEditingChanged: { isActive in
-                        isTextFieldActive = isActive
-                    })
-                    .font(.custom("Lato Bold", size: 20))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-                    //                    .padding(.all, 10)
-                    .frame(width: 340, height: 40)
-                    .background(Color(hex: "#29606D"))
-                    .cornerRadius(15)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .overlay(
-                        Group {
-                            if ruleName.isEmpty && !isTextFieldActive {
-                                Text("Name of your rule...")
-                                    .foregroundColor(.white)
-                            }
-                        }
-                    )
-                    .onTapGesture {
-                        isTextFieldActive = true
-                        
-                    }
-                    VStack(spacing: 10) {
-                        TextEditor(text: $ruleDescription)
-                            .font(.body)
-                            .foregroundColor(.black)
-                            .padding(.all, 15)
-                            .frame(width: 340, height: 200)
-                            .background(Color.white)
-                            .cornerRadius(15)
-                            .overlay(
-                                Group {
-                                    if ruleDescription.isEmpty && !isTextEditorActive {
-                                        Text("Write description of your rule here...")
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                            )
-                            .onTapGesture {
-                                isTextEditorActive = true
-                            }
-                    }
-                    
-                    HStack {
-                        Button(action: addRule) {
-                            Text("ADD")
-                                .foregroundColor(.white)
-                                .font(.custom("Lato Bold", size: 20))
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical, 10)
-                                .frame(width: 130, height: 50)
-                                .background(Color(hex: "29606D"))
-                                .cornerRadius(15)
-                                .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-                        }
-                        
-                        Button(action: {
-                            isRuleListVisible = true
-                        }) {
-                            Text("Show Rules")
-                                .foregroundColor(.white)
-                                .font(.custom("Lato Bold", size: 20))
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical, 10)
-                                .frame(width: 130, height: 50)
-                                .background(Color(hex: "29606D"))
-                                .cornerRadius(15)
-                                .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-                        }
-                    }
-                }
-                .padding(.bottom, 50)
-                if isRuleListVisible {
-                                    NavigationView {
-                                        CustomRulesListView(ruleList: ruleList, selectedRule: $selectedRule)
-                                            .navigationBarItems(trailing: Button(action: {
-                                                isRuleListVisible = false
-                                            }) {
-                                            })
-                                    }
-                                }
-                            }
-                        }
-                        .navigationTitle("Your rules")
-                    }
-                }
-
-struct Rule: Identifiable, Codable, Hashable {
-    var id = UUID()
-    var name: String
-    var description: String
 }
 
+// MARK: - Custom Components
+struct CustomTextField: View {
+    @Binding var text: String
+    @Binding var isActive: Bool
+    let placeholder: String
+    
+    var body: some View {
+        TextField("", text: $text, onEditingChanged: { isActive in
+            self.isActive = isActive
+        })
+        .font(.custom("Lato Bold", size: 20))
+        .foregroundColor(.white)
+        .multilineTextAlignment(.center)
+        .frame(width: 340, height: 40)
+        .background(Color(hex: "#29606D"))
+        .cornerRadius(15)
+        .textFieldStyle(PlainTextFieldStyle())
+        .overlay(
+            Group {
+                if text.isEmpty && !isActive {
+                    Text(placeholder)
+                        .foregroundColor(.white)
+                }
+            }
+        )
+    }
+}
 
-private func hideKeyboard() {
-    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+struct CustomTextEditor: View {
+    @Binding var text: String
+    @Binding var isActive: Bool
+    
+    var body: some View {
+        TextEditor(text: $text)
+            .font(.body)
+            .foregroundColor(.black)
+            .padding(.all, 15)
+            .frame(width: 340, height: 200)
+            .background(Color.white)
+            .cornerRadius(15)
+            .overlay(
+                Group {
+                    if text.isEmpty && !isActive {
+                        Text("Write description of your rule here...")
+                            .foregroundColor(.gray)
+                            .padding(.all, 15)
+                    }
+                }
+            )
+            .onTapGesture {
+                isActive = true
+            }
+    }
+}
+
+struct ActionButton: View {
+    let title: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .foregroundColor(.white)
+                .font(.custom("Lato Bold", size: 20))
+                .multilineTextAlignment(.center)
+                .padding(.vertical, 10)
+                .frame(width: 130, height: 50)
+                .background(Color(hex: "#29606D"))
+                .cornerRadius(15)
+                .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+        }
+    }
 }
 
 struct CustomRulesListView: View {
     @ObservedObject var ruleList: RuleList
     @Binding var selectedRule: Rule?
+    @Binding var isVisible: Bool
     @AppStorage("isDarkMode") var isDarkMode = false
-
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Image(isDarkMode ? "imageDark" : "Image")
-                    .resizable()
-                           .aspectRatio(contentMode: .fill)
-                           .frame(minWidth: 0, maxWidth: .infinity)
-                           .edgesIgnoringSafeArea(.all)
-                
-                ScrollView(.vertical) {
-                                   VStack {
-                                       ForEach(ruleList.rules) { rule in
-                                           HStack {
-                                               VStack(alignment: .leading, spacing: 5) {
-                                                   Button(action: {
-                                                       selectedRule = rule
-                                                   }) {
-                                                       Text(limitTitle(rule.name))                                                           .font(.custom("Lato Bold", size: 20))
-                                                           .foregroundColor(.white)
-                                                           .padding(.horizontal, 20.0)
-                                                           .fixedSize(horizontal: true, vertical: false) // Zwiększenie liczby linii
-                                                   }
-                                                   .frame(height: 40.0) // Zachowaj wysokość przycisku
-                                               }
-                                               Spacer()
-                                
-                                Image(systemName: "trash")
-                                    .foregroundColor(.red)
-                                    .padding(.horizontal, 20.0)
-                                    .onTapGesture {
-                                        removeRule(rule)
-                                    }
-                            }
-                        }
-                        .frame(width: 340, height: 40.0)
-                        .background(Color(hex: "#29606D"))
-                        .cornerRadius(15)
-                        
-                        
+        ZStack {
+            Image(isDarkMode ? "imageDark" : "Image")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity)
+                .edgesIgnoringSafeArea(.all)
+            
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 10) {
+                    ForEach(ruleList.rules) { rule in
+                        CustomRuleRow(
+                            rule: rule,
+                            onSelect: { selectedRule = rule },
+                            onDelete: { removeRule(rule) }
+                        )
                     }
                 }
-                .padding(.bottom)
-                .listStyle(PlainListStyle())
-                .frame(maxHeight: 630) //Determining the maximum height of the list
-                .onAppear {hideKeyboard()
-                }
-                .alert(item: $selectedRule) { rule in
-                    Alert(
-                        title: Text(rule.name),
-                        message: Text(rule.description),
-                        dismissButton: .default(Text("OK"))
-                    )
-                }
+                .padding()
             }
         }
-    }
-        func removeRule(_ rule: Rule) {
-            if let index = ruleList.rules.firstIndex(of: rule) {
-                selectedRule = nil
-                ruleList.rules.remove(at: index)
-            }
+        .alert(item: $selectedRule) { rule in
+            Alert(
+                title: Text(rule.name),
+                message: Text(rule.description),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
-
-func limitTitle(_ title: String) -> String {
-    let maxTitleLength = 25
-    if title.count > maxTitleLength {
-        let endIndex = title.index(title.startIndex, offsetBy: maxTitleLength)
-        return String(title[..<endIndex])
+    
+    private func removeRule(_ rule: Rule) {
+        if let index = ruleList.rules.firstIndex(of: rule) {
+            selectedRule = nil
+            ruleList.rules.remove(at: index)
+        }
     }
-    return title
 }
-//
-//struct CustomRulesListView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        AddRuleView()
-//    }
-//}
+
+struct CustomRuleRow: View {
+    let rule: Rule
+    let onSelect: () -> Void
+    let onDelete: () -> Void
+    
+    var body: some View {
+        HStack {
+            Button(action: onSelect) {
+                Text(limitTitle(rule.name))
+                    .font(.custom("Lato Bold", size: 20))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .lineLimit(1)
+            }
+            
+            Spacer()
+            
+            Button(action: onDelete) {
+                Image(systemName: "trash")
+                    .foregroundColor(.red)
+                    .padding(.horizontal, 20)
+            }
+        }
+        .frame(width: 340, height: 40)
+        .background(Color(hex: "#29606D"))
+        .cornerRadius(15)
+    }
+    
+    private func limitTitle(_ title: String) -> String {
+        let maxTitleLength = 25
+        if title.count > maxTitleLength {
+            let endIndex = title.index(title.startIndex, offsetBy: maxTitleLength)
+            return String(title[..<endIndex]) + "..."
+        }
+        return title
+    }
+}
+
+// MARK: - Utilities
+private func hideKeyboard() {
+    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+}
