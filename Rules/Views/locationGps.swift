@@ -3,18 +3,9 @@ import Foundation
 import CoreLocation
 import MapKit
 
-
-struct LocationData: Identifiable, Codable {
-    var id = UUID()
-    let latitude: Double
-    let longitude: Double
-    var description: String
-}
-
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
     @Published var locationData: [LocationData] = []
-
     
     override init() {
         super.init()
@@ -42,10 +33,8 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         
         if let lastLocationData = locationData.last, lastLocationData.description.isEmpty {
-            // Jeśli ostatnia lokalizacja nie ma opisu, zaktualizuj ją z nową lokalizacją
             locationData[locationData.count - 1] = LocationData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, description: "")
         } else {
-            // W przeciwnym razie, dodaj nową lokalizację
             let newLocation = LocationData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, description: "")
             locationData.append(newLocation)
         }
@@ -70,16 +59,13 @@ struct GPSView: View {
     @State private var description = ""
     @State private var currentLocation: CLLocation?
     @State private var region = MKCoordinateRegion()
-
     @AppStorage("isDarkMode") var isDarkMode = false
-
+    
     var body: some View {
         ZStack {
             Image(isDarkMode ? "imageDark" : "Image")
                 .resizable()
-//                       .aspectRatio(contentMode: .fill)
-//                       .frame(minWidth: 0, maxWidth: .infinity)
-                       .edgesIgnoringSafeArea(.all)
+                .edgesIgnoringSafeArea(.all)
             
             VStack {
                 Spacer()
@@ -96,13 +82,23 @@ struct GPSView: View {
                     }
                 }
                 
-                Map(coordinateRegion: $region, showsUserLocation: true)
-                    .frame(height: 240)
-                    .frame(width: 340)
-
-                    .cornerRadius(15)
-                    .padding(.horizontal)
-                                Spacer()
+                // Mapa z kompatybilnością wsteczną
+                if #available(iOS 17.0, *) {
+                    Map(coordinateRegion: $region, showsUserLocation: true)
+                        .frame(height: 240)
+                        .frame(width: 340)
+                        .cornerRadius(15)
+                        .padding(.horizontal)
+                } else {
+                    Map(coordinateRegion: $region, showsUserLocation: true)
+                        .frame(height: 240)
+                        .frame(width: 340)
+                        .cornerRadius(15)
+                        .padding(.horizontal)
+                }
+                
+                Spacer()
+                
                 VStack {
                     TextField("Description", text: $description)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -112,10 +108,13 @@ struct GPSView: View {
                         Button(action: {
                             guard let location = currentLocation else { return }
                             if !description.isEmpty {
-                                let newLocation = LocationData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, description: description)
+                                let newLocation = LocationData(
+                                    latitude: location.coordinate.latitude,
+                                    longitude: location.coordinate.longitude,
+                                    description: description
+                                )
                                 locationManager.locationData.append(newLocation)
-                                description = "" // Clear the description field
-                                print("Save button tapped")
+                                description = ""
                                 locationManager.saveLocations()
                             }
                         }) {
@@ -163,14 +162,104 @@ struct GPSView: View {
             if let lastLocation = locations.last {
                 currentLocation = CLLocation(latitude: lastLocation.latitude, longitude: lastLocation.longitude)
                 let coordinate = CLLocationCoordinate2D(latitude: lastLocation.latitude, longitude: lastLocation.longitude)
-                region = MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02))
+                region = MKCoordinateRegion(
+                    center: coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+                )
             }
         }
     }
 }
 
-
-
+struct SavedLocationsView: View {
+    var locationData: [LocationData]
+    var deleteAction: (Int) -> Void
+    
+    @State private var selectedLocation: LocationData?
+    @State private var showActionSheet = false
+    @AppStorage("isDarkMode") var isDarkMode = false
+    
+    var body: some View {
+        ZStack {
+            Image(isDarkMode ? "imageDark" : "Image")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .edgesIgnoringSafeArea(.all)
+            
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(Array(locationData.enumerated()), id: \.element.id) { index, location in
+                        VStack {
+                            Text(formatCoordinates(latitude: location.latitude, longitude: location.longitude))
+                                .foregroundColor(.white)
+                                .padding(.vertical, 5)
+                                .fixedSize(horizontal: false, vertical: true)
+                            
+                            Text("Description: \(location.description)")
+                                .foregroundColor(.white)
+                                .padding(.bottom, 5)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .frame(width: 340, height: 80)
+                        .background(Color(hex: "#29606D"))
+                        .cornerRadius(15)
+                        .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                        .onTapGesture {
+                            selectedLocation = location
+                            showActionSheet = true
+                        }
+                    }
+                }
+                .padding()
+            }
+        }
+        .actionSheet(isPresented: $showActionSheet) {
+            ActionSheet(title: Text("Location Actions"), buttons: [
+                .default(Text("Open in Google Maps")) {
+                    openMapsApp(with: .googleMaps, location: selectedLocation)
+                },
+                .default(Text("Open in Apple Maps")) {
+                    openMapsApp(with: .appleMaps, location: selectedLocation)
+                },
+                .destructive(Text("Delete")) {
+                    if let index = locationData.firstIndex(where: { $0.id == selectedLocation?.id }) {
+                        deleteAction(index)
+                    }
+                },
+                .cancel()
+            ])
+        }
+    }
+    
+    private func formatCoordinates(latitude: Double, longitude: Double) -> String {
+        let latDegrees = Int(latitude)
+        let latMinutes = Int((latitude - Double(latDegrees)) * 60)
+        let latSeconds = (latitude - Double(latDegrees) - Double(latMinutes) / 60) * 3600
+        
+        let lonDegrees = Int(longitude)
+        let lonMinutes = Int((longitude - Double(lonDegrees)) * 60)
+        let lonSeconds = (longitude - Double(lonDegrees) - Double(lonMinutes) / 60) * 3600
+        
+        let latDirection = latitude >= 0 ? "N" : "S"
+        let lonDirection = longitude >= 0 ? "E" : "W"
+        
+        return String(format: "%d° %d' %.3f'' %@\n%d° %d' %.4f'' %@",
+                     abs(latDegrees), abs(latMinutes), abs(latSeconds), latDirection,
+                     abs(lonDegrees), abs(lonMinutes), abs(lonSeconds), lonDirection)
+    }
+    
+    private func openMapsApp(with provider: MapProvider, location: LocationData?) {
+        guard let location = location else { return }
+        
+        let urlString = provider.urlString(latitude: location.latitude, longitude: location.longitude)
+        guard let url = URL(string: urlString) else { return }
+        
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+    }
+}
 
 struct GPSView_Previews: PreviewProvider {
     static var previews: some View {

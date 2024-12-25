@@ -4,9 +4,9 @@ import UserNotifications
 class NotificationManager {
     static let instance = NotificationManager()
     
-    func requestAuthorization(){
+    func requestAuthorization() {
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) {(success, error) in
+        UNUserNotificationCenter.current().requestAuthorization(options: options) { (success, error) in
             if let error = error {
                 print("Error: \(error)")
             } else {
@@ -14,16 +14,14 @@ class NotificationManager {
             }
         }
     }
-    func scheduleNotification(){
+    
+    func scheduleNotification() {
         let content = UNMutableNotificationContent()
         content.title = "Hey!!"
         content.subtitle = "Check rule for today!"
         content.sound = .default
         content.badge = 1
         
-        //        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5.0, repeats: false)
-        
-        //calendar
         var dateComponents = DateComponents()
         dateComponents.hour = 16
         dateComponents.minute = 0
@@ -33,7 +31,9 @@ class NotificationManager {
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
             content: content,
-            trigger: trigger)
+            trigger: trigger
+        )
+        
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("Error scheduling notification: \(error)")
@@ -42,17 +42,27 @@ class NotificationManager {
             }
         }
     }
+    
+    func resetBadgeCount() {
+        UNUserNotificationCenter.current().setBadgeCount(0) { error in
+            if let error = error {
+                print("Error resetting badge count: \(error)")
+            }
+        }
+    }
 }
 
-struct pushView: View {
+struct PushView: View {
     @Binding var showPushView: Bool
     @State private var isNotificationEnabled = false
-    @State private var isCountingDown = false // Dodana zmienna stanu isCountingDown
+    @State private var isCountingDown = false
     
     var body: some View {
         NavigationView {
-            ZStack{
+            ZStack {
                 Color(hex: "#DDAA4F")
+                    .edgesIgnoringSafeArea(.all)
+                
                 VStack {
                     HStack {
                         Spacer()
@@ -60,7 +70,8 @@ struct pushView: View {
                             .font(.title)
                             .padding()
                         Spacer()
-                            Button(action: {
+                        
+                        Button(action: {
                             showPushView = false
                         }) {
                             Image(systemName: "xmark.circle")
@@ -69,29 +80,28 @@ struct pushView: View {
                                 .padding()
                         }
                     }
-                        
+                    
                     HStack {
                         Toggle("Enable Notifications", isOn: $isNotificationEnabled)
-                            .onChange(of: isNotificationEnabled) { newValue in
+                            .onChange(of: isNotificationEnabled) { oldValue, newValue in
                                 if newValue {
                                     NotificationManager.instance.requestAuthorization()
-                                    isCountingDown = true // Ustawienie isCountingDown na true, gdy użytkownik włącza powiadomienia
-                                    NotificationManager.instance.scheduleNotification() // Uruchomienie odliczania po zgodzie na powiadomienia
+                                    isCountingDown = true
+                                    NotificationManager.instance.scheduleNotification()
                                 } else {
-                                    isCountingDown = false // Ustawienie isCountingDown na false, gdy użytkownik wyłącza powiadomienia
+                                    isCountingDown = false
+                                    // Można dodać kod do anulowania powiadomień
                                 }
                             }
                             .padding(20)
-
                     }
-                            Spacer()
-                        
-                    }
-                    .onAppear {
-                        UIApplication.shared.applicationIconBadgeNumber = 0
-                    }
+                    
+                    Spacer()
                 }
             }
         }
+        .onAppear {
+            NotificationManager.instance.resetBadgeCount()
+        }
     }
-
+}
