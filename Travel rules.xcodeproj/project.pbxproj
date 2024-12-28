@@ -14,6 +14,9 @@
 		0707D9B62A1453D900186248 /* RulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707D9B52A1453D900186248 /* RulesTests.swift */; };
 		0707D9C02A1453D900186248 /* RulesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707D9BF2A1453D900186248 /* RulesUITests.swift */; };
 		0707D9C22A1453D900186248 /* RulesUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707D9C12A1453D900186248 /* RulesUITestsLaunchTests.swift */; };
+		0710BC9F2D1F5B6800B24A42 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0710BC9E2D1F5B6200B24A42 /* LanguageManager.swift */; };
+		0710BCA12D1F5BA600B24A42 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0710BCA02D1F5BA100B24A42 /* StringExtensions.swift */; };
+		0710BCA32D1FF36700B24A42 /* LocalizedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0710BCA22D1FF36000B24A42 /* LocalizedView.swift */; };
 		0718517A2A76F1CD00B61C24 /* RulesListPL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071851792A76F1CD00B61C24 /* RulesListPL.swift */; };
 		07339B542A64019600120686 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079190592A1FA1F200C94BE3 /* SwiftUI.framework */; };
 		076EAFC92A3A3E2E0021DA4C /* grunge-bounce-drum-loop-40464.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 076EAFC62A3A3E2E0021DA4C /* grunge-bounce-drum-loop-40464.mp3 */; };
@@ -32,6 +35,8 @@
 		07E14CAA2A33320B00B5062C /* locationGps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14CA92A33320B00B5062C /* locationGps.swift */; };
 		07E14CAC2A33336F00B5062C /* savedRuleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14CAB2A33336F00B5062C /* savedRuleList.swift */; };
 		07E14CAE2A33344B00B5062C /* myChecklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E14CAD2A33344B00B5062C /* myChecklist.swift */; };
+		07F108DB2D1EF419003EEBB6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 07F108D92D1EF419003EEBB6 /* Localizable.strings */; };
+		07F108DF2D1EF74B003EEBB6 /* RuleListES.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F108DE2D1EF740003EEBB6 /* RuleListES.swift */; };
 		07FD9C572A2B8B2E009809F0 /* RulesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FD9C562A2B8B2E009809F0 /* RulesList.swift */; };
 		07FE35572A36100800C93577 /* colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FE35562A36100700C93577 /* colors.swift */; };
 /* End PBXBuildFile section */
@@ -64,6 +69,9 @@
 		0707D9BB2A1453D900186248 /* RulesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RulesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0707D9BF2A1453D900186248 /* RulesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesUITests.swift; sourceTree = "<group>"; };
 		0707D9C12A1453D900186248 /* RulesUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		0710BC9E2D1F5B6200B24A42 /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
+		0710BCA02D1F5BA100B24A42 /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		0710BCA22D1FF36000B24A42 /* LocalizedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedView.swift; sourceTree = "<group>"; };
 		071851792A76F1CD00B61C24 /* RulesListPL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesListPL.swift; sourceTree = "<group>"; };
 		072EE9C52A24375E00D2C858 /* Lato-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Thin.ttf"; sourceTree = "<group>"; };
 		072EE9C62A24375F00D2C858 /* Lato-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-BlackItalic.ttf"; sourceTree = "<group>"; };
@@ -100,6 +108,10 @@
 		07E14CA92A33320B00B5062C /* locationGps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = locationGps.swift; sourceTree = "<group>"; };
 		07E14CAB2A33336F00B5062C /* savedRuleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = savedRuleList.swift; sourceTree = "<group>"; };
 		07E14CAD2A33344B00B5062C /* myChecklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myChecklist.swift; sourceTree = "<group>"; };
+		07F108DA2D1EF419003EEBB6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		07F108DC2D1EF44C003EEBB6 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
+		07F108DD2D1EF69A003EEBB6 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		07F108DE2D1EF740003EEBB6 /* RuleListES.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleListES.swift; sourceTree = "<group>"; };
 		07FD9C562A2B8B2E009809F0 /* RulesList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulesList.swift; sourceTree = "<group>"; };
 		07FE35562A36100700C93577 /* colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -165,8 +177,10 @@
 				07FE35552A360FE100C93577 /* Extensions */,
 				07E14C7E2A320E6600B5062C /* Views */,
 				07E14C7B2A320E1100B5062C /* Lists */,
+				0710BC9D2D1F5B4700B24A42 /* Managers */,
 				0707D9A42A1453D800186248 /* RulesApp.swift */,
 				0707D9A62A1453D800186248 /* ContentView.swift */,
+				07F108D92D1EF419003EEBB6 /* Localizable.strings */,
 				0707D9A82A1453D900186248 /* Assets.xcassets */,
 				0707D9AA2A1453D900186248 /* Preview Content */,
 			);
@@ -196,6 +210,14 @@
 				0707D9C12A1453D900186248 /* RulesUITestsLaunchTests.swift */,
 			);
 			path = RulesUITests;
+			sourceTree = "<group>";
+		};
+		0710BC9D2D1F5B4700B24A42 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				0710BC9E2D1F5B6200B24A42 /* LanguageManager.swift */,
+			);
+			path = Managers;
 			sourceTree = "<group>";
 		};
 		072EE9C42A24374900D2C858 /* Font LATO */ = {
@@ -249,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				07FD9C562A2B8B2E009809F0 /* RulesList.swift */,
+				07F108DE2D1EF740003EEBB6 /* RuleListES.swift */,
 				071851792A76F1CD00B61C24 /* RulesListPL.swift */,
 				07E14C7C2A320E5C00B5062C /* ListItem.swift */,
 			);
@@ -258,6 +281,7 @@
 		07E14C7E2A320E6600B5062C /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0710BCA22D1FF36000B24A42 /* LocalizedView.swift */,
 				07E14C7F2A320EA400B5062C /* travelChecklist.swift */,
 				07C717332A644ADB0014F2A8 /* downMenuBar.swift */,
 				07835FE02A5A1151008CE8F7 /* pushView.swift */,
@@ -275,6 +299,7 @@
 		07FE35552A360FE100C93577 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				0710BCA02D1F5BA100B24A42 /* StringExtensions.swift */,
 				07FE35562A36100700C93577 /* colors.swift */,
 				07A7C9132A546FB10017E850 /* hex.swift */,
 			);
@@ -375,6 +400,7 @@
 				en,
 				pl,
 				Base,
+				es,
 			);
 			mainGroup = 0707D9982A1453D800186248;
 			productRefGroup = 0707D9A22A1453D800186248 /* Products */;
@@ -396,6 +422,7 @@
 				076EAFCB2A3A3E2E0021DA4C /* ambient-wave-48-tribute-17243.mp3 in Resources */,
 				0780433E2A231CDD004BCE3D /* Property List.plist in Resources */,
 				076EAFCA2A3A3E2E0021DA4C /* lofi-ambient-pianoline-116134.mp3 in Resources */,
+				07F108DB2D1EF419003EEBB6 /* Localizable.strings in Resources */,
 				076EAFC92A3A3E2E0021DA4C /* grunge-bounce-drum-loop-40464.mp3 in Resources */,
 				0707D9AC2A1453D900186248 /* Preview Assets.xcassets in Resources */,
 				0707D9A92A1453D900186248 /* Assets.xcassets in Resources */,
@@ -423,9 +450,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0710BCA32D1FF36700B24A42 /* LocalizedView.swift in Sources */,
 				07E14C802A320EA400B5062C /* travelChecklist.swift in Sources */,
 				07FE35572A36100800C93577 /* colors.swift in Sources */,
 				07E14C7D2A320E5C00B5062C /* ListItem.swift in Sources */,
+				0710BC9F2D1F5B6800B24A42 /* LanguageManager.swift in Sources */,
 				07A7C9142A546FB10017E850 /* hex.swift in Sources */,
 				07E14CA82A33317300B5062C /* customRule.swift in Sources */,
 				07E14CAA2A33320B00B5062C /* locationGps.swift in Sources */,
@@ -434,10 +463,12 @@
 				07A7C9162A54702C0017E850 /* settingsView.swift in Sources */,
 				0707D9A52A1453D800186248 /* RulesApp.swift in Sources */,
 				07A7C9122A546EA10017E850 /* GPSlistView.swift in Sources */,
+				0710BCA12D1F5BA600B24A42 /* StringExtensions.swift in Sources */,
 				07D111862D1C98D70020C518 /* LocationData.swift in Sources */,
 				07C717312A6435DA0014F2A8 /* startScreen.swift in Sources */,
 				07FD9C572A2B8B2E009809F0 /* RulesList.swift in Sources */,
 				07835FE12A5A1151008CE8F7 /* pushView.swift in Sources */,
+				07F108DF2D1EF74B003EEBB6 /* RuleListES.swift in Sources */,
 				07E14CAE2A33344B00B5062C /* myChecklist.swift in Sources */,
 				0718517A2A76F1CD00B61C24 /* RulesListPL.swift in Sources */,
 			);
@@ -474,6 +505,19 @@
 			targetProxy = 0707D9BC2A1453D900186248 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		07F108D92D1EF419003EEBB6 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				07F108DA2D1EF419003EEBB6 /* en */,
+				07F108DC2D1EF44C003EEBB6 /* pl */,
+				07F108DD2D1EF69A003EEBB6 /* es */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		0707D9C32A1453D900186248 /* Debug */ = {
@@ -600,10 +644,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Rules/Rules.entitlements;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "Rules/Preview\\ Content Rules/Assets.xcassets";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3Y79SF4PL3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rules/Info.plist;

@@ -5,6 +5,7 @@ struct RulesListView: View {
     @State private var showAlert = false
     @Binding var savedRules: [String]
     @AppStorage("isDarkMode") var isDarkMode = false
+    @StateObject private var languageManager = LanguageManager.shared
     
     var body: some View {
         ZStack {
@@ -28,16 +29,16 @@ struct RulesListView: View {
                     }
                     .padding(.horizontal)
                 }
-                .navigationBarTitle("Saved rules", displayMode: .inline)
+                .navigationBarTitle("saved_rules".appLocalized, displayMode: .inline)
                 .padding(.bottom)
                 .frame(maxHeight: .infinity)
             }
             .alert(isPresented: $showAlert) {
                 Alert(
-                    title: Text("Delete Rule"),
-                    message: Text("Are you sure you want to delete this rule?"),
-                    primaryButton: .cancel(Text("Cancel")),
-                    secondaryButton: .destructive(Text("Delete")) {
+                    title: Text("delete_rule".appLocalized),
+                    message: Text("delete_rule_confirmation".appLocalized),
+                    primaryButton: .cancel(Text("cancel".appLocalized)),
+                    secondaryButton: .destructive(Text("delete".appLocalized)) {
                         if let rule = selectedRule {
                             deleteRule(rule)
                         }
@@ -51,13 +52,29 @@ struct RulesListView: View {
         withAnimation {
             if let index = savedRules.firstIndex(of: rule) {
                 savedRules.remove(at: index)
+                saveRulesToUserDefaults()
+                // Opcjonalnie: dodaj informację o pomyślnym usunięciu
+                print("Rule successfully deleted and saved")
             }
+        }
+    } 
+    private func saveRulesToUserDefaults() {
+        do {
+            let data = try JSONEncoder().encode(savedRules)
+            UserDefaults.standard.set(data, forKey: "savedRules")
+            UserDefaults.standard.synchronize() // Wymuszamy natychmiastowy zapis
+        } catch {
+            print("Error saving rules: \(error)")
         }
     }
     
     private func openRule(_ rule: String) {
-        let alert = UIAlertController(title: "Rule", message: rule, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        let alert = UIAlertController(
+            title: "rule".appLocalized,
+            message: rule,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "ok".appLocalized, style: .default))
         
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let viewController = windowScene.windows.first?.rootViewController {

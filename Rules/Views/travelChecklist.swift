@@ -6,20 +6,9 @@ struct TravelChecklist: View {
     @State private var selectedTab: ListItem?
     @State private var scrollToTop: Bool = false
     @State private var scrollViewProxy: ScrollViewProxy? = nil
-    
-    // Tu dodajemy słownik do przechowywania zrobionych elementów dla każdego typu
+    @State private var items: [ListItemView] = []
+    @StateObject private var languageManager = LanguageManager.shared
     @State private var completedItems: [ListItem: [String]] = [:]
-    
-    let listData: [ListItemView] = [
-        ListItemView(type: .BathroomItems, title: "Bathroom", subtitle: "Bathroom Essentials"),
-        ListItemView(type: .KitchenItems, title: "Kitchen", subtitle: "Kitchen Essentials"),
-        ListItemView(type: .ClothesItems, title: "Clothes", subtitle: "Clothing Essentials"),
-        ListItemView(type: .UsefulItems, title: "Useful", subtitle: "Useful Items"),
-        ListItemView(type: .ElectronicsItems, title: "Electronics", subtitle: "Electronics"),
-        ListItemView(type: .CampingItems, title: "Camping", subtitle: "Camping Essentials"),
-        ListItemView(type: .ToolsItems, title: "Tools", subtitle: "Tools and Equipment"),
-        ListItemView(type: .OtherItems, title: "Other", subtitle: "Other Items")
-    ]
     
     init() {
         loadCompletedItems()
@@ -29,27 +18,19 @@ struct TravelChecklist: View {
         VStack {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    ForEach(listData) { listItem in
+                    ForEach(items) { listItem in
                         Button(action: {
                             selectedTab = listItem.type
                             scrollToTop = true
                         }) {
-                            Text(listItem.title)
+                            Text(listItem.title.appLocalized)
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .padding()
                                 .background(
                                     RoundedRectangle(cornerRadius: 15)
                                         .fill(selectedTab == listItem.type ? (Color(hex: "#29606D")) : Color.gray.opacity(0.5))
-                                        .foregroundColor(.white)
-
-                                        )
-                                .onTapGesture {
-                                    withAnimation(.easeInOut) {
-                                        selectedTab = listItem.type
-                                        scrollToTop = true
-                                    }
-                                }
+                                )
                         }
                     }
                 }
@@ -65,9 +46,9 @@ struct TravelChecklist: View {
             ScrollViewReader { scrollViewProxy in
                 ScrollView {
                     VStack(spacing: 10) {
-                        ForEach(listData) { listItem in
+                        ForEach(items) { listItem in
                             VStack(alignment: .leading, spacing: 10) {
-                                Text(listItem.title)
+                                Text(listItem.title.appLocalized) // Dodano .appLocalized
                                     .font(.title)
                                     .fontWeight(.bold)
                                     .padding(.leading, 16)
@@ -82,7 +63,7 @@ struct TravelChecklist: View {
                                                 .foregroundColor(itemIsCompleted(listItem: listItem, itemTitle: item) ? .green : .white)
                                                 .padding(.trailing, 5)
                                         }
-                                        Text(item)
+                                        Text(item.appLocalized) // Dodano .appLocalized
                                         Spacer()
                                     }
                                     .padding(.leading, 10)
@@ -93,15 +74,8 @@ struct TravelChecklist: View {
                                     .cornerRadius(15)
                                     .frame(maxWidth: 340)
                                     .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-
-                                    
-
-                                    
                                 }
                             }
-//                                .background(Color.white.opacity(0.5))
-//                                .cornerRadius(15)
-
                             .id(listItem.type.rawValue)
                             .onChange(of: selectedTab) { newValue in
                                 if newValue == listItem.type && scrollToTop {
@@ -118,7 +92,6 @@ struct TravelChecklist: View {
                 .overlay(
                     GeometryReader { proxy in
                         Color.clear.preference(key: ScrollViewOffsetPreferenceKey.self, value: proxy.frame(in: .global).minY)
-                        
                     }
                 )
                 .onPreferenceChange(ScrollViewOffsetPreferenceKey.self) { value in
@@ -128,30 +101,47 @@ struct TravelChecklist: View {
         }
         .onAppear {
             loadCompletedItems()
+            updateLocalizedData()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
+            updateLocalizedData()
         }
         .onDisappear {
             saveCompletedItems()
         }
     }
     
+    private func updateLocalizedData() {
+        items = [
+            ListItemView(type: .BathroomItems, title: "bathroom".appLocalized, subtitle: "bathroom_essentials".appLocalized),
+            ListItemView(type: .KitchenItems, title: "kitchen".appLocalized, subtitle: "kitchen_essentials".appLocalized),
+            ListItemView(type: .ClothesItems, title: "clothes".appLocalized, subtitle: "clothing_essentials".appLocalized),
+            ListItemView(type: .UsefulItems, title: "useful".appLocalized, subtitle: "useful_items".appLocalized),
+            ListItemView(type: .ElectronicsItems, title: "electronics".appLocalized, subtitle: "electronics_items".appLocalized),
+            ListItemView(type: .CampingItems, title: "camping".appLocalized, subtitle: "camping_essentials".appLocalized),
+            ListItemView(type: .ToolsItems, title: "tools".appLocalized, subtitle: "tools_equipment".appLocalized),
+            ListItemView(type: .OtherItems, title: "other".appLocalized, subtitle: "other_items".appLocalized)
+        ]
+    }
+    
     func getListItems(for type: ListItem) -> [String] {
         switch type {
         case .BathroomItems:
-            return BathroomItems
+            return getBathroomItems()
         case .KitchenItems:
-            return KitchenItems
+            return getKitchenItems()
         case .ClothesItems:
-            return ClothesItems
+            return getClothesItems()
         case .UsefulItems:
-            return UsefulItems
+            return getUsefulItems()
         case .ElectronicsItems:
-            return ElectronicsItems
+            return getElectronicsItems()
         case .CampingItems:
-            return CampingItems
+            return getCampingItems()
         case .ToolsItems:
-            return ToolsItems
+            return getToolsItems()
         case .OtherItems:
-            return OtherItems
+            return getOtherItems()
         }
     }
     
@@ -173,10 +163,9 @@ struct TravelChecklist: View {
     }
     
     func updateSelectedTab() {
-        guard let selectedItem = listData.last(where: { $0.type.rawValue == selectedTab?.rawValue }) else {
+        guard let selectedItem = items.last(where: { $0.type.rawValue == selectedTab?.rawValue }) else {
             return
         }
-        
         selectedTab = selectedItem.type
     }
     
@@ -185,7 +174,6 @@ struct TravelChecklist: View {
               let completedItems = try? JSONDecoder().decode([ListItem: [String]].self, from: data) else {
             return
         }
-        
         self.completedItems = completedItems
     }
     
@@ -193,23 +181,13 @@ struct TravelChecklist: View {
         guard let data = try? JSONEncoder().encode(completedItems) else {
             return
         }
-        
         UserDefaults.standard.set(data, forKey: "CompletedItems")
     }
 }
 
-struct TravelChecklist_Previews: PreviewProvider {
-    static var previews: some View {
-        TravelChecklist()
-    }
-}
-
-
 struct ScrollViewOffsetPreferenceKey: PreferenceKey {
     typealias Value = CGFloat
-    
     static var defaultValue: CGFloat = 0
-    
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }

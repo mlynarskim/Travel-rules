@@ -1,7 +1,219 @@
-/* 
-  Localizable.strings
-  Travel rules
+// Główne elementy interfejsu
+"the_rule_for_today" = "Zasada na dziś to:";
+"draw" = "Losuj";
+"success" = "Sukces";
+"travel_rules" = "ZASADY PODRÓŻY";
+"all_rules_used" = "Wszystkie zasady zostały już wykorzystane!";
+"save" = "Zapisz";
+"rule_saved" = "Zasada została zapisana na Twojej liście!";
+"rule_exists" = "Ta zasada jest już na Twojej liście!";
+"settings" = "Ustawienia";
+"language" = "Język";
+"dark_mode" = "Tryb ciemny";
+"slow_down" = "Zwolnij";
+"take_time_think" = "Proszę poświęć czas na przemyślenie zasady.";
+"ok" = "OK";
+"saved_rules" = "Zapisane zasady";
+"delete_rule" = "Usuń zasadę";
+"delete_rule_confirmation" = "Czy na pewno chcesz usunąć tę zasadę?";
+"cancel" = "Anuluj";
+"delete" = "Usuń";
+"rule" = "Zasada";
+"settings" = "Ustawienia";
+"dark_mode" = "Tryb ciemny";
+"music" = "Muzyka";
+"language" = "Język";
+"reset_all_settings" = "Zresetuj wszystkie ustawienia";
+"reset_title" = "Czy na pewno chcesz zresetować wszystkie ustawienia?";
+"reset_message" = "Ta akcja przywróci wszystkie ustawienia do wartości domyślnych.";
+"reset_button" = "Zresetuj";
+"cancel" = "Anuluj";
+"share_app" = "Udostępnij aplikację";
+"share" = "Udostępnij";
+"rate_app" = "Oceń aplikację";
+"rate" = "Oceń";
+"send_feedback" = "Wyślij opinię";
+"send" = "Wyślij";
+"An app for everyone who loves the lifestyle of living on wheels. You will find lots of rules to help you prepare for life in an RV, caravan, plane, train, boat or foot." = "Aplikacja dla wszystkich, którzy kochają styl życia na kółkach. Znajdziesz tu wiele zasad, które pomogą ci przygotować się do życia w kamperze, przyczepie, samolocie, pociągu, łodzi lub pieszo.";
+"Let's go!" = "Zaczynamy!";
 
-  Created by Mateusz Mlynarski on 27/12/2024.
-  
-*/
+// Lokalizacja
+"current_location" = "Aktualna lokalizacja:";
+"latitude" = "Szerokość";
+"longitude" = "Długość";
+"altitude" = "Wysokość";
+"waiting_location" = "Oczekiwanie na lokalizację...";
+"description" = "Opis";
+"save_location" = "Zapisz lokalizację";
+"locations" = "Lokalizacje";
+"location_details" = "Szczegóły lokalizacji";
+"enter_location_description" = "Wprowadź opis lokalizacji...";
+"location_actions" = "Akcje lokalizacji";
+"open_google_maps" = "Otwórz w Google Maps";
+"open_apple_maps" = "Otwórz w Apple Maps";
+"coordinates" = "Współrzędne";
+"meters" = "m";
+"north" = "N";
+"south" = "S";
+"east" = "E";
+"west" = "W";
+
+// Kategorie
+"bathroom" = "Łazienka";
+"kitchen" = "Kuchnia";
+"clothes" = "Ubrania";
+"useful" = "Przydatne";
+"electronics" = "Elektronika";
+"camping" = "Camping";
+"tools" = "Narzędzia";
+"other" = "Inne";
+
+// Podtytuły kategorii
+"bathroom_essentials" = "Rzeczy łazienkowe";
+"kitchen_essentials" = "Rzeczy kuchenne";
+"clothing_essentials" = "Niezbędne ubrania";
+"useful_items" = "Przydatne rzeczy";
+"electronics_items" = "Elektronika";
+"camping_essentials" = "Wyposażenie campingowe";
+"tools_equipment" = "Narzędzia i sprzęt";
+"other_items" = "Pozostałe rzeczy";
+
+// Przedmioty łazienkowe
+"antibacterial_hand_gel" = "Żel antybakteryjny";
+"moisturizing_wipes" = "Chusteczki nawilżające";
+"deodorant_perfume" = "Dezodorant, perfumy";
+"disposable_gloves" = "Jednorazowe rękawiczki gumowe";
+"cream" = "Krem";
+"mirror" = "Lustro";
+"shaving_razor" = "Maszynka do golenia";
+"soap_shampoo" = "Mydło, szampon";
+"toilet_paper" = "Papier toaletowy";
+"toothpaste" = "Pasta do zębów";
+"tweezers" = "Pęseta";
+"toilet_fluid" = "Płyn do toalet";
+"portable_shower" = "Prysznic przenośny";
+"towels" = "Ręczniki";
+"dry_shampoo" = "Suchy szampon";
+"toothbrush" = "Szczoteczka do zębów";
+"portable_toilet" = "Toaleta przenośna";
+
+// Przedmioty kuchenne
+"water_bottle" = "Butelka na wodę";
+"kettle" = "Czajnik";
+"cutting_board" = "Deska do krojenia";
+"pots_pans" = "Garnki, patelnie";
+"trash_can_and_bags" = "Kosz na śmieci i worki";
+"thermos" = "Termos";
+"scissors" = "Nożyczki";
+"wine_and_beer_opener" = "Otwieracz do wina i piwa";
+"dish_soap" = "Płyn do mycia naczyń";
+"cooking_utensils" = "Przybory kuchenne";
+"dishcloths_sponges" = "Ściereczki, gąbki";
+"plates_bowls" = "Talerze, miski";
+"travel_mug" = "Kubek podróżny";
+"coffee_maker" = "Ekspres do kawy";
+"water_containers" = "Pojemniki na wodę";
+"insect_repellent" = "Środek na owady";
+"knives_forks_spoons" = "Noże, widelce, łyżki";
+"food_storage_containers" = "Pojemniki na jedzenie";
+
+// Ubrania
+"sweatshirt" = "Bluza";
+"long_sleeved_blouse" = "Bluzka z długim rękawem";
+"underwear" = "Bielizna";
+"trekking_shoes" = "Buty trekkingowe";
+"shower_sandals" = "Klapki pod prysznic";
+"shirt" = "Koszula";
+"shorts" = "Szorty";
+"raincoat" = "Płaszcz przeciwdeszczowy";
+"jacket" = "Kurtka";
+"sunglasses" = "Okulary przeciwsłoneczne";
+"socks" = "Skarpetki";
+"sweatpants_leggings" = "Spodnie dresowe, legginsy";
+"skirt" = "Spódnica";
+"dress" = "Sukienka";
+"t_shirts" = "Koszulki";
+"sneakers" = "Adidasy";
+"regular_pants" = "Spodnie";
+
+// Rzeczy przydatne
+"pen" = "Długopis";
+"board_games_playing_cards" = "Gry planszowe, karty do gry";
+"blanket" = "Koc";
+"night_lamp" = "Lampka nocna";
+"mosquito_net" = "Moskitiera";
+"bedding" = "Pościel";
+"pillows_duvet" = "Poduszki, kołdra";
+"storage_boxes_baskets" = "Pojemniki, koszyki";
+"clothespins" = "Klamerki";
+"clothesline" = "Sznur na pranie";
+"breakfast_table" = "Stolik śniadaniowy";
+"favorite_book" = "Ulubiona książka";
+"earplugs" = "Zatyczki do uszu";
+"notebook_journal" = "Notatnik, dziennik";
+"window_curtains" = "Zasłony";
+
+// Elektronika
+"camera" = "Aparat fotograficzny";
+"wireless_speaker" = "Głośnik bezprzewodowy";
+"gps" = "Nawigacja GPS";
+"usb_cables_chargers" = "Kable USB, ładowarki";
+"dashcam" = "Kamera samochodowa";
+"laptop_tablet" = "Laptop/tablet";
+"phone" = "Telefon";
+"usb_adapters" = "Adaptery USB";
+"spare_batteries" = "Zapasowe baterie";
+"memory_cards" = "Karty pamięci";
+"chargers_for_devices" = "Ładowarki do urządzeń";
+
+// Camping
+"hammock_with_attachments" = "Hamak z mocowaniami";
+"beach_blanket" = "Koc plażowy";
+"camping_chairs" = "Krzesła kempingowe";
+"sunscreen" = "Krem przeciwsłoneczny";
+"flashlight_lamp" = "Latarka/lampa";
+"tent_and_sleeping_bag" = "Namiot i śpiwór";
+"pocket_knife" = "Scyzoryk";
+"shovel" = "Łopata";
+"axe" = "Siekiera";
+"mosquito_and_tick_repellent" = "Środek na komary i kleszcze";
+"folding_table" = "Składany stolik";
+
+// Narzędzia
+"additional_water_pump" = "Dodatkowa pompa wodna";
+"first_aid_kit" = "Apteczka pierwszej pomocy";
+"gas_detector" = "Czujnik gazu";
+"pepper_spray" = "Gaz pieprzowy";
+"reflective_vests" = "Kamizelki odblaskowe";
+"jumper_cables" = "Kable rozruchowe";
+"gas_canister" = "Kanister na paliwo";
+"keys" = "Klucze";
+"padlock" = "Kłódka";
+"car_jack" = "Podnośnik samochodowy";
+"hammer" = "Młotek";
+"current_meter" = "Miernik prądu";
+"pliers" = "Szczypce";
+"tire_compressor" = "Kompresor do opon";
+"protective_gloves" = "Rękawice ochronne";
+"silicone" = "Silikon";
+"screwdriver_and_screws" = "Śrubokręt i śruby";
+"triangle_warning_sign" = "Trójkąt ostrzegawczy";
+"zip_ties" = "Opaski zaciskowe";
+"wd40" = "WD40";
+"spare_oil" = "Olej zapasowy";
+
+// Inne
+"phone_holder_for_the_car" = "Uchwyt na telefon do samochodu";
+"laundry_basket_bag" = "Kosz/torba na pranie";
+"needle_thread_safety_pin" = "Igła, nić, agrafka";
+"dustpan_and_brush" = "Szufelka i zmiotka";
+"floor_cloth" = "Ścierka do podłogi";
+"water_hose" = "Wąż ogrodowy";
+"hose_connectors_and_taps" = "Złącza do węży i krany";
+"wheel_ramps" = "Najazdy kołowe";
+"plasters_and_bandages" = "Plastry i bandaże";
+"wound_disinfectant" = "Środek do dezynfekcji ran";
+"medication_painkillers_antidiarrheals" = "Leki: przeciwbólowe, przeciwbiegunkowe";
+"personal_documents" = "Dokumenty osobiste";
+"insurance_ehic_card" = "Ubezpieczenie, karta EHIC";
+"drivers_license" = "Prawo jazdy";
