@@ -60,7 +60,8 @@ struct GPSView: View {
     @State private var currentLocation: CLLocation?
     @State private var region = MKCoordinateRegion()
     @AppStorage("isDarkMode") var isDarkMode = false
-    
+    @StateObject private var languageManager = LanguageManager.shared
+
     var body: some View {
         ZStack {
             Image(isDarkMode ? "imageDark" : "Image")
@@ -71,14 +72,14 @@ struct GPSView: View {
                 Spacer()
                 
                 VStack {
-                    Text("Current Location:")
+                    Text("current_location".appLocalized)
                         .font(.headline)
                     
                     if let location = currentLocation {
-                        Text("Latitude: \(location.coordinate.latitude)")
-                        Text("Longitude: \(location.coordinate.longitude)")
+                        Text("\("latitude".appLocalized): \(location.coordinate.latitude)")
+                        Text("\("longitude".appLocalized): \(location.coordinate.longitude)")
                     } else {
-                        Text("Waiting for location...")
+                        Text("waiting_location".appLocalized)
                     }
                 }
                 
@@ -100,10 +101,9 @@ struct GPSView: View {
                 Spacer()
                 
                 VStack {
-                    TextField("Description", text: $description)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding()
-                    
+                                    TextField("description".appLocalized, text: $description)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        .padding()
                     HStack {
                         Button(action: {
                             guard let location = currentLocation else { return }
@@ -118,25 +118,25 @@ struct GPSView: View {
                                 locationManager.saveLocations()
                             }
                         }) {
-                            Text("Save")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(width: 120, height: 50)
-                                .background(Color(hex: "#29606D"))
-                                .cornerRadius(15)
-                                .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-                                .padding()
-                        }
-                        
-                        NavigationLink(destination: SavedLocationsView(locationData: locationManager.locationData, deleteAction: locationManager.deleteLocation)) {
-                            Text("Locations")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(width: 120, height: 50)
-                                .background(Color(hex: "#29606D"))
-                                .cornerRadius(15)
-                                .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-                                .padding()
+                            Text("save_location".appLocalized)
+                                                           .font(.headline)
+                                                           .foregroundColor(.white)
+                                                           .frame(width: 120, height: 50)
+                                                           .background(Color(hex: "#29606D"))
+                                                           .cornerRadius(15)
+                                                           .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                                                           .padding()
+                                                   }
+                                                   
+                                                   NavigationLink(destination: SavedLocationsView(locationData: locationManager.locationData, deleteAction: locationManager.deleteLocation)) {
+                                                       Text("locations".appLocalized)
+                                                           .font(.headline)
+                                                           .foregroundColor(.white)
+                                                           .frame(width: 120, height: 50)
+                                                           .background(Color(hex: "#29606D"))
+                                                           .cornerRadius(15)
+                                                           .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                                                           .padding()
                         }
                     }
                 }
@@ -196,7 +196,7 @@ struct SavedLocationsView: View {
                                 .padding(.vertical, 5)
                                 .fixedSize(horizontal: false, vertical: true)
                             
-                            Text("Description: \(location.description)")
+                            Text("\("description".appLocalized): \(location.description)")
                                 .foregroundColor(.white)
                                 .padding(.bottom, 5)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -213,41 +213,42 @@ struct SavedLocationsView: View {
                 }
                 .padding()
             }
-        }
+            }
         .actionSheet(isPresented: $showActionSheet) {
-            ActionSheet(title: Text("Location Actions"), buttons: [
-                .default(Text("Open in Google Maps")) {
-                    openMapsApp(with: .googleMaps, location: selectedLocation)
-                },
-                .default(Text("Open in Apple Maps")) {
-                    openMapsApp(with: .appleMaps, location: selectedLocation)
-                },
-                .destructive(Text("Delete")) {
-                    if let index = locationData.firstIndex(where: { $0.id == selectedLocation?.id }) {
-                        deleteAction(index)
-                    }
-                },
-                .cancel()
-            ])
-        }
-    }
+                    ActionSheet(title: Text("location_actions".appLocalized), buttons: [
+                        .default(Text("open_google_maps".appLocalized)) {
+                            openMapsApp(with: .googleMaps, location: selectedLocation)
+                        },
+                        .default(Text("open_apple_maps".appLocalized)) {
+                            openMapsApp(with: .appleMaps, location: selectedLocation)
+                        },
+                        .destructive(Text("delete".appLocalized)) {
+                            if let index = locationData.firstIndex(where: { $0.id == selectedLocation?.id }) {
+                                deleteAction(index)
+                            }
+                        },
+                        .cancel(Text("cancel".appLocalized))
+                    ])
+                }
+            }
+        
     
-    private func formatCoordinates(latitude: Double, longitude: Double) -> String {
-        let latDegrees = Int(latitude)
-        let latMinutes = Int((latitude - Double(latDegrees)) * 60)
-        let latSeconds = (latitude - Double(latDegrees) - Double(latMinutes) / 60) * 3600
-        
-        let lonDegrees = Int(longitude)
-        let lonMinutes = Int((longitude - Double(lonDegrees)) * 60)
-        let lonSeconds = (longitude - Double(lonDegrees) - Double(lonMinutes) / 60) * 3600
-        
-        let latDirection = latitude >= 0 ? "N" : "S"
-        let lonDirection = longitude >= 0 ? "E" : "W"
-        
-        return String(format: "%d° %d' %.3f'' %@\n%d° %d' %.4f'' %@",
-                     abs(latDegrees), abs(latMinutes), abs(latSeconds), latDirection,
-                     abs(lonDegrees), abs(lonMinutes), abs(lonSeconds), lonDirection)
-    }
+private func formatCoordinates(latitude: Double, longitude: Double) -> String {
+    let latDegrees = Int(latitude)
+    let latMinutes = Int((latitude - Double(latDegrees)) * 60)
+    let latSeconds = (latitude - Double(latDegrees) - Double(latMinutes) / 60) * 3600
+    
+    let lonDegrees = Int(longitude)
+    let lonMinutes = Int((longitude - Double(lonDegrees)) * 60)
+    let lonSeconds = (longitude - Double(lonDegrees) - Double(lonMinutes) / 60) * 3600
+    
+    let latDirection = latitude >= 0 ? "north".appLocalized : "south".appLocalized
+    let lonDirection = longitude >= 0 ? "east".appLocalized : "west".appLocalized
+    
+    return String(format: "%d° %d' %.3f'' %@\n%d° %d' %.4f'' %@",
+                 abs(latDegrees), abs(latMinutes), abs(latSeconds), latDirection,
+                 abs(lonDegrees), abs(lonMinutes), abs(lonSeconds), lonDirection)
+}
     
     private func openMapsApp(with provider: MapProvider, location: LocationData?) {
         guard let location = location else { return }

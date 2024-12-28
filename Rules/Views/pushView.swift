@@ -23,7 +23,7 @@ class NotificationManager {
         content.badge = 1
         
         var dateComponents = DateComponents()
-        dateComponents.hour = 16
+        dateComponents.hour = 17
         dateComponents.minute = 0
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
@@ -39,6 +39,34 @@ class NotificationManager {
                 print("Error scheduling notification: \(error)")
             } else {
                 print("Notification scheduled successfully")
+            }
+        }
+    }
+    
+    func scheduleMonthlyDocumentCheckNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Document Check Reminder"
+        content.subtitle = "Remember to check the validity of your documents!"
+        content.sound = .default
+        content.badge = 1
+        
+        var dateComponents = DateComponents()
+        dateComponents.day = 1 // Powiadomienie pierwszego dnia każdego miesiąca
+        dateComponents.hour = 10 // O godzinie 10:00
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true) // Ustawienia dla powiadomienia miesięcznego
+        
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: trigger
+        )
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling monthly document check notification: \(error)")
+            } else {
+                print("Monthly document check notification scheduled successfully")
             }
         }
     }
@@ -88,6 +116,7 @@ struct PushView: View {
                                     NotificationManager.instance.requestAuthorization()
                                     isCountingDown = true
                                     NotificationManager.instance.scheduleNotification()
+                                    NotificationManager.instance.scheduleMonthlyDocumentCheckNotification() // Dodanie powiadomienia miesięcznego
                                 } else {
                                     isCountingDown = false
                                     // Można dodać kod do anulowania powiadomień

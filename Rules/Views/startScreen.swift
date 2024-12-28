@@ -73,7 +73,7 @@ struct TitleSection: View {
             Spacer()
             
             AnimatedText(
-                text: "TRAVEL",
+                text: "TRAVEL".appLocalized,
                 offset: animateTravel ? 0 : -100,
                 opacity: animateTravel ? 1 : 0,
                 delay: 1
@@ -81,7 +81,7 @@ struct TitleSection: View {
             .padding(.top, 80)
             
             AnimatedText(
-                text: "RULES",
+                text: "RULES".appLocalized,
                 offset: animateRules ? 0 : 100,
                 opacity: animateRules ? 1 : 0,
                 delay: 2
@@ -116,7 +116,7 @@ struct DescriptionSection: View {
         VStack {
             Spacer()
             
-            Text("An app for everyone who loves the lifestyle of living on wheels. You will find lots of rules to help you prepare for life in an RV, caravan, plane, train, boat or foot.")
+            Text("An app for everyone who loves the lifestyle of living on wheels. You will find lots of rules to help you prepare for life in an RV, caravan, plane, train, boat or foot.".appLocalized)
                 .font(.custom("Lato-Bold", size: 16))
                 .fontWeight(.bold)
                 .foregroundColor(.white)
@@ -140,7 +140,7 @@ struct StartButton: View {
             .frame(width: 200, height: 50)
             .padding(.all, 15)
             .overlay(
-                Text("Let's go!")
+                Text("Let's go!".appLocalized)
                     .font(.custom("Lato-Bold", size: 24))
                     .foregroundColor(.black)
             )

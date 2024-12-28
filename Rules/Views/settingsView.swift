@@ -28,6 +28,7 @@ struct SettingsView: View {
     @Binding var showSettings: Bool
     @AppStorage("isDarkMode") var isDarkMode = false
     @AppStorage("isMusicEnabled") var isMusicEnabled = true
+    @StateObject private var languageManager = LanguageManager.shared
     
     var body: some View {
         NavigationView {
@@ -36,7 +37,7 @@ struct SettingsView: View {
                 VStack {
                     HStack {
                         Spacer()
-                        Text("Settings")
+                        Text("settings".appLocalized)
                             .font(.title)
                             .padding()
                         Spacer()
@@ -49,56 +50,144 @@ struct SettingsView: View {
                                 .padding()
                         }
                     }
-                    HStack {
-                        VStack {
-                            Toggle("Dark Mode", isOn: $isDarkMode)
-                                .padding()
-                                .foregroundColor(.black)
-                            
-                            Toggle("Music", isOn: $isMusicEnabled)
-                                .padding()
-                                .foregroundColor(.black)
-                                .onChange(of: isMusicEnabled) { oldValue, newValue in
-                                    if newValue {
-                                        playBackgroundMusic()
-                                    } else {
-                                        stopBackgroundMusic()
-                                    }
+                    
+                    VStack {
+                        // Przełączniki
+                        Toggle("dark_mode".appLocalized, isOn: $isDarkMode)
+                            .padding()
+                            .foregroundColor(.black)
+                        
+                        Toggle("music".appLocalized, isOn: $isMusicEnabled)
+                            .padding()
+                            .foregroundColor(.black)
+                            .onChange(of: isMusicEnabled) { oldValue, newValue in
+                                if newValue {
+                                    playBackgroundMusic()
+                                } else {
+                                    stopBackgroundMusic()
                                 }
-                            Button(action: {
-                                resetApplication()
-                            }) {
-                                Text("Reset all settings!")
-                                    .foregroundColor(.white)
-                                    .font(.custom("Lato Bold", size: 20))
-                                    .padding(5)
-                                    .frame(width: 200, height: 50)
-                                    .background(Color(hex: "#fc2c03"))
-                                    .cornerRadius(15)
-                                    .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                            }
+                        
+                        // Wybór języka
+                        HStack {
+                            Text("language".appLocalized)
+                                .foregroundColor(.black)
+                            Spacer()
+                            Picker("", selection: $languageManager.currentLanguage) {
+                                ForEach(AppLanguage.allCases, id: \ .self) { language in
+                                    Text(language.displayName).tag(language)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .onChange(of: languageManager.currentLanguage) { oldValue, newValue in
+                                print("Language changed from \(oldValue) to \(newValue)")
+                                // Wymuszamy pełne odświeżenie widoku
+                                UIApplication.shared.windows.first?.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations()
                                 
+                                // Wysyłamy notyfikację o zmianie języka
+                                NotificationCenter.default.post(name: NSNotification.Name("LanguageChanged"), object: nil)
                             }
                         }
-                        .padding(20)
+                        .padding()
+                        
+                        Button(action: {
+                            resetApplication()
+                        }) {
+                            Text("reset_all_settings".appLocalized)
+                                .foregroundColor(.white)
+                                .font(.custom("Lato Bold", size: 20))
+                                .padding(5)
+                                .frame(width: 200, height: 50)
+                                .background(Color(hex: "#fc2c03"))
+                                .cornerRadius(15)
+                                .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                        }
+                        
+                        Divider().padding(.vertical, 10)
+
+                        // Udostępnij aplikację
+                        HStack {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: 24))
+                                .foregroundColor(.black)
+                            Text("share_app".appLocalized)
+                                .foregroundColor(.black)
+                            Spacer()
+                            Button(action: {
+                                // Wklej tutaj link do aplikacji
+                                let appLink = "[TUTAJ WKLEJ LINK]"
+                                let activityController = UIActivityViewController(activityItems: [appLink], applicationActivities: nil)
+                                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                                   let topViewController = windowScene.windows.first?.rootViewController?.topmostViewController() {
+                                    topViewController.present(activityController, animated: true, completion: nil)
+                                }
+                            }) {
+                                Text("share".appLocalized)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .padding()
+
+                        // Oceń aplikację w App Store
+                        HStack {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(.yellow)
+                            Text("rate_app".appLocalized)
+                                .foregroundColor(.black)
+                            Spacer()
+                            Button(action: {
+                                // Wklej tutaj link do App Store
+                                if let url = URL(string: "[TUTAJ WKLEJ LINK]") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                Text("rate".appLocalized)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .padding()
+
+                        // Prześlij opinię
+                        HStack {
+                            Image(systemName: "envelope.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(.red)
+                            Text("send_feedback".appLocalized)
+                                .foregroundColor(.black)
+                            Spacer()
+                            Button(action: {
+                                // Wklej tutaj adres e-mail
+                                let email = "example@example.com" // Zmień na swój adres
+                                if let url = URL(string: "mailto:\(email)") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                Text("send".appLocalized)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .padding()
                     }
+                    .padding(20)
                     Spacer()
                 }
             }
         }
     }
+
     func resetApplication() {
         let confirmReset = UIAlertController(
-            title: "Reset All Settings",
-            message: "Are you sure you want to reset all settings?",
+            title: "reset_title".appLocalized,
+            message: "reset_message".appLocalized,
             preferredStyle: .alert
         )
         
-        confirmReset.addAction(UIAlertAction(title: "Reset", style: .destructive, handler: { _ in
+        confirmReset.addAction(UIAlertAction(title: "reset_button".appLocalized, style: .destructive, handler: { _ in
             if let bundleIdentifier = Bundle.main.bundleIdentifier {
                 UserDefaults.standard.removePersistentDomain(forName: bundleIdentifier)
                 UserDefaults.standard.synchronize()
                 
-                // Reset the root view of the main window
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                    let mainWindow = windowScene.windows.first {
                     mainWindow.rootViewController = UIHostingController(rootView: ContentView())
@@ -107,7 +196,7 @@ struct SettingsView: View {
             }
         }))
         
-        confirmReset.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        confirmReset.addAction(UIAlertAction(title: "cancel".appLocalized, style: .cancel, handler: nil))
         
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let topViewController = windowScene.windows.first?.rootViewController?.topmostViewController() {
