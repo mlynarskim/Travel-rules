@@ -36,6 +36,16 @@
 "send" = "Wyślij";
 "An app for everyone who loves the lifestyle of living on wheels. You will find lots of rules to help you prepare for life in an RV, caravan, plane, train, boat or foot." = "Aplikacja dla wszystkich, którzy kochają styl życia na kółkach. Znajdziesz tu wiele zasad, które pomogą ci przygotować się do życia w kamperze, przyczepie, samolocie, pociągu, łodzi lub pieszo.";
 "Let's go!" = "Zaczynamy!";
+"my_checklist" = "Moja lista";   
+"packing_list" = "Lista pakowania";
+"add" = "Dodaj";
+
+//zasady
+"daily_limit" = "Dzienny limit";
+"come_back_tomorrow" = "Osiągnąłeś dzienny limit 3 zasad. Wróć jutro po więcej!";
+"daily_limit_reached" = "Osiągnąłeś dzienny limit. Wróć jutro!";
+
+
 
 // Lokalizacja
 "current_location" = "Aktualna lokalizacja:";

@@ -6,239 +6,307 @@ import MapKit
 
 // MARK: - Metrics
 struct ScreenMetrics {
-    static let screenWidth = UIScreen.main.bounds.width
-    static let screenHeight = UIScreen.main.bounds.height
-    static func adaptiveWidth(_ percentage: CGFloat) -> CGFloat {
-        return screenWidth * (percentage / 100)
-    }
-    static func adaptiveHeight(_ percentage: CGFloat) -> CGFloat {
-        return screenHeight * (percentage / 100)
-    }
+   static let screenWidth = UIScreen.main.bounds.width
+   static let screenHeight = UIScreen.main.bounds.height
+   static func adaptiveWidth(_ percentage: CGFloat) -> CGFloat {
+       return screenWidth * (percentage / 100)
+   }
+   static func adaptiveHeight(_ percentage: CGFloat) -> CGFloat {
+       return screenHeight * (percentage / 100)
+   }
 }
 
-// MARK: - UI Components
 struct TopMenuView: View {
-    @Binding var showSettings: Bool
-    @Binding var showPushView: Bool
-    
-    var body: some View {
-        HStack {
-            MenuButton(icon: "list.dash") {
-                showSettings = true
-            }
-            
-            Spacer()
-            
-            MenuButton(icon: "bell") {
-                showPushView = true
-            }
-        }
-        .padding(.horizontal, AppTheme.layout.spacing.large)
-        .padding(.vertical, AppTheme.layout.spacing.small)
-        .background(
-            Color.white.opacity(0.1)
-                .blur(radius: 5)
-        )
-        .sheet(isPresented: $showSettings) {
-            SettingsView(showSettings: $showSettings)
-                .transition(.move(edge: .leading))
-        }
-        .sheet(isPresented: $showPushView) {
-            PushView(showPushView: $showPushView)
-                .transition(.move(edge: .trailing))
-        }
-    }
+   @Binding var showSettings: Bool
+   @Binding var showPushView: Bool
+   
+   var body: some View {
+       HStack {
+           MenuButton(icon: "list.dash") {
+               showSettings = true
+           }
+           
+           Spacer()
+           
+           MenuButton(icon: "bell") {
+               showPushView = true
+           }
+       }
+       .padding(.horizontal, AppTheme.layout.spacing.large)
+       .padding(.vertical, AppTheme.layout.spacing.small)
+       .background(
+           Color.white.opacity(0.1)
+               .blur(radius: 5)
+       )
+       .sheet(isPresented: $showSettings) {
+           SettingsView(showSettings: $showSettings)
+               .transition(.move(edge: .leading))
+       }
+       .sheet(isPresented: $showPushView) {
+           PushView(showPushView: $showPushView)
+               .transition(.move(edge: .trailing))
+       }
+   }
 }
 
 struct MenuButton: View {
-    let icon: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 24, weight: .semibold))
-                .foregroundColor(AppTheme.colors.primaryText)
-                .frame(width: 44, height: 44)
-                .background(
-                    Circle()
-                        .fill(Color.white.opacity(0.2))
-                        .shadow(color: AppTheme.colors.cardShadow, radius: 5)
-                )
-        }
-    }
+   let icon: String
+   let action: () -> Void
+   
+   var body: some View {
+       Button(action: action) {
+           Image(systemName: icon)
+               .font(.system(size: 24, weight: .semibold))
+               .foregroundColor(AppTheme.colors.primaryText)
+               .frame(width: 44, height: 44)
+               .background(
+                   Circle()
+                       .fill(Color.white.opacity(0.2))
+                       .shadow(color: AppTheme.colors.cardShadow, radius: 5)
+               )
+       }
+   }
 }
+
 struct ShareButton: View {
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: "square.and.arrow.up")
-                .font(.system(size: 24))
-                .foregroundColor(AppTheme.colors.primary)
-                .padding(12)
-                .background(
-                    Circle()
-                        .fill(Color.white)
-                        .shadow(color: AppTheme.colors.cardShadow, radius: 3)
-                )
-        }
-        .offset(x: ScreenMetrics.adaptiveWidth(32), y: -8) // Usuń przesunięcie w pionie
-    }
+   let action: () -> Void
+   
+   var body: some View {
+       Button(action: action) {
+           Image(systemName: "square.and.arrow.up")
+               .font(.system(size: 24))
+               .foregroundColor(AppTheme.colors.primary)
+               .padding(12)
+               .background(
+                   Circle()
+                       .fill(Color.white)
+                       .shadow(color: AppTheme.colors.cardShadow, radius: 3)
+               )
+       }
+       .offset(x: ScreenMetrics.adaptiveWidth(32), y: -8)
+   }
 }
 
 struct MainActionButton: View {
-    let title: String
-    let icon: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
-                Text(title)
-                    .font(AppTheme.typography.headline)
-            }
-            .foregroundColor(.white)
-            .frame(width: ScreenMetrics.adaptiveWidth(32), height: 50)
-            .background(
-                RoundedRectangle(cornerRadius: AppTheme.layout.cornerRadius.medium)
-                    .fill(AppTheme.colors.primary)
-                    .shadow(color: AppTheme.colors.cardShadow, radius: 5)
-            )
-        }
-    }
+   let title: String
+   let icon: String
+   let action: () -> Void
+   
+   var body: some View {
+       Button(action: action) {
+           HStack {
+               Image(systemName: icon)
+                   .font(.system(size: 16, weight: .semibold))
+               Text(title)
+                   .font(AppTheme.typography.headline)
+           }
+           .foregroundColor(.white)
+           .frame(width: ScreenMetrics.adaptiveWidth(32), height: 50)
+           .background(
+               RoundedRectangle(cornerRadius: AppTheme.layout.cornerRadius.medium)
+                   .fill(AppTheme.colors.primary)
+                   .shadow(color: AppTheme.colors.cardShadow, radius: 5)
+           )
+       }
+   }
 }
 
 struct LoadingView: View {
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.4)
-                .edgesIgnoringSafeArea(.all)
-            
-            ProgressView()
-                .scaleEffect(1.5)
-                .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
-        }
-        .transition(.opacity)
-    }
+   var body: some View {
+       ZStack {
+           Color.black.opacity(0.4)
+               .edgesIgnoringSafeArea(.all)
+           
+           ProgressView()
+               .scaleEffect(1.5)
+               .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+       }
+       .transition(.opacity)
+   }
 }
+
 struct NextView: View {
    @State private var randomRule: String = ""
-   @State private var savedRules: [String] = []
-   @State private var buttonPressCount: Int = 0
+   @State private var lastDrawnRule: String = ""
+   @State private var savedRules: [Int] = []
    @State private var showSettings = false
    @State private var showPushView = false
    @State private var showRulesList = false
    @AppStorage("isDarkMode") var isDarkMode = false
-    var rulesList: [String] {
-        return getLocalizedRules()
-    };   @State private var showAlert = false
+   @AppStorage("lastRulesDate") private var lastRulesDate: Double = Date().timeIntervalSince1970
+   @AppStorage("dailyRulesCount") private var dailyRulesCount: Int = 0
+   @State private var usedRulesIndices: [Int] = []
+   var rulesList: [String] { return getLocalizedRules() }
+   @State private var showAlert = false
    @State private var isLoading = false
    @State private var errorMessage: String?
    @State private var showSaveAlert = false
    @State private var saveAlertMessage = ""
    @StateObject private var languageManager = LanguageManager.shared
-   
-   var body: some View {
-       LocalizedView {
-           ZStack {
-               Image(isDarkMode ? "imageDark" : "Image")
-                   .resizable()
-                   .scaledToFill()
-                   .edgesIgnoringSafeArea(.all)
-               
-               VStack {
-                   TopMenuView(showSettings: $showSettings, showPushView: $showPushView)
-                   VStack(spacing: AppTheme.layout.spacing.medium) {
-                       Text("the_rule_for_today".appLocalized)
-                           .font(AppTheme.typography.headline)
-                           .foregroundColor(AppTheme.colors.lightText)
-                           .frame(maxWidth: .infinity)
-                           .padding(AppTheme.layout.spacing.medium)
-                           .background(
-                               RoundedRectangle(cornerRadius: AppTheme.layout.cornerRadius.medium)
-                                   .fill(AppTheme.colors.primary)
-                                   .shadow(color: AppTheme.colors.cardShadow, radius: 5)
-                           )
-                           .padding(.horizontal)
-                       
-                       ZStack {
-                           RoundedRectangle(cornerRadius: AppTheme.layout.cornerRadius.medium)
-                               .fill(Color.white)
-                               .shadow(color: AppTheme.colors.cardShadow, radius: 8)
-                           
-                           VStack {
-                               Text(randomRule)
-                                   .font(AppTheme.typography.body)
-                                   .multilineTextAlignment(.center)
-                                   .foregroundColor(AppTheme.colors.primaryText)
-                                   .padding()
-                               
-                               Spacer()
-                               
-                               ShareButton {
-                                   shareRule()
-                               }
-                               .padding(.bottom, 10)
-                           }
-                       }
-                       .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(25))
-                       .padding(.horizontal)
-                       
-                       HStack {
-                           MainActionButton(title: "draw".appLocalized, icon: "dice.fill") {
-                               withAnimation(.spring()) {
-                                   buttonPressCount += 2
-                                   if buttonPressCount <= 5 {
-                                       getRandomRule()
-                                   } else {
-                                       buttonPressCount = 0
-                                       displayAlert()
-                                   }
-                               }
-                           }
-                           
-                           MainActionButton(title: "save".appLocalized, icon: "bookmark.fill") {
-                               withAnimation(.spring()) {
-                                   saveRule()
-                                   showRulesList = true
-                               }
-                           }
-                       }
-                       .padding(.horizontal)
-                   }
-                   
-                   Spacer()
-                   BottomNavigationMenu(savedRules: $savedRules)
-               }
-               
-               if isLoading {
-                   LoadingView()
-               }
-           }
-           .alert(isPresented: $showAlert) {
-               Alert(
-                   title: Text("slow_down".appLocalized),
-                   message: Text("take_time_think".appLocalized),
-                   dismissButton: .default(Text("ok".appLocalized))
-               )
-           }
-           .alert("success".appLocalized, isPresented: $showSaveAlert) {
-               Button("ok".appLocalized, role: .cancel) { }
-           } message: {
-               Text(saveAlertMessage)
-           }
-           .onAppear {
-               loadSavedRules()
-               getRandomRule()
-           }
-       }
-       .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
-           getRandomRule()
-       }
-   }
+    
+    var body: some View {
+        LocalizedView {
+            ZStack {
+                Image(isDarkMode ? "imageDark" : "Image")
+                    .resizable()
+                    .scaledToFill()
+                    .edgesIgnoringSafeArea(.all)
+                
+                VStack {
+                    TopMenuView(showSettings: $showSettings, showPushView: $showPushView)
+                    VStack(spacing: AppTheme.layout.spacing.medium) {
+                        Text("the_rule_for_today".appLocalized)
+                            .font(AppTheme.typography.headline)
+                            .foregroundColor(AppTheme.colors.lightText)
+                            .frame(maxWidth: .infinity)
+                            .padding(AppTheme.layout.spacing.medium)
+                            .background(
+                                RoundedRectangle(cornerRadius: AppTheme.layout.cornerRadius.medium)
+                                    .fill(AppTheme.colors.primary)
+                                    .shadow(color: AppTheme.colors.cardShadow, radius: 5)
+                            )
+                            .padding(.horizontal)
+                        
+                        ZStack {
+                            RoundedRectangle(cornerRadius: AppTheme.layout.cornerRadius.medium)
+                                .fill(Color.white)
+                                .shadow(color: AppTheme.colors.cardShadow, radius: 8)
+                            
+                            VStack {
+                                Text(randomRule)
+                                    .font(AppTheme.typography.body)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(AppTheme.colors.primaryText)
+                                    .padding()
+                                
+                                Spacer()
+                                
+                                ShareButton {
+                                    shareRule()
+                                }
+                                .padding(.bottom, 10)
+                            }
+                        }
+                        .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(25))
+                        .padding(.horizontal)
+                        
+                        HStack {
+                            MainActionButton(title: "draw".appLocalized, icon: "dice.fill") {
+                                withAnimation(.spring()) {
+                                    if dailyRulesCount >= 3 {
+                                        showAlert = true
+                                        randomRule = lastDrawnRule
+                                    } else {
+                                        getRandomRule()
+                                    }
+                                }
+                            }
+                            
+                            MainActionButton(title: "save".appLocalized, icon: "bookmark.fill") {
+                                withAnimation(.spring()) {
+                                    saveRule()
+                                    showRulesList = true
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    
+                    Spacer()
+                    BottomNavigationMenu(savedRules: $savedRules)
+                }
+                
+                if isLoading {
+                    LoadingView()
+                }
+            }
+            .alert(isPresented: $showAlert) {
+                Alert(
+                    title: Text("daily_limit".appLocalized),
+                    message: Text("come_back_tomorrow".appLocalized),
+                    dismissButton: .default(Text("ok".appLocalized))
+                )
+            }
+            .alert("success".appLocalized, isPresented: $showSaveAlert) {
+                Button("ok".appLocalized, role: .cancel) { }
+            } message: {
+                Text(saveAlertMessage)
+            }
+            .onAppear {
+                loadSavedRules()
+                loadUsedRulesIndices()
+                loadLastDrawnRule()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
+            loadLastDrawnRule()
+        }
+    }
+    
+    private func saveLastDrawnRule() {
+        UserDefaults.standard.set(randomRule, forKey: "lastDrawnRule")
+        lastDrawnRule = randomRule
+    }
+    
+    private func loadLastDrawnRule() {
+        if let lastRule = UserDefaults.standard.string(forKey: "lastDrawnRule") {
+            randomRule = lastRule
+            lastDrawnRule = lastRule
+        } else {
+            let currentRules = getLocalizedRules()
+            let allIndices = Set(0..<currentRules.count)
+            let usedIndicesSet = Set(usedRulesIndices)
+            let availableIndices = allIndices.subtracting(usedIndicesSet)
+            
+            if availableIndices.isEmpty {
+                randomRule = "all_rules_used".appLocalized
+                return
+            }
+            
+            if let randomIndex = availableIndices.randomElement() {
+                randomRule = currentRules[randomIndex]
+                lastDrawnRule = randomRule
+                saveLastDrawnRule()
+            }
+        }
+    }
+    
+    func getRandomRule() {
+        let currentDate = Date()
+        let calendar = Calendar.current
+        
+        if !calendar.isDate(Date(timeIntervalSince1970: lastRulesDate), inSameDayAs: currentDate) {
+            dailyRulesCount = 0
+            lastRulesDate = currentDate.timeIntervalSince1970
+        }
+        
+        let currentRules = getLocalizedRules()
+        let allIndices = Set(0..<currentRules.count)
+        let usedIndicesSet = Set(usedRulesIndices)
+        let availableIndices = allIndices.subtracting(usedIndicesSet)
+        
+        if availableIndices.isEmpty {
+            randomRule = "all_rules_used".appLocalized
+            saveLastDrawnRule()
+            return
+        }
+        
+        if dailyRulesCount >= 3 {
+            showAlert = true
+            randomRule = lastDrawnRule
+            return
+        }
+        
+        if let randomIndex = availableIndices.randomElement() {
+            randomRule = currentRules[randomIndex]
+            if !usedRulesIndices.contains(randomIndex) {
+                usedRulesIndices.append(randomIndex)
+                saveUsedRulesIndices()
+                dailyRulesCount += 1
+                saveLastDrawnRule()
+            }
+        }
+    }
    
    func shareRule() {
        guard let image = generateImage() else {
@@ -308,34 +376,44 @@ struct NextView: View {
        return image
    }
    
-   func getRandomRule() {
-       if Set(RulesList).subtracting(Set(savedRules)).isEmpty {
-           randomRule = "all_rules_used".appLocalized
-           return
+   func findRuleIndex(_ rule: String) -> Int? {
+       if let index = RulesList.firstIndex(of: rule) {
+           return index
        }
-       
-       repeat {
-           randomRule = RulesList.randomElement() ?? ""
-       } while savedRules.contains(randomRule)
+       if let index = RulesListPL.firstIndex(of: rule) {
+           return index
+       }
+       if let index = RulesListES.firstIndex(of: rule) {
+           return index
+       }
+       return nil
    }
    
    func saveRule() {
-       if !savedRules.contains(randomRule) {
-           savedRules.append(randomRule)
-           saveRules()
-           getRandomRule()
-           saveAlertMessage = "rule_saved".appLocalized
-           showSaveAlert = true
-       } else {
-           saveAlertMessage = "rule_exists".appLocalized
-           showSaveAlert = true
+       if let index = findRuleIndex(randomRule) {
+           if !savedRules.contains(index) {
+               savedRules.append(index)
+               saveRules()
+               getRandomRule()
+               saveAlertMessage = "rule_saved".appLocalized
+               showSaveAlert = true
+           } else {
+               saveAlertMessage = "rule_exists".appLocalized
+               showSaveAlert = true
+           }
        }
    }
-   
-   func displayAlert() {
-       showAlert = true
-   }
-   
+    private func saveUsedRulesIndices() {
+        if let encoded = try? JSONEncoder().encode(usedRulesIndices) {
+            UserDefaults.standard.set(encoded, forKey: "usedRulesIndices")
+        }
+    }
+    private func loadUsedRulesIndices() {
+        if let data = UserDefaults.standard.data(forKey: "usedRulesIndices"),
+           let decoded = try? JSONDecoder().decode([Int].self, from: data) {
+            usedRulesIndices = decoded
+        }
+    }
    private func saveRules() {
        do {
            let data = try JSONEncoder().encode(savedRules)
@@ -347,26 +425,26 @@ struct NextView: View {
    
    private func loadSavedRules() {
        if let data = UserDefaults.standard.data(forKey: "savedRules"),
-          let decoded = try? JSONDecoder().decode([String].self, from: data) {
+          let decoded = try? JSONDecoder().decode([Int].self, from: data) {
            savedRules = decoded
        }
    }
 }
 
-// Pozostałe komponenty zostają bez zmian
 struct BottomNavigationMenu: View {
-   @Binding var savedRules: [String]
-   
-   var body: some View {
-       HStack {
-           NavigationButton(destination: AddRuleView(), icon: "plus")
-           NavigationButton(destination: TravelListView(), icon: "checkmark.circle")
-           NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
-           NavigationButton(destination: RulesListView(savedRules: $savedRules), icon: "list.star")
-       }
-       .padding(.horizontal)
-   }
+    @Binding var savedRules: [Int] // Zmieniamy z [Rule] na [Int], bo wcześniej używaliśmy Int
+    
+    var body: some View {
+        HStack {
+            NavigationButton(destination: AddRuleView(), icon: "plus")
+            NavigationButton(destination: TravelListView(), icon: "checkmark.circle")
+            NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
+            NavigationButton(destination: RulesListView(savedRules: $savedRules), icon: "list.star")
+        }
+        .padding(.horizontal)
+    }
 }
+
 
 struct NavigationButton<Destination: View>: View {
    let destination: Destination
@@ -396,9 +474,10 @@ struct ScaleButtonStyle: ButtonStyle {
            .animation(.spring(), value: configuration.isPressed)
    }
 }
+
 struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .environment(\.colorScheme, .light)
-    }
+   static var previews: some View {
+       ContentView()
+           .environment(\.colorScheme, .light)
+   }
 }
