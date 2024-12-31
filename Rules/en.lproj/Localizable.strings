@@ -37,6 +37,16 @@
 "RULES" = "RULES";
 "An app for everyone who loves the lifestyle of living on wheels. You will find lots of rules to help you prepare for life in an RV, caravan, plane, train, boat or foot." = "An app for everyone who loves the lifestyle of living on wheels. You will find lots of rules to help you prepare for life in an RV, caravan, plane, train, boat or foot.";
 "Let's go!" = "Let's go!";
+"my_checklist" = "My Checklist"; 
+"packing_list" = "Packing List";
+"add" = "Add";
+
+
+//zasady
+"daily_limit" = "Daily Limit";
+"come_back_tomorrow" = "You've reached your daily limit of 3 rules. Come back tomorrow for more!";
+"daily_limit_reached" = "You've reached your daily limit. Come back tomorrow!";
+
 
 
 // Location

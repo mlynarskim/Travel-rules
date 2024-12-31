@@ -17,6 +17,9 @@
 		0710BC9F2D1F5B6800B24A42 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0710BC9E2D1F5B6200B24A42 /* LanguageManager.swift */; };
 		0710BCA12D1F5BA600B24A42 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0710BCA02D1F5BA100B24A42 /* StringExtensions.swift */; };
 		0710BCA32D1FF36700B24A42 /* LocalizedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0710BCA22D1FF36000B24A42 /* LocalizedView.swift */; };
+		0716DB872D24077E00C16258 /* CountryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0716DB862D24077900C16258 /* CountryInfo.swift */; };
+		0716DB892D24079A00C16258 /* CountryInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0716DB882D24079400C16258 /* CountryInfoService.swift */; };
+		0716DB8C2D2407E200C16258 /* CountryInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0716DB8B2D2407DE00C16258 /* CountryInfoView.swift */; };
 		0718517A2A76F1CD00B61C24 /* RulesListPL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071851792A76F1CD00B61C24 /* RulesListPL.swift */; };
 		07339B542A64019600120686 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079190592A1FA1F200C94BE3 /* SwiftUI.framework */; };
 		076EAFC92A3A3E2E0021DA4C /* grunge-bounce-drum-loop-40464.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 076EAFC62A3A3E2E0021DA4C /* grunge-bounce-drum-loop-40464.mp3 */; };
@@ -72,6 +75,9 @@
 		0710BC9E2D1F5B6200B24A42 /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
 		0710BCA02D1F5BA100B24A42 /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		0710BCA22D1FF36000B24A42 /* LocalizedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedView.swift; sourceTree = "<group>"; };
+		0716DB862D24077900C16258 /* CountryInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryInfo.swift; sourceTree = "<group>"; };
+		0716DB882D24079400C16258 /* CountryInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryInfoService.swift; sourceTree = "<group>"; };
+		0716DB8B2D2407DE00C16258 /* CountryInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryInfoView.swift; sourceTree = "<group>"; };
 		071851792A76F1CD00B61C24 /* RulesListPL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesListPL.swift; sourceTree = "<group>"; };
 		072EE9C52A24375E00D2C858 /* Lato-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Thin.ttf"; sourceTree = "<group>"; };
 		072EE9C62A24375F00D2C858 /* Lato-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-BlackItalic.ttf"; sourceTree = "<group>"; };
@@ -281,6 +287,9 @@
 		07E14C7E2A320E6600B5062C /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0716DB8B2D2407DE00C16258 /* CountryInfoView.swift */,
+				0716DB882D24079400C16258 /* CountryInfoService.swift */,
+				0716DB862D24077900C16258 /* CountryInfo.swift */,
 				0710BCA22D1FF36000B24A42 /* LocalizedView.swift */,
 				07E14C7F2A320EA400B5062C /* travelChecklist.swift */,
 				07C717332A644ADB0014F2A8 /* downMenuBar.swift */,
@@ -452,7 +461,9 @@
 			files = (
 				0710BCA32D1FF36700B24A42 /* LocalizedView.swift in Sources */,
 				07E14C802A320EA400B5062C /* travelChecklist.swift in Sources */,
+				0716DB872D24077E00C16258 /* CountryInfo.swift in Sources */,
 				07FE35572A36100800C93577 /* colors.swift in Sources */,
+				0716DB892D24079A00C16258 /* CountryInfoService.swift in Sources */,
 				07E14C7D2A320E5C00B5062C /* ListItem.swift in Sources */,
 				0710BC9F2D1F5B6800B24A42 /* LanguageManager.swift in Sources */,
 				07A7C9142A546FB10017E850 /* hex.swift in Sources */,
@@ -467,6 +478,7 @@
 				07D111862D1C98D70020C518 /* LocationData.swift in Sources */,
 				07C717312A6435DA0014F2A8 /* startScreen.swift in Sources */,
 				07FD9C572A2B8B2E009809F0 /* RulesList.swift in Sources */,
+				0716DB8C2D2407E200C16258 /* CountryInfoView.swift in Sources */,
 				07835FE12A5A1151008CE8F7 /* pushView.swift in Sources */,
 				07F108DF2D1EF74B003EEBB6 /* RuleListES.swift in Sources */,
 				07E14CAE2A33344B00B5062C /* myChecklist.swift in Sources */,
