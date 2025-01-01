@@ -27,6 +27,13 @@
 		076EAFCB2A3A3E2E0021DA4C /* ambient-wave-48-tribute-17243.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 076EAFC82A3A3E2E0021DA4C /* ambient-wave-48-tribute-17243.mp3 */; };
 		0780433E2A231CDD004BCE3D /* Property List.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0780433D2A231CDD004BCE3D /* Property List.plist */; };
 		07835FE12A5A1151008CE8F7 /* pushView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07835FE02A5A1151008CE8F7 /* pushView.swift */; };
+		079F9CC02D249027004AB1C5 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 079F9CBF2D249027004AB1C5 /* GoogleMobileAds */; };
+		079F9CC22D2492F3004AB1C5 /* BannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079F9CC12D2492E7004AB1C5 /* BannerView.swift */; };
+		079F9CC52D25931B004AB1C5 /* Achievement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079F9CC42D259317004AB1C5 /* Achievement.swift */; };
+		079F9CC72D259349004AB1C5 /* AchievementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079F9CC62D259344004AB1C5 /* AchievementsView.swift */; };
+		079F9CC92D25939C004AB1C5 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079F9CC82D259396004AB1C5 /* HapticManager.swift */; };
+		079F9CCB2D2593FA004AB1C5 /* AchievementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079F9CCA2D2593F4004AB1C5 /* AchievementManager.swift */; };
+		079F9CD02D25AB19004AB1C5 /* ToastView.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079F9CCF2D25AB16004AB1C5 /* ToastView.swift.swift */; };
 		07A7C9122A546EA10017E850 /* GPSlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9112A546EA10017E850 /* GPSlistView.swift */; };
 		07A7C9142A546FB10017E850 /* hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9132A546FB10017E850 /* hex.swift */; };
 		07A7C9162A54702C0017E850 /* settingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A7C9152A54702C0017E850 /* settingsView.swift */; };
@@ -98,6 +105,12 @@
 		079190592A1FA1F200C94BE3 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		0791905B2A1FA20600C94BE3 /* libswiftAVFoundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftAVFoundation.tbd; path = usr/lib/swift/libswiftAVFoundation.tbd; sourceTree = SDKROOT; };
 		079190602A1FA23900C94BE3 /* libswiftFoundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftFoundation.tbd; path = usr/lib/swift/libswiftFoundation.tbd; sourceTree = SDKROOT; };
+		079F9CC12D2492E7004AB1C5 /* BannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerView.swift; sourceTree = "<group>"; };
+		079F9CC42D259317004AB1C5 /* Achievement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Achievement.swift; sourceTree = "<group>"; };
+		079F9CC62D259344004AB1C5 /* AchievementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsView.swift; sourceTree = "<group>"; };
+		079F9CC82D259396004AB1C5 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		079F9CCA2D2593F4004AB1C5 /* AchievementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementManager.swift; sourceTree = "<group>"; };
+		079F9CCF2D25AB16004AB1C5 /* ToastView.swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift.swift; sourceTree = "<group>"; };
 		07A7C9112A546EA10017E850 /* GPSlistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSlistView.swift; sourceTree = "<group>"; };
 		07A7C9132A546FB10017E850 /* hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hex.swift; sourceTree = "<group>"; };
 		07A7C9152A54702C0017E850 /* settingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settingsView.swift; sourceTree = "<group>"; };
@@ -127,6 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				079F9CC02D249027004AB1C5 /* GoogleMobileAds in Frameworks */,
 				07339B542A64019600120686 /* SwiftUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -151,6 +165,7 @@
 		0707D9982A1453D800186248 = {
 			isa = PBXGroup;
 			children = (
+				079F9CC82D259396004AB1C5 /* HapticManager.swift */,
 				076EAFBF2A3A3C9D0021DA4C /* sounds */,
 				072EE9C42A24374900D2C858 /* Font LATO */,
 				0780433D2A231CDD004BCE3D /* Property List.plist */,
@@ -159,7 +174,6 @@
 				0707D9BE2A1453D900186248 /* RulesUITests */,
 				0707D9A22A1453D800186248 /* Products */,
 				079190582A1FA1F100C94BE3 /* Frameworks */,
-				6472A902C802B2ACC6ADFD97 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -265,6 +279,26 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		079F9CC32D2592B4004AB1C5 /* Achievements */ = {
+			isa = PBXGroup;
+			children = (
+				079F9CCA2D2593F4004AB1C5 /* AchievementManager.swift */,
+				079F9CC62D259344004AB1C5 /* AchievementsView.swift */,
+				079F9CC42D259317004AB1C5 /* Achievement.swift */,
+			);
+			path = Achievements;
+			sourceTree = "<group>";
+		};
+		079F9CCC2D259754004AB1C5 /* CountryInfo */ = {
+			isa = PBXGroup;
+			children = (
+				0716DB8B2D2407DE00C16258 /* CountryInfoView.swift */,
+				0716DB882D24079400C16258 /* CountryInfoService.swift */,
+				0716DB862D24077900C16258 /* CountryInfo.swift */,
+			);
+			path = CountryInfo;
+			sourceTree = "<group>";
+		};
 		07D111842D1C98500020C518 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -287,9 +321,10 @@
 		07E14C7E2A320E6600B5062C /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				0716DB8B2D2407DE00C16258 /* CountryInfoView.swift */,
-				0716DB882D24079400C16258 /* CountryInfoService.swift */,
-				0716DB862D24077900C16258 /* CountryInfo.swift */,
+				079F9CC32D2592B4004AB1C5 /* Achievements */,
+				079F9CCF2D25AB16004AB1C5 /* ToastView.swift.swift */,
+				079F9CC12D2492E7004AB1C5 /* BannerView.swift */,
+				079F9CCC2D259754004AB1C5 /* CountryInfo */,
 				0710BCA22D1FF36000B24A42 /* LocalizedView.swift */,
 				07E14C7F2A320EA400B5062C /* travelChecklist.swift */,
 				07C717332A644ADB0014F2A8 /* downMenuBar.swift */,
@@ -313,13 +348,6 @@
 				07A7C9132A546FB10017E850 /* hex.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		6472A902C802B2ACC6ADFD97 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -412,6 +440,9 @@
 				es,
 			);
 			mainGroup = 0707D9982A1453D800186248;
+			packageReferences = (
+				079F9CBE2D249027004AB1C5 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			productRefGroup = 0707D9A22A1453D800186248 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -459,12 +490,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				079F9CC22D2492F3004AB1C5 /* BannerView.swift in Sources */,
+				079F9CC72D259349004AB1C5 /* AchievementsView.swift in Sources */,
+				079F9CC92D25939C004AB1C5 /* HapticManager.swift in Sources */,
 				0710BCA32D1FF36700B24A42 /* LocalizedView.swift in Sources */,
 				07E14C802A320EA400B5062C /* travelChecklist.swift in Sources */,
 				0716DB872D24077E00C16258 /* CountryInfo.swift in Sources */,
+				079F9CCB2D2593FA004AB1C5 /* AchievementManager.swift in Sources */,
 				07FE35572A36100800C93577 /* colors.swift in Sources */,
 				0716DB892D24079A00C16258 /* CountryInfoService.swift in Sources */,
 				07E14C7D2A320E5C00B5062C /* ListItem.swift in Sources */,
+				079F9CC52D25931B004AB1C5 /* Achievement.swift in Sources */,
+				079F9CD02D25AB19004AB1C5 /* ToastView.swift.swift in Sources */,
 				0710BC9F2D1F5B6800B24A42 /* LanguageManager.swift in Sources */,
 				07A7C9142A546FB10017E850 /* hex.swift in Sources */,
 				07E14CA82A33317300B5062C /* customRule.swift in Sources */,
@@ -854,6 +891,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		079F9CBE2D249027004AB1C5 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.13.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		079F9CBF2D249027004AB1C5 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 079F9CBE2D249027004AB1C5 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0707D9992A1453D800186248 /* Project object */;
 }

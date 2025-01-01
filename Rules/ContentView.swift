@@ -17,36 +17,46 @@ struct ScreenMetrics {
 }
 
 struct TopMenuView: View {
-   @Binding var showSettings: Bool
-   @Binding var showPushView: Bool
-   
-   var body: some View {
-       HStack {
-           MenuButton(icon: "list.dash") {
-               showSettings = true
-           }
-           
-           Spacer()
-           
-           MenuButton(icon: "bell") {
-               showPushView = true
-           }
-       }
-       .padding(.horizontal, AppTheme.layout.spacing.large)
-       .padding(.vertical, AppTheme.layout.spacing.small)
-       .background(
-           Color.white.opacity(0.1)
-               .blur(radius: 5)
-       )
-       .sheet(isPresented: $showSettings) {
-           SettingsView(showSettings: $showSettings)
-               .transition(.move(edge: .leading))
-       }
-       .sheet(isPresented: $showPushView) {
-           PushView(showPushView: $showPushView)
-               .transition(.move(edge: .trailing))
-       }
-   }
+    @Binding var showSettings: Bool
+    @Binding var showPushView: Bool
+    @State private var showAchievements = false
+    
+    var body: some View {
+        HStack {
+            MenuButton(icon: "list.dash") {
+                showSettings = true
+            }
+            
+            Spacer()
+            
+            HStack(spacing: 15) {
+                MenuButton(icon: "trophy.fill") {
+                    showAchievements = true
+                }
+                
+                MenuButton(icon: "bell") {
+                    showPushView = true
+                }
+            }
+        }
+        .padding(.horizontal, AppTheme.layout.spacing.large)
+        .padding(.vertical, AppTheme.layout.spacing.small)
+        .background(
+            Color.white.opacity(0.1)
+                .blur(radius: 5)
+        )
+        .sheet(isPresented: $showSettings) {
+            SettingsView(showSettings: $showSettings)
+                .transition(.move(edge: .leading))
+        }
+        .sheet(isPresented: $showPushView) {
+            PushView(showPushView: $showPushView)
+                .transition(.move(edge: .trailing))
+        }
+        .sheet(isPresented: $showAchievements) {
+            AchievementsView()
+        }
+    }
 }
 
 struct MenuButton: View {
@@ -126,6 +136,9 @@ struct LoadingView: View {
 }
 
 struct NextView: View {
+    let bannerID = "ca-app-pub-5307701268996147/4702587401"
+        @State private var shouldShowAd = false
+        private let maxDailyRules = 5 // zmienione z 3 na 5
    @State private var randomRule: String = ""
    @State private var lastDrawnRule: String = ""
    @State private var savedRules: [Int] = []
@@ -143,6 +156,9 @@ struct NextView: View {
    @State private var showSaveAlert = false
    @State private var saveAlertMessage = ""
    @StateObject private var languageManager = LanguageManager.shared
+    @StateObject private var achievementManager = AchievementManager()
+    @AppStorage("totalRulesDrawn") private var totalRulesDrawn: Int = 0
+    @AppStorage("totalRulesSaved") private var totalRulesSaved: Int = 0
     
     var body: some View {
         LocalizedView {
@@ -152,6 +168,13 @@ struct NextView: View {
                     .scaledToFill()
                     .edgesIgnoringSafeArea(.all)
                 
+                if achievementManager.showToast, let achievement = achievementManager.currentAchievement {
+                                    ToastView(achievement: achievement, isShowing: $achievementManager.showToast)
+                                        .transition(.move(edge: .top).combined(with: .opacity))
+                                        .zIndex(1)
+                                        .padding(.top, 50)
+                                }
+                                
                 VStack {
                     TopMenuView(showSettings: $showSettings, showPushView: $showPushView)
                     VStack(spacing: AppTheme.layout.spacing.medium) {
@@ -178,6 +201,12 @@ struct NextView: View {
                                     .multilineTextAlignment(.center)
                                     .foregroundColor(AppTheme.colors.primaryText)
                                     .padding()
+                                
+                                if shouldShowAd {
+                                    BannerView(adUnitID: bannerID)
+                                        .frame(height: 50)
+                                        .padding(.horizontal)
+                                }
                                 
                                 Spacer()
                                 
@@ -291,7 +320,7 @@ struct NextView: View {
             return
         }
         
-        if dailyRulesCount >= 3 {
+        if dailyRulesCount >= maxDailyRules {
             showAlert = true
             randomRule = lastDrawnRule
             return
@@ -304,10 +333,24 @@ struct NextView: View {
                 saveUsedRulesIndices()
                 dailyRulesCount += 1
                 saveLastDrawnRule()
+                totalRulesDrawn += 1
+                achievementManager.checkAchievements(rulesDrawn: totalRulesDrawn, rulesSaved: totalRulesSaved)
+                
+                // Pokaż reklamę co drugą zasadę
+                if dailyRulesCount % 2 == 0 {
+                    withAnimation {
+                        shouldShowAd = true
+                    }
+                    // Ukryj reklamę po 5 sekundach
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                        withAnimation {
+                            shouldShowAd = false
+                        }
+                    }
+                }
             }
         }
     }
-   
    func shareRule() {
        guard let image = generateImage() else {
            print("Failed to generate image")
@@ -389,20 +432,22 @@ struct NextView: View {
        return nil
    }
    
-   func saveRule() {
-       if let index = findRuleIndex(randomRule) {
-           if !savedRules.contains(index) {
-               savedRules.append(index)
-               saveRules()
-               getRandomRule()
-               saveAlertMessage = "rule_saved".appLocalized
-               showSaveAlert = true
-           } else {
-               saveAlertMessage = "rule_exists".appLocalized
-               showSaveAlert = true
-           }
-       }
-   }
+    func saveRule() {
+        if let index = findRuleIndex(randomRule) {
+            if !savedRules.contains(index) {
+                savedRules.append(index)
+                saveRules()
+                getRandomRule()
+                totalRulesSaved += 1
+                achievementManager.checkAchievements(rulesDrawn: totalRulesDrawn, rulesSaved: totalRulesSaved)
+                saveAlertMessage = "rule_saved".appLocalized
+                showSaveAlert = true
+            } else {
+                saveAlertMessage = "rule_exists".appLocalized
+                showSaveAlert = true
+            }
+        }
+    }
     private func saveUsedRulesIndices() {
         if let encoded = try? JSONEncoder().encode(usedRulesIndices) {
             UserDefaults.standard.set(encoded, forKey: "usedRulesIndices")
@@ -432,8 +477,7 @@ struct NextView: View {
 }
 
 struct BottomNavigationMenu: View {
-    @Binding var savedRules: [Int] // Zmieniamy z [Rule] na [Int], bo wcześniej używaliśmy Int
-    
+    @Binding var savedRules: [Int]
     var body: some View {
         HStack {
             NavigationButton(destination: AddRuleView(), icon: "plus")
