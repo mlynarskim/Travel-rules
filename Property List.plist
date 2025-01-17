@@ -4,5 +4,9 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>The app needs access to your location in order to personalize features near you.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Potrzebujemy dostępu do Twojej lokalizacji, aby pokazać Twoją aktualną pozycję.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Potrzebujemy dostępu do Twojej lokalizacji, aby pokazać Twoją aktualną pozycję.</string>
 </dict>
 </plist>
