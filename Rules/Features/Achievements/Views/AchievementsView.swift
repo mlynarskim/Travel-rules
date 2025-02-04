@@ -3,13 +3,23 @@ import SwiftUI
 struct AchievementsView: View {
    @Environment(\.dismiss) private var dismiss
    @Environment(\.colorScheme) private var colorScheme
+   @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
    @StateObject private var achievementManager = AchievementManager()
+   
+   private var theme: ThemeColors {
+       switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
+       case .classic: return ThemeColors.classicTheme
+       case .mountain: return ThemeColors.mountainTheme
+       case .beach: return ThemeColors.beachTheme
+       case .desert: return ThemeColors.desertTheme
+       case .forest: return ThemeColors.forestTheme
+       }
+   }
    
    var body: some View {
        NavigationView {
            ZStack {
-               Color(hex: "#29606D")
-                   .opacity(colorScheme == .dark ? 0.15 : 0.1)
+               Color(theme.background)
                    .edgesIgnoringSafeArea(.all)
                
                List {
@@ -17,36 +27,37 @@ struct AchievementsView: View {
                        HStack {
                            Image(systemName: achievement.icon)
                                .foregroundColor(achievement.isUnlocked ?
-                                              achievement.themeColor :
+                                              theme.accent :
                                               .gray.opacity(0.5))
                                .font(.title2)
                                .frame(width: 40)
+                               .scaleEffect(achievement.isUnlocked ? 1.1 : 1.0)
+                               .animation(.easeInOut(duration: 0.3), value: achievement.isUnlocked)
                            
                            VStack(alignment: .leading, spacing: 4) {
                                Text(achievement.title)
                                    .font(.headline)
-                                   .foregroundColor(colorScheme == .dark ? .white : .primary)
+                                   .foregroundColor(theme.primaryText)
                                
                                Text(achievement.description)
                                    .font(.subheadline)
-                                   .foregroundColor(.secondary)
+                                   .foregroundColor(theme.secondaryText)
                            }
                            
                            Spacer()
                            
                            if achievement.isUnlocked {
                                Image(systemName: "checkmark.circle.fill")
-                                   .foregroundColor(achievement.themeColor)
+                                   .foregroundColor(theme.success)
                            }
                        }
                        .padding(.vertical, 8)
                        .opacity(achievement.isUnlocked ? 1 : 0.6)
-                       .animation(.spring(), value: achievement.isUnlocked)
                    }
                }
                .listStyle(InsetGroupedListStyle())
            }
-           .navigationTitle(NSLocalizedString("achievements.title", comment: ""))
+           .navigationTitle("Osiągnięcia")
            .navigationBarTitleDisplayMode(.inline)
            .toolbar {
                ToolbarItem(placement: .navigationBarTrailing) {
@@ -58,10 +69,6 @@ struct AchievementsView: View {
                    }
                }
            }
-           .onAppear {
-               print("Achievements count: \(achievementManager.achievements.count)")
-           }
        }
    }
 }
-

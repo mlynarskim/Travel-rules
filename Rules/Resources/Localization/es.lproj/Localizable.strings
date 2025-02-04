@@ -292,3 +292,27 @@
 "export.error.title" = "Error de exportación";
 "export.error.message" = "No se pudo generar el archivo PDF. Por favor, inténtelo de nuevo.";
 "pdf.page" = "Página %d";
+
+//motywy
+"choose_theme" = "Elige un tema";
+"theme_classic" = "Clásico";
+"theme_mountain" = "Montaña";
+"theme_beach" = "Playa";
+"theme_desert" = "Desierto";
+"theme_forest" = "Bosque";
+"theme_classic_description" = "Tema estándar de la aplicación";
+"theme_mountain_description" = "Inspirado en caminatas por montañas";
+"theme_beach_description" = "Ambiente de playa vacacional";
+"theme_desert_description" = "Paisajes desérticos";
+"theme_forest_description" = "Senderos del bosque";
+
+//rejestracja
+"registration_title" = "Registro";
+"email_placeholder" = "Correo electrónico";
+"password_placeholder" = "Contraseña";
+"confirm_password_placeholder" = "Confirmar contraseña";
+"register_button" = "Registrarse";
+"error_missing_email_password" = "Por favor, introduzca un correo electrónico y una contraseña.";
+"error_passwords_mismatch" = "Las contraseñas no coinciden.";
+"registration_error" = "Error de registro";
+

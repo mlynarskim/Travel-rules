@@ -1,7 +1,1 @@
-//
-//  Message.swift
-//  Rules
-//
-//  Created by Mateusz Mlynarski on 17/01/2025.
-//
-
+//Message.swift

@@ -32,10 +32,11 @@ struct ContentView: View {
                         .edgesIgnoringSafeArea(.all)
                     
                 )
-                .navigationBarHidden(true)
+            .navigationBarHidden(true)
         }
     }
 }
+
 
 struct ScreenMetrics {
     static let screenWidth = UIScreen.main.bounds.width
@@ -232,7 +233,7 @@ struct NextView: View {
                                     .padding()
                                 
                                 if shouldShowAd {
-                                    BannerView(adUnitID: bannerID)
+                                    AdBannerView(adUnitID: bannerID)
                                         .frame(height: 50)
                                         .padding(.horizontal)
                                 }
@@ -542,7 +543,16 @@ struct BottomNavigationMenu: View {
     
     var body: some View {
         HStack {
-            NavigationButton(destination: PeopleTabView(), icon: "person.2")
+            NavigationButton(destination: PeopleTabView(user: NearbyUser(
+                id: UUID(),
+                name: "Użytkownik",
+                status: .available,
+                category: .social,
+                location: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                distance: 0,
+                shareLevel: .approximate,
+                description: nil
+            )), icon: "person.2")
             NavigationButton(destination: TravelListView(), icon: "checkmark.circle")
             NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
             NavigationButton(destination: RulesListViewControllerRepresentable(), icon: "list.star")
