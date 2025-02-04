@@ -296,3 +296,26 @@
 "export.error.title" = "Błąd eksportu";
 "export.error.message" = "Nie udało się wygenerować pliku PDF. Spróbuj ponownie.";
 "pdf.page" = "Strona %d";
+
+//Motywy
+"choose_theme" = "Wybierz motyw";
+"theme_classic" = "Klasyczny";
+"theme_mountain" = "Górski";
+"theme_beach" = "Plaża";
+"theme_desert" = "Pustynia";
+"theme_forest" = "Leśny";
+"theme_classic_description" = "Standardowy motyw aplikacji";
+"theme_mountain_description" = "Inspirowany górskimi wędrówkami";
+"theme_beach_description" = "Wakacyjny klimat plaży";
+"theme_desert_description" = "Pustynne przestrzenie";
+"theme_forest_description" = "Leśne ścieżki";
+
+//rejestracja
+"registration_title" = "Rejestracja";
+"email_placeholder" = "Email";
+"password_placeholder" = "Hasło";
+"confirm_password_placeholder" = "Potwierdź hasło";
+"register_button" = "Zarejestruj się";
+"error_missing_email_password" = "Proszę wprowadzić email i hasło.";
+"error_passwords_mismatch" = "Hasła się nie zgadzają.";
+"registration_error" = "Błąd rejestracji";

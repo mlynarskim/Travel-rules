@@ -25,8 +25,7 @@ struct Achievement: Codable, Identifiable {
 
 extension Achievement {
     static let achievements: [Achievement] = [
-        // Basic achievements
-        Achievement(
+            Achievement(
             id: "first_rule",
             titleKey: "achievement.first_rule.title",
             descriptionKey: "achievement.first_rule.description",
@@ -54,7 +53,6 @@ extension Achievement {
             color: "AchievementBronze"
         ),
         
-        // Save achievements
         Achievement(
             id: "save_first",
             titleKey: "achievement.save_first.title",
@@ -74,7 +72,6 @@ extension Achievement {
             color: "AchievementPurple"
         ),
         
-        // Streak achievements
         Achievement(
             id: "daily_streak_3",
             titleKey: "achievement.daily_streak_3.title",
@@ -103,7 +100,6 @@ extension Achievement {
             color: "AchievementGold"
         ),
         
-        // Feature achievements
         Achievement(
             id: "first_share",
             titleKey: "achievement.first_share.title",

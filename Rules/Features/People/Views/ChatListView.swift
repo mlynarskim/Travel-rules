@@ -1,7 +1,13 @@
-//
-//  ChatView.swift
-//  Rules
-//
-//  Created by Mateusz Mlynarski on 17/01/2025.
-//
+//ChatListView.swift
+import SwiftUI
 
+struct ChatListView: View {
+    var body: some View {
+        NavigationView {
+            List {
+                Text("Lista czatów")
+            }
+            .navigationTitle("Czaty")
+        }
+    }
+}

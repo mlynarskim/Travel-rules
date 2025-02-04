@@ -7,7 +7,7 @@ struct ThemeSelectionView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                Text("Wybierz motyw")
+                Text("choose_theme".appLocalized)
                     .font(.title)
                     .padding()
                 
@@ -62,10 +62,12 @@ struct ThemePreviewCard: View {
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.blue)
+                        .transition(.scale)
+                        .animation(.easeInOut, value: isSelected)
                 }
             }
             .padding()
-            .background(Color.white)
+            .background(Color(.systemBackground))
             .cornerRadius(15)
             .shadow(radius: 5)
             .opacity(theme.isPremium && !isPremium ? 0.6 : 1)
@@ -76,21 +78,21 @@ struct ThemePreviewCard: View {
     
     private func getThemeName() -> String {
         switch theme {
-        case .classic: return "Klasyczny"
-        case .mountain: return "Górski"
-        case .beach: return "Plażowy"
-        case .desert: return "Pustynny"
-        case .forest: return "Leśny"
+        case .classic: return "theme_classic".appLocalized
+        case .mountain: return "theme_mountain".appLocalized
+        case .beach: return "theme_beach".appLocalized
+        case .desert: return "theme_desert".appLocalized
+        case .forest: return "theme_forest".appLocalized
         }
     }
     
     private func getThemeDescription() -> String {
         switch theme {
-        case .classic: return "Standardowy motyw aplikacji"
-        case .mountain: return "Inspirowany górskimi wędrówkami"
-        case .beach: return "Wakacyjny klimat plaży"
-        case .desert: return "Pustynne przestrzenie"
-        case .forest: return "Leśne ścieżki"
+        case .classic: return "theme_classic_description".appLocalized
+        case .mountain: return "theme_mountain_description".appLocalized
+        case .beach: return "theme_beach_description".appLocalized
+        case .desert: return "theme_desert_description".appLocalized
+        case .forest: return "theme_forest_description".appLocalized
         }
     }
     

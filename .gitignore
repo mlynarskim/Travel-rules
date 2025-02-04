@@ -2,11 +2,7 @@
 ## User settings
 xcuserdata/
 
-## Xcode 8 and earlier
-*.xcscmblueprint
-*.xccheckout
-
-### Xcode Patch ###
+## Xcode Patch ###
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
@@ -14,17 +10,17 @@ xcuserdata/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 ### macOS ###
-# General
 .DS_Store
-.AppleDouble
 .LSOverride
 
-### Swift ###
-## Build generated
+# Xcode Build
 build/
 DerivedData/
+*.xcworkspace
+*.xcuserstate
+xcdebugger/
 
-## Various settings
+## Xcode settings
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -33,13 +29,9 @@ DerivedData/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-
-## Other
-*.moved-aside
-*.xcuserstate
 *.xcscmblueprint
 
-## Obj-C/Swift specific
+## Debugging & Symbols
 *.hmap
 *.ipa
 *.dSYM.zip
@@ -51,7 +43,18 @@ playground.xcworkspace
 
 ### CocoaPods ###
 Pods/
-*.xcworkspace
+Podfile.lock
+
+### Google Services (Firebase, AdMob) ###
+GoogleService-Info.plist
+
+### Swift Package Manager ###
+/.swiftpm
+/.build/
+.build/
+
+### Carthage ###
+Carthage/
 
 ### fastlane ###
 fastlane/report.xml

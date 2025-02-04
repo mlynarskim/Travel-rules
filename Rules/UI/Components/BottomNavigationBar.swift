@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-
+import CoreLocation
 struct BottomNavigationBar: View {
     @Binding var savedRules: [Int]
     @StateObject private var ruleList = RuleList()
@@ -28,7 +28,16 @@ struct BottomNavigationBar: View {
                                                 .font(.system(size: 40))
                                         )
                                 }
-                NavigationLink(destination: PeopleTabView()) {
+                NavigationLink(destination: PeopleTabView(user: NearbyUser(
+                    id: UUID(),
+                    name: "Użytkownik",
+                    status: .available,
+                    category: .social,
+                    location: CLLocationCoordinate2D(latitude: 52.237049, longitude: 21.017532),
+                    distance: 0,
+                    shareLevel: .approximate,
+                    description: nil
+                ))) {
                     RoundedRectangle(cornerRadius: 15)
                         .padding(.all, 5)
                         .foregroundColor(Color(hex: "#DDAA4F"))

@@ -297,3 +297,27 @@
 "export.error.title" = "Export Error";
 "export.error.message" = "Failed to generate PDF file. Please try again.";
 "pdf.page" = "Page %d";
+
+//motywy
+
+"choose_theme" = "Choose a theme";
+"theme_classic" = "Classic";
+"theme_mountain" = "Mountain";
+"theme_beach" = "Beach";
+"theme_desert" = "Desert";
+"theme_forest" = "Forest";
+"theme_classic_description" = "Standard application theme";
+"theme_mountain_description" = "Inspired by mountain hikes";
+"theme_beach_description" = "Vacation beach vibes";
+"theme_desert_description" = "Desert landscapes";
+"theme_forest_description" = "Forest trails";
+
+//rejestracja
+"registration_title" = "Registration";
+"email_placeholder" = "Email";
+"password_placeholder" = "Password";
+"confirm_password_placeholder" = "Confirm Password";
+"register_button" = "Register";
+"error_missing_email_password" = "Please enter an email and password.";
+"error_passwords_mismatch" = "Passwords do not match.";
+"registration_error" = "Registration error";

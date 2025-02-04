@@ -1,3 +1,4 @@
+//LanguageManager.swift
 import SwiftUI
 import ObjectiveC
 import Foundation

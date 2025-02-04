@@ -54,7 +54,6 @@ class AchievementManager: ObservableObject {
    }
    
    func checkAchievements(rulesDrawn: Int, rulesSaved: Int) {
-       // Rules drawn achievements
        if rulesDrawn >= 1 {
            unlockAchievement(id: "first_rule")
        }
@@ -64,8 +63,7 @@ class AchievementManager: ObservableObject {
        if rulesDrawn >= 20 {
            unlockAchievement(id: "twenty_rules")
        }
-       
-       // Rules saved achievements
+
        if rulesSaved >= 1 {
            unlockAchievement(id: "save_first")
        }

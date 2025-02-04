@@ -1,12 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!--
-   Property List.plist
-   Travel rules
-
-   Created by Mateusz Mlynarski on 04/02/2025.
-   Copyright (c) 2025 ___ORGANIZATIONNAME___. All rights reserved.
--->
 <plist version="1.0">
-<dict/>
+<dict>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    
+    <key>CFBundleIdentifier</key>
+    <string>com.twojaprojekt.travelrules</string>
+    
+    <key>CFBundleName</key>
+    <string>Travel Rules</string>
+    
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>The app needs access to your location in order to personalize features near you.</string>
+    
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Potrzebujemy dostępu do Twojej lokalizacji, aby pokazać Twoją aktualną pozycję.</string>
+    
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+    </array>
+
+    <key>GADApplicationIdentifier</key>
+    <string>ca-app-pub-3940256099942544~1458002511</string>
+
+    <key>GIDClientID</key>
+    <string>1037418769624-hk1a1p8q56bctrs539kcpim2k9e02fk4.apps.googleusercontent.com</string>
+
+    <key>SKAdNetworkItems</key>
+    <array>
+      <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>cstr6suwn9.skadnetwork</string>
+      </dict>
+    </array>
+</dict>
 </plist>
