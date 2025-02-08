@@ -1,9 +1,27 @@
+//RulesListViewController.swift
+//głowny widok z zakładkami
 import UIKit
 import SwiftUI
+import Foundation
 
 class RulesListViewController: UIViewController {
+    
+    // MARK: - AppStorage
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("selectedTheme") private var selectedTheme: String = "classic"
+    
+    // MARK: - Motyw
+    private var themeColors: ThemeColors {
+        switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
+        case .classic:   return .classicTheme
+        case .mountain:  return .mountainTheme
+        case .beach:     return .beachTheme
+        case .desert:    return .desertTheme
+        case .forest:    return .forestTheme
+        }
+    }
+    
+    // MARK: - UI elementy
     private let backgroundImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -11,14 +29,21 @@ class RulesListViewController: UIViewController {
         return imageView
     }()
     
-    private let segmentedControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["Saved Rules", "My Rules"])
+    private lazy var segmentedControl: UISegmentedControl = {
+        let control = UISegmentedControl(items: [
+            "saved_rules".appLocalized,
+            "my_rules".appLocalized
+        ])
         control.selectedSegmentIndex = 0
         control.translatesAutoresizingMaskIntoConstraints = false
-        control.backgroundColor = UIColor(Color(hex: "#29606D")).withAlphaComponent(0.7)
-        control.selectedSegmentTintColor = UIColor(Color(hex: "#29606D"))
+        
+        // Kolory z motywu
+        let uiColorPrimary = UIColor(themeColors.primary)
+        control.backgroundColor = uiColorPrimary.withAlphaComponent(0.7)
+        control.selectedSegmentTintColor = uiColorPrimary
         control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .normal)
         control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+        
         return control
     }()
     
@@ -42,12 +67,15 @@ class RulesListViewController: UIViewController {
         return vc
     }()
     
+    // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
+        edgesForExtendedLayout = .all
         setupUI()
         setupNavigationBar()
         updateBackgroundImage()
         setupChildViewControllers()
+        
         
         NotificationCenter.default.addObserver(
             self,
@@ -61,6 +89,7 @@ class RulesListViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    // MARK: - Inicjalizacja kontrolerów
     private func setupChildViewControllers() {
         segmentedControl.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
         
@@ -71,21 +100,24 @@ class RulesListViewController: UIViewController {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.backgroundColor = .clear
+        appearance.backgroundEffect = nil
         appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.compactAppearance = appearance
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.isTranslucent = true
         navigationController?.view.backgroundColor = .clear
+        navigationController?.navigationBar.isTranslucent = true
+        navigationController?.navigationBar.barStyle = .black
     }
     
+    // MARK: - Ustawienia nav bara
     private func setupNavigationBar() {
-        title = "Rules"
+        // Tytuł "Rules" -> używamy tłumaczenia
+        title = "rules".appLocalized
         navigationController?.navigationBar.prefersLargeTitles = true
+        
         navigationController?.navigationBar.largeTitleTextAttributes = [
             .foregroundColor: UIColor.white
         ]
@@ -94,23 +126,27 @@ class RulesListViewController: UIViewController {
         ]
     }
     
+    // MARK: - Update tła
     @objc public func updateBackgroundImage() {
         let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
         let imageName: String
         
         switch theme {
-        case .classic: imageName = isDarkMode ? "classic-bg-dark" : "classic-bg"
-        case .mountain: imageName = isDarkMode ? "mountain-bg-dark" : "mountain-bg"
-        case .beach: imageName = isDarkMode ? "beach-bg-dark" : "beach-bg"
-        case .desert: imageName = isDarkMode ? "desert-bg-dark" : "desert-bg"
-        case .forest: imageName = isDarkMode ? "forest-bg-dark" : "forest-bg"
+        case .classic:   imageName = isDarkMode ? "classic-bg-dark" : "classic-bg"
+        case .mountain:  imageName = isDarkMode ? "mountain-bg-dark" : "mountain-bg"
+        case .beach:     imageName = isDarkMode ? "beach-bg-dark" : "beach-bg"
+        case .desert:    imageName = isDarkMode ? "desert-bg-dark" : "desert-bg"
+        case .forest:    imageName = isDarkMode ? "forest-bg-dark" : "forest-bg"
         }
         
         backgroundImageView.image = UIImage(named: imageName)
+        
+        // Aktualizacja w child VC, jeśli również muszą mieć zaktualizowane tło
         savedRulesVC.updateBackgroundImage()
         myRulesVC.updateBackgroundImage()
     }
     
+    // MARK: - UI Layout
     private func setupUI() {
         view.backgroundColor = .clear
         containerView.backgroundColor = .clear
@@ -160,11 +196,13 @@ class RulesListViewController: UIViewController {
         ])
     }
     
+    // MARK: - Segment zmiana
     @objc private func segmentChanged(_ sender: UISegmentedControl) {
-        savedRulesVC.view.isHidden = sender.selectedSegmentIndex != 0
-        myRulesVC.view.isHidden = sender.selectedSegmentIndex != 1
+        savedRulesVC.view.isHidden = (sender.selectedSegmentIndex != 0)
+        myRulesVC.view.isHidden    = (sender.selectedSegmentIndex != 1)
     }
     
+    // MARK: - Dodawanie childViewController
     private func add(childViewController: UIViewController) {
         addChild(childViewController)
         childViewController.didMove(toParent: self)

@@ -6,7 +6,7 @@ struct ThemeManager {
     static let layout = ThemeLayout()
     static let typography = ThemeTypography()
     static let animation = ThemeAnimation()
-
+    
     @AppStorage("selectedTheme") static var currentTheme = ThemeStyle.classic.rawValue
     
     static var colors: ThemeColors {
@@ -24,7 +24,7 @@ struct ThemeManager {
 struct AppThemeModifier: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
-
+    
     var backgroundImage: String {
         let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
         switch theme {
@@ -35,14 +35,15 @@ struct AppThemeModifier: ViewModifier {
         case .forest: return colorScheme == .dark ? "forest-bg-dark" : "forest-bg"
         }
     }
-
+    
     func body(content: Content) -> some View {
         ZStack {
             Image(backgroundImage)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(minWidth: 0, maxWidth: .infinity)
-                .edgesIgnoringSafeArea(.all)
+            //.edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea()
             content
         }
     }

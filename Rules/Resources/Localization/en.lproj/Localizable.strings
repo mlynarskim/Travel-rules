@@ -48,7 +48,7 @@
 "enable_monthly_reminder" = "Enable Monthly Document Reminder";
 
 //customrule
-"add_rule" = "Add Rule";
+"add_rule" = "Add";
 "show_rules" = "Show Rules";
 "your_rules" = "Your Rules";
 "rule_name_placeholder" = "Name of your rule...";
@@ -321,3 +321,24 @@
 "error_missing_email_password" = "Please enter an email and password.";
 "error_passwords_mismatch" = "Passwords do not match.";
 "registration_error" = "Registration error";
+
+"saved_rules" = "Saved rules";
+"my_rules" = "My rules";
+"rules" = "Rules";
+"add_custom_rule" = "Add Custom rule";
+
+"remove_rule_title" = "Warning";
+"remove_rule_confirmation" = "Are you sure you want to delete the saved rule?";
+"delete" = "Delete";
+"cancel" = "Cancel";
+
+"emergency_numbers" = "Emegency Numbers";
+"useful_links" = "Useful links";
+"embassy_information" = "Embassy information";
+"general" = "General";
+"police" = "Police";
+"ambulance" = "Ambulance";
+"fire" = "Fire";
+
+//kraje
+

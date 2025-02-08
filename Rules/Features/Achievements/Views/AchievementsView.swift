@@ -20,8 +20,8 @@ struct AchievementsView: View {
        NavigationView {
            ZStack {
                Color(theme.background)
-                   .edgesIgnoringSafeArea(.all)
-               
+                   //.edgesIgnoringSafeArea(.all)
+                   .ignoresSafeArea()
                List {
                    ForEach(achievementManager.achievements) { achievement in
                        HStack {

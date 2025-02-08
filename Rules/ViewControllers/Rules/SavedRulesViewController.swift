@@ -1,9 +1,22 @@
+//SavedRulesViewController.swift
+//lista zapisanych zasad
 import UIKit
 import SwiftUI
+import Foundation
 
 class SavedRulesViewController: UIViewController {
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
+    
+    private var themeColors: ThemeColors {
+        switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
+        case .classic: return ThemeColors.classicTheme
+        case .mountain: return ThemeColors.mountainTheme
+        case .beach: return ThemeColors.beachTheme
+        case .desert: return ThemeColors.desertTheme
+        case .forest: return ThemeColors.forestTheme
+        }
+    }
     
     private let backgroundImageView: UIImageView = {
         let imageView = UIImageView()
@@ -22,13 +35,12 @@ class SavedRulesViewController: UIViewController {
     }()
     
     private var savedRules: [Int] = [] {
-        didSet {
-            saveRulesToUserDefaults()
-        }
+        didSet { saveRulesToUserDefaults() }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        edgesForExtendedLayout = .all
         setupUI()
         setupNavigationBar()
         updateBackgroundImage()
@@ -53,17 +65,9 @@ class SavedRulesViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func saveRule(_ ruleIndex: Int) {
-        if !savedRules.contains(ruleIndex) {
-            savedRules.append(ruleIndex)
-            tableView.reloadData()
-        }
-    }
-    
     private func saveRulesToUserDefaults() {
         if let encoded = try? JSONEncoder().encode(savedRules) {
             UserDefaults.standard.set(encoded, forKey: "savedRules")
-            UserDefaults.standard.synchronize()
         }
     }
     
@@ -80,22 +84,11 @@ class SavedRulesViewController: UIViewController {
     }
     
     @objc public func updateBackgroundImage() {
-        let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
-        let imageName: String
-        
-        switch theme {
-        case .classic: imageName = isDarkMode ? "imageDark" : "Image"
-        case .mountain: imageName = isDarkMode ? "mountain-bg-dark" : "mountain-bg"
-        case .beach: imageName = isDarkMode ? "beach-bg-dark" : "beach-bg"
-        case .desert: imageName = isDarkMode ? "desert-bg-dark" : "desert-bg"
-        case .forest: imageName = isDarkMode ? "forest-bg-dark" : "forest-bg"
-        }
-        
-        backgroundImageView.image = UIImage(named: imageName)
+        backgroundImageView.image = UIImage(named: themeColors.background)
     }
     
     private func setupNavigationBar() {
-        title = "Saved Rules"
+        title = "saved_rules".appLocalized
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.largeTitleTextAttributes = [
             .foregroundColor: UIColor.white
@@ -104,7 +97,6 @@ class SavedRulesViewController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = .clear
-        
         view.addSubview(backgroundImageView)
         view.sendSubviewToBack(backgroundImageView)
         view.addSubview(tableView)
@@ -126,6 +118,7 @@ class SavedRulesViewController: UIViewController {
     }
 }
 
+
 extension SavedRulesViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return savedRules.count
@@ -138,18 +131,52 @@ extension SavedRulesViewController: UITableViewDelegate, UITableViewDataSource {
         
         let ruleIndex = savedRules[indexPath.row]
         if let ruleText = getLocalizedRules()[safe: ruleIndex] {
-            cell.configure(with: Rule(name: ruleText, description: ""), index: ruleIndex, isSaved: true) { [weak self] in
-                self?.savedRules.removeAll(where: { $0 == ruleIndex })
-                self?.tableView.reloadData()
-            }
+            
+            cell.configure(with: Rule(name: ruleText, description: ""),
+                           index: ruleIndex,
+                           deleteAction: { [weak self] in
+                guard let self = self else { return }
+                
+                let alert = UIAlertController(
+                    title: "remove_rule_title".appLocalized,
+                    message: "remove_rule_confirmation".appLocalized,
+                    preferredStyle: .alert
+                )
+                
+                let deleteAction = UIAlertAction(title: "delete".appLocalized, style: .destructive) { _ in
+                    self.savedRules.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                }
+                
+                let cancelAction = UIAlertAction(title: "cancel".appLocalized, style: .cancel)
+                
+                alert.addAction(deleteAction)
+                alert.addAction(cancelAction)
+                self.present(alert, animated: true)
+            })
+            
         }
         return cell
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            savedRules.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            let alert = UIAlertController(
+                title: "remove_rule_title".appLocalized,
+                message: "remove_rule_confirmation".appLocalized,
+                preferredStyle: .alert
+            )
+            
+            let deleteAction = UIAlertAction(title: "delete".appLocalized, style: .destructive) { _ in
+                self.savedRules.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+            }
+            
+            let cancelAction = UIAlertAction(title: "cancel".appLocalized, style: .cancel)
+            
+            alert.addAction(deleteAction)
+            alert.addAction(cancelAction)
+            present(alert, animated: true)
         }
     }
     
@@ -160,8 +187,8 @@ extension SavedRulesViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let ruleIndex = savedRules[indexPath.row]
         if let ruleText = getLocalizedRules()[safe: ruleIndex] {
-            let alert = UIAlertController(title: "Rule", message: ruleText, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            let alert = UIAlertController(title: "rule".appLocalized, message: ruleText, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "ok".appLocalized, style: .default))
             present(alert, animated: true)
         }
     }

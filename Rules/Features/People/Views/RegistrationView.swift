@@ -9,10 +9,10 @@ struct RegistrationView: View {
     @State private var isLoading = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
     let authenticationService = AuthenticationService.shared
-
+    
     var body: some View {
         VStack {
-            Text("registration_title".appLocalized) 
+            Text("registration_title".appLocalized)
                 .font(.largeTitle)
                 .foregroundColor(currentTheme.primaryText)
             
@@ -57,7 +57,9 @@ struct RegistrationView: View {
             Spacer()
         }
         .padding()
-        .background(Color(currentTheme.background).edgesIgnoringSafeArea(.all))
+        .background(Color(currentTheme.background))
+        //.edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
         .navigationTitle("registration_title".appLocalized)
     }
     

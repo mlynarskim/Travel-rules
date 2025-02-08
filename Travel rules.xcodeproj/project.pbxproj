@@ -81,6 +81,8 @@
 		07DD83AB2D267182004C5C5F /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD834D2D267182004C5C5F /* AppTheme.swift */; };
 		07DD83AC2D267182004C5C5F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD82EE2D267182004C5C5F /* ContentView.swift */; };
 		07F01DC62D51D979003CA72E /* Property List.plist in Resources */ = {isa = PBXBuildFile; fileRef = 07F01DC52D51D979003CA72E /* Property List.plist */; };
+		07F01DC82D51FC44003CA72E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 07F01DC72D51FC44003CA72E /* LaunchScreen.storyboard */; };
+		07F01DCC2D54C210003CA72E /* info.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F01DCB2D54C20C003CA72E /* info.swift */; };
 		07FC28E42D3A85BF00A4A34A /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FC28E32D3A85BC00A4A34A /* UserProfile.swift */; };
 		07FC28E62D3A85C900A4A34A /* UserLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FC28E52D3A85C700A4A34A /* UserLocation.swift */; };
 		07FC28E82D3A85D800A4A34A /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FC28E72D3A85D500A4A34A /* Message.swift */; };
@@ -180,6 +182,8 @@
 		07DD83612D267182004C5C5F /* Travel rules.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "Travel rules.xcodeproj"; sourceTree = "<group>"; };
 		07DD83622D267182004C5C5F /* Travel rules.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = wrapper.workspace; path = "Travel rules.xcworkspace"; sourceTree = "<group>"; };
 		07F01DC52D51D979003CA72E /* Property List.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Property List.plist"; sourceTree = "<group>"; };
+		07F01DC72D51FC44003CA72E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		07F01DCB2D54C20C003CA72E /* info.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = info.swift; sourceTree = "<group>"; };
 		07FC28E32D3A85BC00A4A34A /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		07FC28E52D3A85C700A4A34A /* UserLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLocation.swift; sourceTree = "<group>"; };
 		07FC28E72D3A85D500A4A34A /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
@@ -214,6 +218,7 @@
 		0707D9982A1453D800186248 = {
 			isa = PBXGroup;
 			children = (
+				07F01DC72D51FC44003CA72E /* LaunchScreen.storyboard */,
 				07F01DC52D51D979003CA72E /* Property List.plist */,
 				0741A6A12D4CD8AC00DB6E37 /* Config.xcconfig */,
 				071485012D48A7250063B774 /* Podfile */,
@@ -241,7 +246,9 @@
 		07211A022D29B03100B501B9 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				07F01DCB2D54C20C003CA72E /* info.swift */,
 				07211A172D2F433E00B501B9 /* RuleCell.swift */,
+				07DD83172D267182004C5C5F /* CustomRuleView.swift */,
 				07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */,
 				07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */,
 				07211A032D29B03C00B501B9 /* RulesListViewController.swift */,
@@ -494,7 +501,6 @@
 		07DD831B2D267182004C5C5F /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				07DD83172D267182004C5C5F /* CustomRuleView.swift */,
 				07211A192D2F699800B501B9 /* KeyboardResponder.swift */,
 				07DD83192D267182004C5C5F /* SavedRuleList.swift */,
 				07DD83182D267182004C5C5F /* MyChecklistView.swift */,
@@ -634,9 +640,9 @@
 				07211A012D29B02300B501B9 /* ViewControllers */,
 				07DD82FE2D267182004C5C5F /* Core */,
 				07DD831D2D267182004C5C5F /* Features */,
-				07DD831F2D267182004C5C5F /* Preview Content */,
-				07DD83362D267182004C5C5F /* Resources */,
 				07DD834F2D267182004C5C5F /* UI */,
+				07DD83362D267182004C5C5F /* Resources */,
+				07DD831F2D267182004C5C5F /* Preview Content */,
 				07DD83502D267182004C5C5F /* Assets.xcassets */,
 				07DD83522D267182004C5C5F /* Rules.entitlements */,
 				07DD83532D267182004C5C5F /* RulesRelease.entitlements */,
@@ -797,6 +803,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07F01DC82D51FC44003CA72E /* LaunchScreen.storyboard in Resources */,
 				07F01DC62D51D979003CA72E /* Property List.plist in Resources */,
 				07DD83652D267182004C5C5F /* Travel rules.xcworkspace in Resources */,
 				07DD83662D267182004C5C5F /* Lato-Regular.ttf in Resources */,
@@ -948,6 +955,7 @@
 				07FC28E62D3A85C900A4A34A /* UserLocation.swift in Sources */,
 				073A7B622D26F6CB0030C39B /* ThemeStyle.swift in Sources */,
 				07DD83A92D267182004C5C5F /* CustomRuleView.swift in Sources */,
+				07F01DCC2D54C210003CA72E /* info.swift in Sources */,
 				07DD83AA2D267182004C5C5F /* CountryInfo.swift in Sources */,
 				07FC28EB2D3A860500A4A34A /* PeopleLocationService.swift in Sources */,
 				07DD83AB2D267182004C5C5F /* AppTheme.swift in Sources */,

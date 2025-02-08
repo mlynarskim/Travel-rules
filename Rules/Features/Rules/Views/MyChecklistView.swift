@@ -1,4 +1,4 @@
-//MyChecklistView.swift
+//TravelListView.swift
 import SwiftUI
 import Combine
 
@@ -62,6 +62,7 @@ struct CustomSegmentedControl: UIViewRepresentable {
         }
     }
 }
+
 struct TravelListView: View {
     @State private var travelItems: [TravelItem] = []
     @State private var newItemName: String = ""
@@ -96,65 +97,76 @@ struct TravelListView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            NavigationView {
-                ZStack {
-                    let imageName = "\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")"
-                    
-                    Image(imageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                    
-                    VStack(spacing: isSmallDevice ? 8 : 16) {
-                        HStack {
-                            Spacer()
-                            Button(action: {
-                                HapticManager.shared.impact(style: .medium)
-                                showExportSheet = true
-                            }) {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.system(size: isSmallDevice ? 18 : 20))
-                                    .foregroundColor(.white)
-                                    .padding(isSmallDevice ? 8 : 10)
-                                    .background(themeColors.primary)
-                                    .cornerRadius(10)
+            ZStack {
+                NavigationView {
+                    ZStack {
+                        // Tło: obrazek dopasowany do ekranu
+                        let imageName = "\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")"
+                        
+                        Image(imageName)
+                            .resizable()
+                            .scaledToFill()
+                            .ignoresSafeArea()
+                        
+                        
+                        // Główny kontent
+                        VStack(spacing: isSmallDevice ? 8 : 16) {
+                            // Górny pasek z przyciskiem export
+                            HStack {
+                                Spacer()
+                                Button(action: {
+                                    HapticManager.shared.impact(style: .medium)
+                                    showExportSheet = true
+                                }) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: isSmallDevice ? 18 : 20))
+                                        .foregroundColor(.white)
+                                        .padding(isSmallDevice ? 8 : 10)
+                                        .background(themeColors.primary)
+                                        .cornerRadius(10)
+                                }
+                                .padding(.trailing)
                             }
-                            .padding(.trailing)
-                        }
-                        .padding(.top, isSmallDevice ? 8 : 16)
-                        
-                        CustomSegmentedControl(selectedTab: $selectedTab)
-                            .frame(height: 40)
-                            .padding(.horizontal)
-                            .padding(.top, isSmallDevice ? 12 : 20)
-                        
-                        if selectedTab == 0 {
-                            MyListContent(
-                                travelItems: $travelItems,
-                                newItemName: $newItemName,
-                                geometry: geometry,
-                                themeColors: themeColors
-                            )
-                        } else {
-                            TravelChecklist()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(Color.clear)
+                            .padding(.top, isSmallDevice ? 8 : 16)
+                            
+                            // Segmented Control
+                            CustomSegmentedControl(selectedTab: $selectedTab)
+                                .frame(height: 40)
+                                .padding(.horizontal)
+                                .padding(.top, isSmallDevice ? 12 : 20)
+                            
+                            // Treść w zależności od zakładki
+                            if selectedTab == 0 {
+                                MyListContent(
+                                    travelItems: $travelItems,
+                                    newItemName: $newItemName,
+                                    geometry: geometry,
+                                    themeColors: themeColors
+                                )
+                            } else {
+                                TravelChecklist()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .background(Color.clear)
+                            }
                         }
                     }
+                    .navigationBarHidden(true)
                 }
-                .navigationBarHidden(true)
+                .ignoresSafeArea() // ← Kluczowe, by NavigationView nie dokładało białych obszarów
+            }
+            // Arkusz exportu
+            .sheet(isPresented: $showExportSheet) {
+                ExportView(items: travelItems.map { $0.name }, themeColors: themeColors)
+            }
+            .onAppear {
+                loadItems()
+            }
+            .onDisappear {
+                saveItems()
             }
         }
-        .sheet(isPresented: $showExportSheet) {
-            ExportView(items: travelItems.map { $0.name }, themeColors: themeColors)
-        }
-        .onAppear {
-            loadItems()
-        }
-        .onDisappear {
-            saveItems()
-        }
     }
+    
     // Funkcje pomocnicze w TravelListView
     private func addItem() {
         guard !newItemName.isEmpty else { return }
@@ -196,80 +208,95 @@ struct TravelListView: View {
     }
 }
 
+// MARK: - MyListContent
 struct MyListContent: View {
-        @Binding var travelItems: [TravelItem]
-        @Binding var newItemName: String
-        let geometry: GeometryProxy
-        let themeColors: ThemeColors
-        
-        private var isSmallDevice: Bool {
-            geometry.size.height <= 667
-        }
-        
-        var body: some View {
-            VStack(spacing: isSmallDevice ? 8 : 12) {
-                HStack {
-                    TextField("enter_new_item".appLocalized, text: $newItemName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .font(.system(size: isSmallDevice ? 14 : 16))
-                        .padding(.leading, isSmallDevice ? 16 : 20)
-                    
-                    Button(action: addItem) {
-                        Text("add".appLocalized)
-                            .font(.system(size: isSmallDevice ? 14 : 16, weight: .semibold))
-                            .frame(width: isSmallDevice ? 70 : 80, height: isSmallDevice ? 32 : 35)
-                            .background(themeColors.primary)
-                            .foregroundColor(.white)
-                            .cornerRadius(15)
-                            .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
-                    }
-                    .padding(.trailing, isSmallDevice ? 16 : 20)
-                }
-                .padding(.vertical, isSmallDevice ? 8 : 10)
+    @Binding var travelItems: [TravelItem]
+    @Binding var newItemName: String
+    let geometry: GeometryProxy
+    let themeColors: ThemeColors
+    
+    private var isSmallDevice: Bool {
+        geometry.size.height <= 667
+    }
+    
+    var body: some View {
+        VStack(spacing: isSmallDevice ? 8 : 12) {
+            // Dodajemy pole tekstowe + przycisk "Add"
+            HStack {
+                TextField("enter_new_item".appLocalized, text: $newItemName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .font(.system(size: isSmallDevice ? 14 : 16))
+                    .padding(.leading, isSmallDevice ? 16 : 20)
                 
-                List {
-                    ForEach(travelItems) { item in
-                        ItemRow(
-                            item: item,
-                            isSmallDevice: isSmallDevice,
-                            themeColors: themeColors,
-                            toggleCompletion: { toggleItemCompletion(item) },
-                            deleteItem: { deleteItem(item) }
-                        )
-                    }
+                Button(action: addItem) {
+                    Text("add".appLocalized)
+                        .font(.system(size: isSmallDevice ? 14 : 16, weight: .semibold))
+                        .frame(width: isSmallDevice ? 70 : 80, height: isSmallDevice ? 32 : 35)
+                        .background(themeColors.primary)
+                        .foregroundColor(.white)
+                        .cornerRadius(15)
+                        .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
                 }
-                .listStyle(PlainListStyle())
+                .padding(.trailing, isSmallDevice ? 16 : 20)
             }
-        }
-        
-        private func addItem() {
-            guard !newItemName.isEmpty else { return }
-            let newItem = TravelItem(name: newItemName)
-            withAnimation(.spring()) {
-                travelItems.append(newItem)
-            }
-            newItemName = ""
-            HapticManager.shared.impact(style: .medium)
-        }
-        
-        private func toggleItemCompletion(_ item: TravelItem) {
-            if let index = travelItems.firstIndex(where: { $0.id == item.id }) {
-                withAnimation(.easeInOut) {
-                    travelItems[index].isCompleted.toggle()
+            .padding(.vertical, isSmallDevice ? 8 : 10)
+            
+            // Lista z zadaniami
+            List {
+                ForEach(travelItems) { item in
+                    ItemRow(
+                        item: item,
+                        isSmallDevice: isSmallDevice,
+                        themeColors: themeColors,
+                        toggleCompletion: { toggleItemCompletion(item) },
+                        deleteItem: { deleteItem(item) }
+                    )
+                    .listRowBackground(Color.clear) // tło wiersza puste
                 }
-                HapticManager.shared.impact(style: .light)
             }
-        }
-        
-        private func deleteItem(_ item: TravelItem) {
-            withAnimation(.easeOut) {
-                travelItems.removeAll(where: { $0.id == item.id })
+            .listStyle(PlainListStyle())
+            // iOS 16+ - usuwa domyślne tło listy, żeby nie pojawiał się biały obszar
+            .background(Color.clear)
+            .onAppear {
+                if #available(iOS 16.0, *) {
+                    UITableView.appearance().backgroundColor = .clear
+                    // lub: .scrollContentBackground(.hidden) na samej Liście,
+                    // ale tak jest bardziej uniwersalnie (i do iOS 15)
+                } else {
+                    UITableView.appearance().backgroundColor = .clear
+                }
             }
-            HapticManager.shared.notification(type: .success)
         }
     }
+    
+    private func addItem() {
+        guard !newItemName.isEmpty else { return }
+        let newItem = TravelItem(name: newItemName)
+        withAnimation(.spring()) {
+            travelItems.append(newItem)
+        }
+        newItemName = ""
+        HapticManager.shared.impact(style: .medium)
+    }
+    
+    private func toggleItemCompletion(_ item: TravelItem) {
+        if let index = travelItems.firstIndex(where: { $0.id == item.id }) {
+            withAnimation(.easeInOut) {
+                travelItems[index].isCompleted.toggle()
+            }
+            HapticManager.shared.impact(style: .light)
+        }
+    }
+    
+    private func deleteItem(_ item: TravelItem) {
+        withAnimation(.easeOut) {
+            travelItems.removeAll(where: { $0.id == item.id })
+        }
+        HapticManager.shared.notification(type: .success)
+    }
+}
 
-
+// MARK: - ItemRow
 struct ItemRow: View {
     let item: TravelItem
     let isSmallDevice: Bool
@@ -279,13 +306,14 @@ struct ItemRow: View {
     
     var body: some View {
         HStack {
+            // Checkmark
             Button(action: toggleCompletion) {
                 Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(item.isCompleted ? themeColors.success : .white)
                     .font(.system(size: isSmallDevice ? 16 : 18))
                     .padding(.horizontal, isSmallDevice ? 8 : 10)
             }
-            
+            // Nazwa zadania
             Text(item.name)
                 .strikethrough(item.isCompleted)
                 .foregroundColor(item.isCompleted ? themeColors.secondaryText : .white)
@@ -293,6 +321,7 @@ struct ItemRow: View {
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
+            // Ikona kosza
             Button(action: deleteItem) {
                 Image(systemName: "trash")
                     .foregroundColor(themeColors.error)
@@ -303,11 +332,11 @@ struct ItemRow: View {
         .frame(height: isSmallDevice ? 36 : 40)
         .background(themeColors.primary)
         .cornerRadius(15)
-        .listRowBackground(Color.clear)
         .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
     }
 }
 
+// MARK: - ExportView
 struct ExportView: View {
     let items: [String]
     let themeColors: ThemeColors
@@ -338,6 +367,7 @@ struct ExportView: View {
     }
 }
 
+// MARK: - Preview
 struct TravelListView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

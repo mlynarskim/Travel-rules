@@ -23,8 +23,8 @@ struct PushView: View {
         NavigationView {
             ZStack {
                 themeColors.secondary
-                    .edgesIgnoringSafeArea(.all)
-                
+                //.edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea()
                 VStack(spacing: 0) {
                     HStack {
                         Spacer()
