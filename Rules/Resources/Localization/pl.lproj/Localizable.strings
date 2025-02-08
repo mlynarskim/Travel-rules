@@ -47,8 +47,7 @@
 "enable_monthly_reminder" =  "Włącz miesięczne przypomnienie o dokumentach";
 
 //custom rule
-"add_rule" = "Dodaj zasadę";
-"show_rules" = "Pokaż zasady";
+"add_rule" = "Dodaj";
 "your_rules" = "Twoje zasady";
 "rule_name_placeholder" = "Nazwa twojej zasady...";
 "rule_description_placeholder" = "Napisz opis swojej zasady...";
@@ -319,3 +318,21 @@
 "error_missing_email_password" = "Proszę wprowadzić email i hasło.";
 "error_passwords_mismatch" = "Hasła się nie zgadzają.";
 "registration_error" = "Błąd rejestracji";
+
+"saved_rules" = "Zapisane zasady";
+"my_rules" = "Moje zasady";
+"rules" = "Zasady";
+"add_custom_rule" = "Dodaj zasadę";
+
+"remove_rule_title" = "Uwaga";
+"remove_rule_confirmation" = "Czy na pewno chcesz usunąć zapisaną zasadę?";
+"delete" = "Usuń";
+"cancel" = "Anuluj";
+
+"emergency_numbers" = "Numery alarmowe";
+"useful_links" = "Przydatne linki";
+"embassy_information" = "Informacje o ambasadzie";
+"general" = "Ogólne";
+"police" = "Policja";
+"ambulance" = "Pogotowie";
+"fire" = "Straż pożarna";

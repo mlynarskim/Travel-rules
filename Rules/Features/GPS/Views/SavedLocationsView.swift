@@ -17,8 +17,8 @@ struct SavedLocationsView: View {
             Image("\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")")
                 .resizable()
                 .scaledToFill()
-                .edgesIgnoringSafeArea(.all)
-            
+               // .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea()
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
                     if locationData.isEmpty {

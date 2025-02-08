@@ -1,3 +1,4 @@
+//ConentView.swift
 import SwiftUI
 import Foundation
 import AVFoundation
@@ -29,10 +30,10 @@ struct ContentView: View {
                     Image(backgroundImage)
                         .resizable()
                         .scaledToFill()
-                        .edgesIgnoringSafeArea(.all)
+                        .ignoresSafeArea()
                     
                 )
-            .navigationBarHidden(true)
+                .navigationBarHidden(true)
         }
     }
 }
@@ -159,8 +160,8 @@ struct LoadingView: View {
     var body: some View {
         ZStack {
             Color.black.opacity(0.4)
-                .edgesIgnoringSafeArea(.all)
-            
+            // .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea()
             ProgressView()
                 .scaleEffect(1.5)
                 .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
@@ -611,9 +612,9 @@ struct ScaleButtonStyle: ButtonStyle {
     }
 }
 
-    struct ContentView_Previews: PreviewProvider {
-        static var previews: some View {
-            ContentView()
-                .environment(\.colorScheme, .light)
-        }
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .environment(\.colorScheme, .light)
     }
+}

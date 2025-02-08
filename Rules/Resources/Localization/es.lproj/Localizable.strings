@@ -56,7 +56,7 @@
 "my_travel_list" = "Mi lista de viaje";
 
 //custom rule
-"add_rule" = "Agregar regla";
+"add_rule" = "Agregar";
 "show_rules" = "Mostrar reglas";
 "your_rules" = "Tus reglas";
 "rule_name_placeholder" = "Nombre de tu regla...";
@@ -315,4 +315,23 @@
 "error_missing_email_password" = "Por favor, introduzca un correo electrónico y una contraseña.";
 "error_passwords_mismatch" = "Las contraseñas no coinciden.";
 "registration_error" = "Error de registro";
+
+"saved_rules" = "Reglas guardadas";
+"my_rules" = "Mis reglas";
+"rules" = "Reglas";
+"add_custom_rule" = "Añadir regla";
+
+"remove_rule_title" = "Advertencia";
+"remove_rule_confirmation" = "¿Estás seguro de que quieres eliminar la regla guardada?";
+"delete" = "Eliminar";
+"cancel" = "Cancelar";
+
+"emergency_numbers" = "Números de emergencia";
+"useful_links" = "Enlaces útiles";
+"embassy_information" = "Información de la embajada";
+"general" = "General";
+"police" = "Policía";
+"ambulance" = "Ambulancia";
+"fire" = "Bomberos";
+
 

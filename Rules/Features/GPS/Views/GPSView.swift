@@ -31,8 +31,8 @@ struct GPSView: View {
             ZStack {
                 Image(isDarkMode ? themeColors.darkBackground : themeColors.background)
                     .resizable()
-                    .edgesIgnoringSafeArea(.all)
-                
+                   // .edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: isSmallDevice ? 12 : 16) {
                         CurrentLocationCard(
