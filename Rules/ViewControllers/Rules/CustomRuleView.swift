@@ -28,13 +28,15 @@ class RuleList: ObservableObject {
     }
     
     private func saveRules() {
-        do {
-            let data = try JSONEncoder().encode(rules)
-            UserDefaults.standard.set(data, forKey: "rules")
-        } catch {
-            print("Failed to save rules: \(error)")
+            DispatchQueue.global(qos: .background).async {
+                do {
+                    let data = try JSONEncoder().encode(self.rules)
+                    UserDefaults.standard.set(data, forKey: "rules")
+                } catch {
+                    print("Failed to save rules: \(error)")
+                }
+            }
         }
-    }
     
     private func loadRules() {
         guard let data = UserDefaults.standard.data(forKey: "rules") else { return }
@@ -46,15 +48,19 @@ class RuleList: ObservableObject {
     }
 }
 
+
+    
 // MARK: - Views
 struct AddRuleView: View {
     var onSave: (Rule) -> Void
     
-    @State private var ruleName = ""
     @State private var ruleDescription = ""
     @State private var isTextFieldActive = false
     @State private var isTextEditorActive = false
     
+    @Environment(\.dismiss) var dismiss // Nowy sposób zamykania widoku
+
+    @State private var ruleName: String = ""
     @ObservedObject private var ruleList = RuleList()
     
     @AppStorage("isDarkMode") var isDarkMode = false
@@ -81,7 +87,7 @@ struct AddRuleView: View {
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
-
+                
                 VStack(spacing: 20) {
                     CustomTextField(
                         text: $ruleName,
@@ -95,11 +101,11 @@ struct AddRuleView: View {
                         isActive: $isTextEditorActive,
                         themeColors: themeColors
                     )
-
+                    
                     ActionButton(title: "add_rule".appLocalized, themeColors: themeColors) {
                         addRule()
                     }
-                    .frame(width: geometry.size.width * 0.9, height: 50)
+                   // .frame(width: geometry.size.width * 0.9, height: 50)
                     .background(themeColors.primary)
                     .cornerRadius(15)
                     .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
@@ -108,7 +114,7 @@ struct AddRuleView: View {
                 .padding(.bottom, 50)
             }
         }
-        .navigationBarHidden(true)
+        .navigationBarHidden(false)
     }
     
     private func addRule() {
@@ -117,9 +123,11 @@ struct AddRuleView: View {
             onSave(rule)
             ruleName = ""
             ruleDescription = ""
+            dismiss()
         }
     }
 }
+
 
 // MARK: - Custom Components
 struct CustomTextField: View {
@@ -132,7 +140,7 @@ struct CustomTextField: View {
         TextField("", text: $text, onEditingChanged: { isActive in
             self.isActive = isActive
         })
-        .contentShape(Rectangle()) // Całe pole aktywne
+        .contentShape(Rectangle())
         .font(.custom("Lato Bold", size: 20))
         .foregroundColor(themeColors.lightText)
         .multilineTextAlignment(.center)
@@ -216,20 +224,7 @@ struct ActionButton: View {
     }
 }
 
-// MARK: - Utilities
-struct HapticFeedback {
-    static func success() {
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
-    }
-    
-    static func error() {
-        UINotificationFeedbackGenerator().notificationOccurred(.error)
-    }
-    
-    static func light() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-    }
-}
+
 
 extension View {
     func customButtonStyle(themeColors: ThemeColors) -> some View {

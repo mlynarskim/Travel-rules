@@ -334,4 +334,13 @@
 "ambulance" = "Ambulancia";
 "fire" = "Bomberos";
 
+// MyRulesView
+"add_custom_rule_button" = "Añadir regla personalizada";
+"delete_rule_title" = "Eliminar regla";
+"delete_rule_message" = "¿Estás seguro de que quieres eliminar esta regla?";
+"delete_button" = "Eliminar";
+"cancel_button" = "Cancelar";
+"rule_details_title" = "Detalles de la regla";
+"ok_button" = "Aceptar";
 
+"back_button" = "Volver";

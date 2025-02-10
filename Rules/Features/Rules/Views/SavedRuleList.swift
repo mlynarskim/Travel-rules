@@ -1,50 +1,55 @@
-//SavedRuleList.swift
 import SwiftUI
 import Foundation
 
 struct SavedRuleList: View {
-    @State private var selectedRule: Int?
-    @State private var showAlert = false
     @Binding var savedRules: [Int]
     @AppStorage("isDarkMode") var isDarkMode = false
-    @StateObject private var languageManager = LanguageManager.shared
+    @State private var selectedRuleIndex: Int?
+    @State private var showAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
     
     var body: some View {
         ZStack {
+            // Tło
             Image(isDarkMode ? "imageDark" : "Image")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
             
-            
             VStack {
+                // Lista reguł
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 12) {
-                        ForEach(savedRules, id: \.self) { ruleIndex in
-                            if let rule = getTranslatedRule(at: ruleIndex) {
-                                RuleRow(rule: rule, onDelete: {
-                                    selectedRule = ruleIndex
-                                    showAlert = true
-                                }, onOpen: {
-                                    openRule(ruleIndex)
-                                })
+                        ForEach(savedRules.indices, id: \.self) { index in
+                            if let rule = getTranslatedRule(at: savedRules[index]) {
+                                RuleItemView(
+                                    rule: Rule(name: rule, description: ""),
+                                    onDelete: {
+                                        selectedRuleIndex = savedRules[index]
+                                        showAlert = true
+                                    },
+                                    onOpen: {
+                                        showRuleDetail(rule)
+                                    }
+                                )
                             }
                         }
                     }
                     .padding(.horizontal)
                     .padding(.top, 10)
                 }
-                .navigationBarTitle("saved_rules".appLocalized, displayMode: .inline)
                 .padding(.bottom)
                 .frame(maxHeight: .infinity)
             }
+            // Alert dla usuwania reguły
             .alert(isPresented: $showAlert) {
                 Alert(
-                    title: Text("delete_rule".appLocalized),
-                    message: Text("delete_rule_confirmation".appLocalized),
+                    title: Text(alertTitle),
+                    message: Text(alertMessage),
                     primaryButton: .cancel(Text("cancel".appLocalized)),
                     secondaryButton: .destructive(Text("delete".appLocalized)) {
-                        if let ruleIndex = selectedRule {
+                        if let ruleIndex = selectedRuleIndex {
                             deleteRule(ruleIndex)
                         }
                     }
@@ -53,78 +58,37 @@ struct SavedRuleList: View {
         }
     }
     
+    // Pobranie przetłumaczonej reguły
     private func getTranslatedRule(at index: Int) -> String? {
         let currentRules = getLocalizedRules()
         guard index < currentRules.count else { return nil }
         return currentRules[index]
     }
     
+    // Usunięcie reguły
     private func deleteRule(_ ruleIndex: Int) {
         withAnimation {
             if let index = savedRules.firstIndex(of: ruleIndex) {
                 savedRules.remove(at: index)
                 saveRulesToUserDefaults()
-                print("Rule successfully deleted and saved")
             }
         }
     }
     
+    // Zapis reguł do UserDefaults
     private func saveRulesToUserDefaults() {
         do {
             let data = try JSONEncoder().encode(savedRules)
             UserDefaults.standard.set(data, forKey: "savedRules")
-            UserDefaults.standard.synchronize()
         } catch {
             print("Error saving rules: \(error)")
         }
     }
     
-    private func openRule(_ ruleIndex: Int) {
-        if let translatedRule = getTranslatedRule(at: ruleIndex) {
-            let alert = UIAlertController(
-                title: "rule".appLocalized,
-                message: translatedRule,
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "ok".appLocalized, style: .default))
-            
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let viewController = windowScene.windows.first?.rootViewController {
-                viewController.present(alert, animated: true)
-            }
-        }
+    // Wyświetlenie szczegółów reguły
+    private func showRuleDetail(_ rule: String) {
+        alertTitle = "rule".appLocalized
+        alertMessage = rule
+        showAlert = true
     }
 }
-
-struct RuleRow: View {
-    let rule: String
-    let onDelete: () -> Void
-    let onOpen: () -> Void
-    
-    var body: some View {
-        HStack {
-            Button(action: onOpen) {
-                Text(rule)
-                    .font(.custom("Lato Bold", size: 18))
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .multilineTextAlignment(.leading)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            
-            Button(action: onDelete) {
-                Image(systemName: "trash")
-                    .foregroundColor(.red)
-                    .padding(.trailing, 16)
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 50)
-        .background(Color(hex: "#29606D"))
-        .cornerRadius(15)
-        .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-    }
-}
-
