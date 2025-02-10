@@ -336,3 +336,14 @@
 "police" = "Policja";
 "ambulance" = "Pogotowie";
 "fire" = "Straż pożarna";
+
+// MyRulesView
+"add_custom_rule_button" = "Dodaj własną zasadę";
+"delete_rule_title" = "Usuń zasadę";
+"delete_rule_message" = "Czy na pewno chcesz usunąć tę zasadę?";
+"delete_button" = "Usuń";
+"cancel_button" = "Anuluj";
+"rule_details_title" = "Szczegóły zasady";
+"ok_button" = "OK";
+
+"back_button" = "Wróć";

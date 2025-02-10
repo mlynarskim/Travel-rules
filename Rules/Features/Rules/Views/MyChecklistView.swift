@@ -150,7 +150,7 @@ struct TravelListView: View {
                             }
                         }
                     }
-                    .navigationBarHidden(true)
+                    .navigationBarHidden(false)
                 }
                 .ignoresSafeArea() // ← Kluczowe, by NavigationView nie dokładało białych obszarów
             }

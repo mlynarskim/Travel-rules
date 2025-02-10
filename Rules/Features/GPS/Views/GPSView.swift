@@ -79,7 +79,7 @@ struct GPSView: View {
                     .padding(.bottom)
                 }
             }
-            .navigationBarHidden(true)
+            .navigationBarHidden(false)
         }
         .onAppear {
             withAnimation {

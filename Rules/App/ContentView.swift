@@ -529,14 +529,6 @@ struct NextView: View {
         }
     }
 }
-struct RulesListViewControllerRepresentable: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> RulesListViewController {
-        return RulesListViewController()
-    }
-    
-    func updateUIViewController(_ uiViewController: RulesListViewController, context: Context) {
-    }
-}
 
 //Navigation Components
 struct BottomNavigationMenu: View {
@@ -556,7 +548,7 @@ struct BottomNavigationMenu: View {
             )), icon: "person.2")
             NavigationButton(destination: TravelListView(), icon: "checkmark.circle")
             NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
-            NavigationButton(destination: RulesListViewControllerRepresentable(), icon: "list.star")
+            NavigationButton(destination: RulesListView(), icon: "list.star")
         }
         .padding(.horizontal)
     }

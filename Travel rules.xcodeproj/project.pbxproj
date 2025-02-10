@@ -12,7 +12,6 @@
 		07211A042D29B04100B501B9 /* RulesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A032D29B03C00B501B9 /* RulesListViewController.swift */; };
 		07211A062D29B0C000B501B9 /* SavedRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */; };
 		07211A082D29B0FE00B501B9 /* MyRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */; };
-		07211A182D2F434500B501B9 /* RuleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A172D2F433E00B501B9 /* RuleCell.swift */; };
 		07211A1A2D2F699800B501B9 /* KeyboardResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A192D2F699800B501B9 /* KeyboardResponder.swift */; };
 		07211A1C2D2FFDB000B501B9 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A1B2D2FFDAD00B501B9 /* LocationManager.swift */; };
 		073426612D4A682A00574629 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073426602D4A682A00574629 /* AuthenticationService.swift */; };
@@ -24,6 +23,7 @@
 		073E03482D268917002BD119 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073E03472D268915002BD119 /* PDFExporter.swift */; };
 		073E034A2D26893C002BD119 /* ExportButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073E03492D268937002BD119 /* ExportButtonView.swift */; };
 		073E034C2D268CD9002BD119 /* PDFConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073E034B2D268CCD002BD119 /* PDFConfiguration.swift */; };
+		075B0D1C2D57ED0000F47C1D /* RuleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */; };
 		079A312A2D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079A31292D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework */; };
 		07DD83652D267182004C5C5F /* Travel rules.xcworkspace in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83622D267182004C5C5F /* Travel rules.xcworkspace */; };
 		07DD83662D267182004C5C5F /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83272D267182004C5C5F /* Lato-Regular.ttf */; };
@@ -105,7 +105,6 @@
 		07211A032D29B03C00B501B9 /* RulesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesListViewController.swift; sourceTree = "<group>"; };
 		07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRulesViewController.swift; sourceTree = "<group>"; };
 		07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRulesViewController.swift; sourceTree = "<group>"; };
-		07211A172D2F433E00B501B9 /* RuleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleCell.swift; sourceTree = "<group>"; };
 		07211A192D2F699800B501B9 /* KeyboardResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardResponder.swift; sourceTree = "<group>"; };
 		07211A1B2D2FFDAD00B501B9 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		072ECB322D26728B00BC81F0 /* Rules.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rules.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -119,6 +118,7 @@
 		073E03492D268937002BD119 /* ExportButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportButtonView.swift; sourceTree = "<group>"; };
 		073E034B2D268CCD002BD119 /* PDFConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFConfiguration.swift; sourceTree = "<group>"; };
 		0741A6A12D4CD8AC00DB6E37 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleRow.swift; sourceTree = "<group>"; };
 		079A31292D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Google_Mobile_Ads_SDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		079DEF4E2D4AA8A800582CD7 /* FirebaseAuth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FirebaseAuth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		07DD82EB2D267182004C5C5F /* Podfile.lock */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
@@ -246,8 +246,8 @@
 		07211A022D29B03100B501B9 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */,
 				07F01DCB2D54C20C003CA72E /* info.swift */,
-				07211A172D2F433E00B501B9 /* RuleCell.swift */,
 				07DD83172D267182004C5C5F /* CustomRuleView.swift */,
 				07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */,
 				07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */,
@@ -915,6 +915,7 @@
 				07FC28F42D3A869100A4A34A /* NearbyPeopleListView.swift in Sources */,
 				07DD83942D267182004C5C5F /* RulesList.swift in Sources */,
 				073426612D4A682A00574629 /* AuthenticationService.swift in Sources */,
+				075B0D1C2D57ED0000F47C1D /* RuleRow.swift in Sources */,
 				07DD83962D267182004C5C5F /* SavedRuleList.swift in Sources */,
 				073E03482D268917002BD119 /* PDFExporter.swift in Sources */,
 				07211A082D29B0FE00B501B9 /* MyRulesViewController.swift in Sources */,
@@ -933,7 +934,6 @@
 				07DD839F2D267182004C5C5F /* PushView.swift in Sources */,
 				07DD83A02D267182004C5C5F /* GPSView.swift in Sources */,
 				07FC28F62D3A86A600A4A34A /* UserProfileView.swift in Sources */,
-				07211A182D2F434500B501B9 /* RuleCell.swift in Sources */,
 				07DD83A12D267182004C5C5F /* ColorExtensions.swift in Sources */,
 				07DD83A22D267182004C5C5F /* ToastView.swift in Sources */,
 				07DD83A32D267182004C5C5F /* SettingsView.swift in Sources */,
