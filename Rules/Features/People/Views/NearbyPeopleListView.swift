@@ -46,7 +46,7 @@ struct NearbyPeopleListView: View {
                 // Zawartość
                 if viewMode == .list {
                     if filteredUsers.isEmpty {
-                        EmptyStateView()
+                        //EmptyStateView()
                     } else {
                         List(filteredUsers) { user in
                             UserListRow(user: user)
