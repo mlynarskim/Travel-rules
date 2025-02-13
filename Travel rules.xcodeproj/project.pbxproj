@@ -80,7 +80,6 @@
 		07DD83AA2D267182004C5C5F /* CountryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD83062D267182004C5C5F /* CountryInfo.swift */; };
 		07DD83AB2D267182004C5C5F /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD834D2D267182004C5C5F /* AppTheme.swift */; };
 		07DD83AC2D267182004C5C5F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD82EE2D267182004C5C5F /* ContentView.swift */; };
-		07F01DC62D51D979003CA72E /* Property List.plist in Resources */ = {isa = PBXBuildFile; fileRef = 07F01DC52D51D979003CA72E /* Property List.plist */; };
 		07F01DC82D51FC44003CA72E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 07F01DC72D51FC44003CA72E /* LaunchScreen.storyboard */; };
 		07F01DCC2D54C210003CA72E /* info.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F01DCB2D54C20C003CA72E /* info.swift */; };
 		07FC28E42D3A85BF00A4A34A /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FC28E32D3A85BC00A4A34A /* UserProfile.swift */; };
@@ -344,7 +343,6 @@
 		07DD82F72D267182004C5C5F /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				07211A1B2D2FFDAD00B501B9 /* LocationManager.swift */,
 				07DD82F52D267182004C5C5F /* HapticManager.swift */,
 				07DD82F62D267182004C5C5F /* LanguageManager.swift */,
 			);
@@ -354,7 +352,6 @@
 		07DD82F92D267182004C5C5F /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				07DD82F82D267182004C5C5F /* LocationData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -449,6 +446,8 @@
 		07DD830B2D267182004C5C5F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				07DD82F82D267182004C5C5F /* LocationData.swift */,
+				07211A1B2D2FFDAD00B501B9 /* LocationManager.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -804,7 +803,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				07F01DC82D51FC44003CA72E /* LaunchScreen.storyboard in Resources */,
-				07F01DC62D51D979003CA72E /* Property List.plist in Resources */,
 				07DD83652D267182004C5C5F /* Travel rules.xcworkspace in Resources */,
 				07DD83662D267182004C5C5F /* Lato-Regular.ttf in Resources */,
 				07DD83682D267182004C5C5F /* Localizable.strings in Resources */,

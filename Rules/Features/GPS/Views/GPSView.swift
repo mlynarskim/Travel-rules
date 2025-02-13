@@ -1,3 +1,4 @@
+// Features/GPS/Views/GPSView.swift
 import SwiftUI
 import CoreLocation
 import MapKit
@@ -6,7 +7,10 @@ struct GPSView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var description = ""
     @State private var currentLocation: CLLocation?
-    @State private var region = MKCoordinateRegion()
+    @State private var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+    )
     @AppStorage("isDarkMode") var isDarkMode = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
     @StateObject private var languageManager = LanguageManager.shared
@@ -31,7 +35,6 @@ struct GPSView: View {
             ZStack {
                 Image(isDarkMode ? themeColors.darkBackground : themeColors.background)
                     .resizable()
-                   // .edgesIgnoringSafeArea(.all)
                     .ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: isSmallDevice ? 12 : 16) {
@@ -42,17 +45,29 @@ struct GPSView: View {
                         )
                         .transition(AnyTransition.scale)
                         
-                        // Map
+                        // Map z dodanymi markerami zapisanych lokalizacji
                         if #available(iOS 14.0, *) {
-                            Map(coordinateRegion: $region, showsUserLocation: true)
-                                .frame(height: isSmallDevice ? 150 : 200)
-                                .frame(maxWidth: isSmallDevice ? 300 : 340)
-                                .cornerRadius(15)
-                                .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
+                            Map(
+                                coordinateRegion: $region,
+                                interactionModes: .all,
+                                showsUserLocation: true,
+                                annotationItems: locationManager.locationData
+                            ) { item in
+                                MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longitude)) {
+                                    Image(systemName: "mappin.circle.fill")
+                                        .resizable()
+                                        .foregroundColor(colorForMarker(item.markerColor))
+                                        .frame(width: 30, height: 30)
+                                }
+                            }
+                            .frame(height: isSmallDevice ? 150 : 200)
+                            .frame(maxWidth: isSmallDevice ? 300 : 380)
+                            .cornerRadius(15)
+                            .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
                         } else {
                             MapFallbackView(region: $region)
                                 .frame(height: isSmallDevice ? 150 : 200)
-                                .frame(maxWidth: isSmallDevice ? 300 : 340)
+                                .frame(maxWidth: isSmallDevice ? 300 : 380)
                                 .cornerRadius(15)
                                 .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
                         }
@@ -67,6 +82,7 @@ struct GPSView: View {
                             )
                         }
                         
+                        // Panel wprowadzania lokalizacji z wyborem koloru pinezki
                         LocationInputPanel(
                             description: $description,
                             currentLocation: currentLocation,
@@ -76,12 +92,19 @@ struct GPSView: View {
                         )
                     }
                     .padding(.top, isSmallDevice ? 8 : 16)
-                    .padding(.bottom)
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
             }
             .navigationBarHidden(false)
         }
         .onAppear {
+            // Konfiguracja przezroczystego NavigationBar, by uniknąć białego paska przy wyświetlaniu klawiatury
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithTransparentBackground()
+            UINavigationBar.appearance().standardAppearance = appearance
+            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+            
             withAnimation {
                 locationManager.startUpdatingLocation()
             }
@@ -89,16 +112,32 @@ struct GPSView: View {
         .onDisappear {
             locationManager.stopUpdatingLocation()
         }
-        .onReceive(locationManager.$locationData) { locations in
-            if let lastLocation = locations.last {
+        .onReceive(locationManager.$lastLocation) { location in
+            if let location = location {
                 withAnimation(.easeInOut(duration: 0.3)) {
-                    currentLocation = CLLocation(latitude: lastLocation.latitude, longitude: lastLocation.longitude)
+                    currentLocation = location
                     region = MKCoordinateRegion(
-                        center: CLLocationCoordinate2D(latitude: lastLocation.latitude, longitude: lastLocation.longitude),
+                        center: location.coordinate,
                         span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
                     )
                 }
             }
+        }
+    }
+    
+    private func colorForMarker(_ marker: String) -> Color {
+        switch marker {
+        case "red": return .red
+        case "green": return .green
+        case "blue": return .blue
+        case "orange": return .orange
+        case "purple": return .purple
+        case "yellow": return .yellow
+        case "pink": return .pink
+        case "brown": return .brown
+        case "gray": return .gray
+        case "black": return .black
+        default: return .red
         }
     }
 }
@@ -114,6 +153,7 @@ struct MapFallbackView: View {
             .background(Color.gray.opacity(0.2))
     }
 }
+
 struct CurrentLocationCard: View {
     let currentLocation: CLLocation?
     let themeColors: ThemeColors
@@ -133,13 +173,22 @@ struct CurrentLocationCard: View {
                         .font(.system(size: isSmallDevice ? 14 : 16))
                 }
                 .foregroundColor(.white)
+                // Dodajemy contextMenu umożliwiający skopiowanie lokalizacji
+                .contextMenu {
+                    Button(action: {
+                        let text = "Lat: \(String(format: "%.6f", location.coordinate.latitude)), Lon: \(String(format: "%.6f", location.coordinate.longitude))"
+                        UIPasteboard.general.string = text
+                    }) {
+                        Label("copy_location".localized, systemImage: "doc.on.doc")
+                    }
+                }
             } else {
                 Text("waiting_location".appLocalized)
                     .font(.system(size: isSmallDevice ? 14 : 16))
                     .foregroundColor(.white.opacity(0.8))
             }
         }
-        .frame(maxWidth: isSmallDevice ? 300 : 340)
+        .frame(maxWidth: isSmallDevice ? 300 : 350)
         .padding(isSmallDevice ? 12 : 16)
         .background(themeColors.primary)
         .cornerRadius(15)
@@ -170,11 +219,11 @@ struct CountryInfoCard: View {
                     Spacer()
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .foregroundColor(.white)
-                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        .rotationEffect(.degrees(isExpanded ? 0 : 180))
                         .animation(.spring(), value: isExpanded)
                 }
                 .padding(isSmallDevice ? 12 : 16)
-                .frame(maxWidth: isSmallDevice ? 300 : 340)
+                .frame(maxWidth: isSmallDevice ? 300 : 380)
                 .background(themeColors.primary)
                 .cornerRadius(15)
             }
@@ -245,7 +294,7 @@ struct CountryInfoDetails: View {
                     .foregroundColor(.white)
             }
         }
-        .frame(maxWidth: isSmallDevice ? 300 : 340)
+        .frame(maxWidth: isSmallDevice ? 300 : 380)
         .padding(isSmallDevice ? 12 : 16)
         .background(themeColors.primary)
         .cornerRadius(15)
@@ -259,6 +308,12 @@ struct LocationInputPanel: View {
     let themeColors: ThemeColors
     let isSmallDevice: Bool
     
+    // Dodana zmienna stanu wyboru koloru pinezki
+    @State private var selectedMarkerColor: String = "red"
+    
+    // Lista dostępnych kolorów
+    private let availableColors = ["red", "green", "blue", "orange", "purple", "yellow", "pink", "brown", "gray", "black"]
+    
     var body: some View {
         VStack(spacing: isSmallDevice ? 12 : 15) {
             TextField("description".appLocalized, text: $description)
@@ -266,12 +321,29 @@ struct LocationInputPanel: View {
                 .font(.system(size: isSmallDevice ? 14 : 16))
                 .padding(.horizontal)
             
+            // LazyVGrid do wyświetlenia kolorów w dwóch wierszach (5 kolumn)
+            let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 5)
+            LazyVGrid(columns: columns, spacing: 2) {
+                ForEach(availableColors, id: \.self) { color in
+                    Circle()
+                        .fill(colorForMarker(color))
+                        .frame(width: 25, height: 25)
+                        .overlay(
+                            Circle().stroke(selectedMarkerColor == color ? Color.black : Color.clear, lineWidth: 2)
+                        )
+                        .onTapGesture {
+                            selectedMarkerColor = color
+                        }
+                }
+            }
+            .padding(.vertical, 5)
+            
             HStack(spacing: isSmallDevice ? 16 : 20) {
                 Button(action: saveLocation) {
                     Text("save_location".appLocalized)
                         .font(.system(size: isSmallDevice ? 14 : 16, weight: .bold))
                         .foregroundColor(.white)
-                        .frame(width: isSmallDevice ? 100 : 120, height: isSmallDevice ? 36 : 44)
+                        .frame(width: isSmallDevice ? 100 : 180, height: isSmallDevice ? 36 : 44)
                         .background(themeColors.primary)
                         .cornerRadius(15)
                         .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
@@ -279,7 +351,10 @@ struct LocationInputPanel: View {
                 
                 NavigationLink(
                     destination: SavedLocationsView(
-                        locationData: locationManager.locationData,
+                        locationData: Binding(
+                            get: { locationManager.locationData },
+                            set: { locationManager.locationData = $0 }
+                        ),
                         deleteAction: locationManager.deleteLocation
                     )
                 ) {
@@ -306,12 +381,29 @@ struct LocationInputPanel: View {
             let newLocation = LocationData(
                 latitude: location.coordinate.latitude,
                 longitude: location.coordinate.longitude,
-                description: description
+                description: description,
+                markerColor: selectedMarkerColor
             )
             locationManager.locationData.append(newLocation)
             description = ""
             locationManager.saveLocations()
             HapticManager.shared.impact(style: .medium)
+        }
+    }
+    
+    private func colorForMarker(_ color: String) -> Color {
+        switch color {
+        case "red": return .red
+        case "green": return .green
+        case "blue": return .blue
+        case "orange": return .orange
+        case "purple": return .purple
+        case "yellow": return .yellow
+        case "pink": return .pink
+        case "brown": return .brown
+        case "gray": return .gray
+        case "black": return .black
+        default: return .red
         }
     }
 }

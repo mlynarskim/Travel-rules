@@ -1,9 +1,10 @@
+// SavedLocationsView.swift
 import SwiftUI
 import CoreLocation
 import MapKit
 
 struct SavedLocationsView: View {
-    var locationData: [LocationData]
+    @Binding var locationData: [LocationData]
     var deleteAction: (Int) -> Void
     
     @State private var selectedLocation: LocationData?
@@ -17,8 +18,8 @@ struct SavedLocationsView: View {
             Image("\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")")
                 .resizable()
                 .scaledToFill()
-               // .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
+            
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
                     if locationData.isEmpty {
@@ -36,41 +37,38 @@ struct SavedLocationsView: View {
                         }
                     }
                 }
-                .padding()
+              .navigationBarBackButtonHidden(true)
+
+                .padding(.horizontal)
+                .padding(.top, 60)
+                .padding(.bottom, 20)
             }
         }
-        .navigationTitle("saved_locations".localized)
-        .actionSheet(isPresented: $showActionSheet) {
-            createActionSheet()
+
+        .confirmationDialog("location_actions".localized, isPresented: $showActionSheet, titleVisibility: .visible) {
+            Button("open_google_maps".localized) {
+                openMapsApp(with: .googleMaps)
+                HapticManager.shared.impact(style: .medium)
+            }
+            Button("open_apple_maps".localized) {
+                openMapsApp(with: .appleMaps)
+                HapticManager.shared.impact(style: .medium)
+            }
+            Button("delete".localized, role: .destructive) {
+                deleteSelectedLocation()
+                HapticManager.shared.notification(type: .success)
+            }
+            Button("cancel".localized, role: .cancel) {}
+        } message: {
+            Text(selectedLocation?.description ?? "")
         }
-    }
-    
-    private func createActionSheet() -> ActionSheet {
-        ActionSheet(
-            title: Text("location_actions".localized),
-            message: Text(selectedLocation?.description ?? ""),
-            buttons: [
-                .default(Text("open_google_maps".localized)) {
-                    openMapsApp(with: .googleMaps)
-                    HapticManager.shared.impact(style: .medium)
-                },
-                .default(Text("open_apple_maps".localized)) {
-                    openMapsApp(with: .appleMaps)
-                    HapticManager.shared.impact(style: .medium)
-                },
-                .destructive(Text("delete".localized)) {
-                    deleteSelectedLocation()
-                    HapticManager.shared.notification(type: .success)
-                },
-                .cancel(Text("cancel".localized))
-            ]
-        )
     }
     
     private func deleteSelectedLocation() {
         if let index = locationData.firstIndex(where: { $0.id == selectedLocation?.id }) {
             withAnimation(.easeOut(duration: 0.3)) {
                 deleteAction(index)
+                selectedLocation = nil
             }
         }
     }
@@ -79,7 +77,6 @@ struct SavedLocationsView: View {
         guard let location = selectedLocation,
               let url = URL(string: provider.urlString(latitude: location.latitude, longitude: location.longitude)),
               UIApplication.shared.canOpenURL(url) else { return }
-        
         UIApplication.shared.open(url)
     }
 }
@@ -90,19 +87,26 @@ struct SavedLocationCard: View {
     let location: LocationData
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(formatCoordinates(latitude: location.latitude, longitude: location.longitude))
-                .font(.system(.headline, design: .rounded))
-                .foregroundColor(.white)
-            
+        VStack(spacing: 8) {
+            // Nazwa lokalizacji z pinezką w kolorze markerColor
             if !location.description.isEmpty {
-                Text(location.description)
-                    .font(.system(.subheadline, design: .rounded))
-                    .foregroundColor(.white.opacity(0.9))
-                    .lineLimit(2)
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(colorForMarker(location.markerColor))
+                        .frame(width: 10, height: 10)
+                    Text(location.description)
+                        .font(.system(.headline, design: .rounded))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                }
             }
+            // Współrzędne w jednej linii
+            Text(formatCoordinates(latitude: location.latitude, longitude: location.longitude))
+                .font(.system(.subheadline, design: .rounded))
+                .foregroundColor(.white.opacity(0.9))
+                .minimumScaleFactor(0.5)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
         .padding()
         .background(Color(hex: "#29606D"))
         .cornerRadius(15)
@@ -121,9 +125,20 @@ struct SavedLocationCard: View {
         let latDirection = latitude >= 0 ? "north".localized : "south".localized
         let lonDirection = longitude >= 0 ? "east".localized : "west".localized
         
-        return String(format: "%d° %d' %.2f'' %@\n%d° %d' %.2f'' %@",
-                     abs(latDegrees), abs(latMinutes), abs(latSeconds), latDirection,
-                     abs(lonDegrees), abs(lonMinutes), abs(lonSeconds), lonDirection)
+        return String(format: "%d° %d' %.2f'' %@, %d° %d' %.2f'' %@",
+                      abs(latDegrees), abs(latMinutes), abs(latSeconds), latDirection,
+                      abs(lonDegrees), abs(lonMinutes), abs(lonSeconds), lonDirection)
+    }
+    
+    private func colorForMarker(_ marker: String) -> Color {
+        switch marker {
+        case "red": return .red
+        case "green": return .green
+        case "blue": return .blue
+        case "orange": return .orange
+        case "purple": return .purple
+        default: return .red
+        }
     }
 }
 
@@ -133,29 +148,38 @@ struct EmptyStateView: View {
             Image(systemName: "location.slash")
                 .font(.system(size: 50))
                 .foregroundColor(.white)
-            
             Text("no_saved_locations".localized)
                 .font(.headline)
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.5)
         }
         .frame(maxWidth: .infinity)
         .padding()
         .background(Color(hex: "#29606D").opacity(0.8))
         .cornerRadius(15)
+
     }
 }
 
-// MARK: - Preview
+// MARK: - Preview Container
+
+struct SavedLocationsViewPreviewContainer: View {
+    @State private var previewLocations: [LocationData] = [
+        LocationData(latitude: 50.0, longitude: 20.0, description: "Test Location", markerColor: "red")
+    ]
+    
+    var body: some View {
+        NavigationView {
+            SavedLocationsView(locationData: $previewLocations, deleteAction: { index in
+                previewLocations.remove(at: index)
+            })
+        }
+    }
+}
+
 struct SavedLocationsView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            SavedLocationsView(
-                locationData: [
-                    LocationData(latitude: 50.0, longitude: 20.0, description: "Test Location")
-                ],
-                deleteAction: { _ in }
-            )
-        }
+        SavedLocationsViewPreviewContainer()
     }
 }
