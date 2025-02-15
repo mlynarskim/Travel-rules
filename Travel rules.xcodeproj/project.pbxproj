@@ -24,6 +24,9 @@
 		073E034A2D26893C002BD119 /* ExportButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073E03492D268937002BD119 /* ExportButtonView.swift */; };
 		073E034C2D268CD9002BD119 /* PDFConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073E034B2D268CCD002BD119 /* PDFConfiguration.swift */; };
 		075B0D1C2D57ED0000F47C1D /* RuleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */; };
+		076C07192D60A12100C12DB1 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076C07182D60A11A00C12DB1 /* ActivityView.swift */; };
+		076C071B2D60A36200C12DB1 /* MyChecklistExportButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076C071A2D60A36000C12DB1 /* MyChecklistExportButtonView.swift */; };
+		076C071F2D60A9FA00C12DB1 /* Travel checklist.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 076C071E2D60A9FA00C12DB1 /* Travel checklist.pdf */; };
 		079A312A2D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079A31292D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework */; };
 		07DD83652D267182004C5C5F /* Travel rules.xcworkspace in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83622D267182004C5C5F /* Travel rules.xcworkspace */; };
 		07DD83662D267182004C5C5F /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83272D267182004C5C5F /* Lato-Regular.ttf */; };
@@ -99,6 +102,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		070E0F232D5DEA3000B59A53 /* grpc.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = grpc.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		070E0F272D5DEA4500B59A53 /* nanopb.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = nanopb.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		071484FF2D48A7000063B774 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		071485012D48A7250063B774 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		07211A032D29B03C00B501B9 /* RulesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesListViewController.swift; sourceTree = "<group>"; };
@@ -118,6 +123,9 @@
 		073E034B2D268CCD002BD119 /* PDFConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFConfiguration.swift; sourceTree = "<group>"; };
 		0741A6A12D4CD8AC00DB6E37 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleRow.swift; sourceTree = "<group>"; };
+		076C07182D60A11A00C12DB1 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		076C071A2D60A36000C12DB1 /* MyChecklistExportButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyChecklistExportButtonView.swift; sourceTree = "<group>"; };
+		076C071E2D60A9FA00C12DB1 /* Travel checklist.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Travel checklist.pdf"; sourceTree = "<group>"; };
 		079A31292D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Google_Mobile_Ads_SDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		079DEF4E2D4AA8A800582CD7 /* FirebaseAuth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FirebaseAuth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		07DD82EB2D267182004C5C5F /* Podfile.lock */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
@@ -245,11 +253,13 @@
 		07211A022D29B03100B501B9 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				076C07172D5F2F3300C12DB1 /* Lists */,
 				075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */,
 				07F01DCB2D54C20C003CA72E /* info.swift */,
 				07DD83172D267182004C5C5F /* CustomRuleView.swift */,
 				07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */,
 				07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */,
+				07DD83192D267182004C5C5F /* SavedRuleList.swift */,
 				07211A032D29B03C00B501B9 /* RulesListViewController.swift */,
 			);
 			path = Rules;
@@ -274,6 +284,7 @@
 		073A7B602D26F6BF0030C39B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				07DD834D2D267182004C5C5F /* AppTheme.swift */,
 				073A7B612D26F6C60030C39B /* ThemeStyle.swift */,
 			);
 			path = Models;
@@ -306,9 +317,29 @@
 		073E03442D2688A1002BD119 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				076C071A2D60A36000C12DB1 /* MyChecklistExportButtonView.swift */,
+				076C07182D60A11A00C12DB1 /* ActivityView.swift */,
 				073E03492D268937002BD119 /* ExportButtonView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		076C07172D5F2F3300C12DB1 /* Lists */ = {
+			isa = PBXGroup;
+			children = (
+				07DD83122D267182004C5C5F /* RuleListES.swift */,
+				07DD83132D267182004C5C5F /* RulesList.swift */,
+				07DD83142D267182004C5C5F /* RulesListPL.swift */,
+			);
+			path = Lists;
+			sourceTree = "<group>";
+		};
+		076C071D2D60A9EF00C12DB1 /* PDF */ = {
+			isa = PBXGroup;
+			children = (
+				076C071E2D60A9FA00C12DB1 /* Travel checklist.pdf */,
+			);
+			path = PDF;
 			sourceTree = "<group>";
 		};
 		07C968572D26881B00FC6FFB /* Export */ = {
@@ -482,9 +513,6 @@
 			isa = PBXGroup;
 			children = (
 				07DD83112D267182004C5C5F /* ListItem.swift */,
-				07DD83122D267182004C5C5F /* RuleListES.swift */,
-				07DD83132D267182004C5C5F /* RulesList.swift */,
-				07DD83142D267182004C5C5F /* RulesListPL.swift */,
 			);
 			path = Lists;
 			sourceTree = "<group>";
@@ -501,20 +529,19 @@
 			isa = PBXGroup;
 			children = (
 				07211A192D2F699800B501B9 /* KeyboardResponder.swift */,
-				07DD83192D267182004C5C5F /* SavedRuleList.swift */,
 				07DD83182D267182004C5C5F /* MyChecklistView.swift */,
 				07DD831A2D267182004C5C5F /* TravelChecklistView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		07DD831C2D267182004C5C5F /* Rules */ = {
+		07DD831C2D267182004C5C5F /* Checklist */ = {
 			isa = PBXGroup;
 			children = (
 				07DD83162D267182004C5C5F /* Models */,
 				07DD831B2D267182004C5C5F /* Views */,
 			);
-			path = Rules;
+			path = Checklist;
 			sourceTree = "<group>";
 		};
 		07DD831D2D267182004C5C5F /* Features */ = {
@@ -526,7 +553,7 @@
 				07DD83052D267182004C5C5F /* Achievements */,
 				07DD830A2D267182004C5C5F /* CountryInfo */,
 				07DD83102D267182004C5C5F /* GPS */,
-				07DD831C2D267182004C5C5F /* Rules */,
+				07DD831C2D267182004C5C5F /* Checklist */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -586,6 +613,7 @@
 		07DD83362D267182004C5C5F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				076C071D2D60A9EF00C12DB1 /* PDF */,
 				07DD832C2D267182004C5C5F /* Fonts */,
 				07DD83312D267182004C5C5F /* Localization */,
 				07DD83352D267182004C5C5F /* Sounds */,
@@ -613,20 +641,11 @@
 			path = Screens;
 			sourceTree = "<group>";
 		};
-		07DD834E2D267182004C5C5F /* Theme */ = {
-			isa = PBXGroup;
-			children = (
-				07DD834D2D267182004C5C5F /* AppTheme.swift */,
-			);
-			path = Theme;
-			sourceTree = "<group>";
-		};
 		07DD834F2D267182004C5C5F /* UI */ = {
 			isa = PBXGroup;
 			children = (
 				07DD833A2D267182004C5C5F /* Components */,
 				07DD833E2D267182004C5C5F /* Screens */,
-				07DD834E2D267182004C5C5F /* Theme */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -717,6 +736,8 @@
 		134206E0AB2799B4F21080A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				070E0F272D5DEA4500B59A53 /* nanopb.framework */,
+				070E0F232D5DEA3000B59A53 /* grpc.framework */,
 				079DEF4E2D4AA8A800582CD7 /* FirebaseAuth.framework */,
 				079A31292D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework */,
 				51576FEBCC7CE96E7C6DF159 /* Pods_Rules.framework */,
@@ -806,6 +827,7 @@
 				07DD83652D267182004C5C5F /* Travel rules.xcworkspace in Resources */,
 				07DD83662D267182004C5C5F /* Lato-Regular.ttf in Resources */,
 				07DD83682D267182004C5C5F /* Localizable.strings in Resources */,
+				076C071F2D60A9FA00C12DB1 /* Travel checklist.pdf in Resources */,
 				07DD836D2D267182004C5C5F /* Lato-Light.ttf in Resources */,
 				07DD836E2D267182004C5C5F /* Podfile.lock in Resources */,
 				07DD836F2D267182004C5C5F /* Lato-Thin.ttf in Resources */,
@@ -911,6 +933,7 @@
 				07FC28EF2D3A862600A4A34A /* UserProfileService.swift in Sources */,
 				07DD83932D267182004C5C5F /* AchievementsView.swift in Sources */,
 				07FC28F42D3A869100A4A34A /* NearbyPeopleListView.swift in Sources */,
+				076C071B2D60A36200C12DB1 /* MyChecklistExportButtonView.swift in Sources */,
 				07DD83942D267182004C5C5F /* RulesList.swift in Sources */,
 				073426612D4A682A00574629 /* AuthenticationService.swift in Sources */,
 				075B0D1C2D57ED0000F47C1D /* RuleRow.swift in Sources */,
@@ -954,6 +977,7 @@
 				073A7B622D26F6CB0030C39B /* ThemeStyle.swift in Sources */,
 				07DD83A92D267182004C5C5F /* CustomRuleView.swift in Sources */,
 				07F01DCC2D54C210003CA72E /* info.swift in Sources */,
+				076C07192D60A12100C12DB1 /* ActivityView.swift in Sources */,
 				07DD83AA2D267182004C5C5F /* CountryInfo.swift in Sources */,
 				07FC28EB2D3A860500A4A34A /* PeopleLocationService.swift in Sources */,
 				07DD83AB2D267182004C5C5F /* AppTheme.swift in Sources */,

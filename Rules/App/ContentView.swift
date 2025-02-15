@@ -546,7 +546,7 @@ struct BottomNavigationMenu: View {
                 shareLevel: .approximate,
                 description: nil
             )), icon: "person.2")
-            NavigationButton(destination: TravelListView(), icon: "checkmark.circle")
+            NavigationButton(destination: MyChecklistView(), icon: "checkmark.circle")
             NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
             NavigationButton(destination: RulesListView(), icon: "list.star")
         }

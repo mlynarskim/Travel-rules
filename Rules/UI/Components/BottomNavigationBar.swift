@@ -50,7 +50,7 @@ struct BottomNavigationBar: View {
                         )
                 }
                 
-                NavigationLink(destination: TravelListView()) {
+                NavigationLink(destination: MyChecklistView()) {
                     RoundedRectangle(cornerRadius: 15)
                         .padding(.all, 5)
                         .foregroundColor(Color(hex: "#DDAA4F"))
