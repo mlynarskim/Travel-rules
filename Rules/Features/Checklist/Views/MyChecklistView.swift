@@ -1,195 +1,91 @@
-//TravelListView.swift
 import SwiftUI
-import Combine
 
 struct TravelItem: Identifiable, Codable {
-    var id: UUID
+    var id = UUID()
     var name: String
-    var isCompleted: Bool = false
-    var isDeleted: Bool = false
-    
+    var isCompleted = false
+
     init(name: String) {
-        self.id = UUID()
         self.name = name
     }
 }
 
-struct CustomSegmentedControl: UIViewRepresentable {
-    @Binding var selectedTab: Int
-    @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
-    
-    private var themeColors: ThemeColors {
-        switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
-        case .classic: return ThemeColors.classicTheme
-        case .mountain: return ThemeColors.mountainTheme
-        case .beach: return ThemeColors.beachTheme
-        case .desert: return ThemeColors.desertTheme
-        case .forest: return ThemeColors.forestTheme
-        }
-    }
-    
-    func makeUIView(context: Context) -> UISegmentedControl {
-        let control = UISegmentedControl(items: ["my_checklist".appLocalized, "packing_list".appLocalized])
-        control.selectedSegmentIndex = 0
-        control.backgroundColor = UIColor(themeColors.primary).withAlphaComponent(0.7)
-        control.selectedSegmentTintColor = UIColor(themeColors.primary)
-        control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .normal)
-        control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
-        control.addTarget(context.coordinator, action: #selector(Coordinator.valueChanged(_:)), for: .valueChanged)
-        return control
-    }
-    
-    func updateUIView(_ uiView: UISegmentedControl, context: Context) {
-        uiView.selectedSegmentIndex = selectedTab
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject {
-        var parent: CustomSegmentedControl
-        
-        init(_ parent: CustomSegmentedControl) {
-            self.parent = parent
-        }
-        
-        @objc func valueChanged(_ sender: UISegmentedControl) {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                parent.selectedTab = sender.selectedSegmentIndex
-            }
-            HapticManager.shared.impact(style: .light)
-        }
-    }
-}
-
-struct TravelListView: View {
+struct MyChecklistView: View {
     @State private var travelItems: [TravelItem] = []
     @State private var newItemName: String = ""
     @State private var selectedTab: Int = 0
     @State private var showExportSheet = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
     @AppStorage("isDarkMode") private var isDarkMode = false
-    @ObservedObject private var keyboard = KeyboardResponder()
-    @StateObject private var languageManager = LanguageManager.shared
+    @StateObject private var keyboard = KeyboardResponder()
     
     private var themeColors: ThemeColors {
         switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
-        case .classic: return ThemeColors.classicTheme
+        case .classic:  return ThemeColors.classicTheme
         case .mountain: return ThemeColors.mountainTheme
-        case .beach: return ThemeColors.beachTheme
-        case .desert: return ThemeColors.desertTheme
-        case .forest: return ThemeColors.forestTheme
+        case .beach:    return ThemeColors.beachTheme
+        case .desert:   return ThemeColors.desertTheme
+        case .forest:   return ThemeColors.forestTheme
         }
-    }
-    
-    private var screenWidth: CGFloat {
-        UIScreen.main.bounds.width
-    }
-    
-    private var screenHeight: CGFloat {
-        UIScreen.main.bounds.height
     }
     
     private var isSmallDevice: Bool {
-        screenHeight <= 667 // iPhone SE, 7, 8
+        UIScreen.main.bounds.height <= 667
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                NavigationView {
-                    ZStack {
-                        // Tło: obrazek dopasowany do ekranu
-                        let imageName = "\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")"
+        NavigationView {
+            GeometryReader { geometry in
+                ZStack {
+                    BackgroundView(selectedTheme: selectedTheme, isDarkMode: isDarkMode)
+                    
+                    VStack(spacing: 16) {
+                        Spacer()
+                            .frame(height: 40)
                         
-                        Image(imageName)
-                            .resizable()
-                            .scaledToFill()
-                            .ignoresSafeArea()
+                        SegmentedPicker(selectedTab: $selectedTab, themeColors: themeColors)
+                            .padding(.horizontal)
+                            .padding(.top, 80)
                         
-                        
-                        // Główny kontent
-                        VStack(spacing: isSmallDevice ? 8 : 16) {
-                            // Górny pasek z przyciskiem export
-                            HStack {
-                                Spacer()
-                                Button(action: {
-                                    HapticManager.shared.impact(style: .medium)
-                                    showExportSheet = true
-                                }) {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .font(.system(size: isSmallDevice ? 18 : 20))
-                                        .foregroundColor(.white)
-                                        .padding(isSmallDevice ? 8 : 10)
-                                        .background(themeColors.primary)
-                                        .cornerRadius(10)
-                                }
-                                .padding(.trailing)
-                            }
-                            .padding(.top, isSmallDevice ? 8 : 16)
-                            
-                            // Segmented Control
-                            CustomSegmentedControl(selectedTab: $selectedTab)
-                                .frame(height: 40)
-                                .padding(.horizontal)
-                                .padding(.top, isSmallDevice ? 12 : 20)
-                            
-                            // Treść w zależności od zakładki
-                            if selectedTab == 0 {
-                                MyListContent(
-                                    travelItems: $travelItems,
-                                    newItemName: $newItemName,
-                                    geometry: geometry,
-                                    themeColors: themeColors
-                                )
-                            } else {
-                                TravelChecklist()
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .background(Color.clear)
-                            }
+                        if selectedTab == 0 {
+                            ChecklistContentView(
+                                travelItems: $travelItems,
+                                newItemName: $newItemName,
+                                themeColors: themeColors,
+                                isSmallDevice: isSmallDevice
+                            )
+                        } else {
+                            TravelChecklist()
                         }
+                        
+                        Spacer()
                     }
-                    .navigationBarHidden(false)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
                 }
-                .ignoresSafeArea() // ← Kluczowe, by NavigationView nie dokładało białych obszarów
             }
-            // Arkusz exportu
+            .ignoresSafeArea()
             .sheet(isPresented: $showExportSheet) {
                 ExportView(items: travelItems.map { $0.name }, themeColors: themeColors)
             }
-            .onAppear {
-                loadItems()
-            }
-            .onDisappear {
-                saveItems()
-            }
+            .onAppear(perform: loadItems)
+            .onDisappear(perform: saveItems)
+            .navigationBarItems(trailing:
+                Button(action: {
+                    HapticManager.shared.impact(style: .medium)
+                    showExportSheet = true
+                }) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: isSmallDevice ? 18 : 20))
+                        .foregroundColor(.white)
+                }
+            )
         }
     }
     
-    // Funkcje pomocnicze w TravelListView
-    private func addItem() {
-        guard !newItemName.isEmpty else { return }
-        let newItem = TravelItem(name: newItemName)
-        withAnimation(.spring()) {
-            travelItems.append(newItem)
-        }
-        newItemName = ""
-    }
-    
-    private func toggleCompletion(for item: TravelItem) {
-        if let index = travelItems.firstIndex(where: { $0.id == item.id }) {
-            withAnimation(.easeInOut) {
-                travelItems[index].isCompleted.toggle()
-            }
-        }
-    }
-    
-    private func deleteItem(_ item: TravelItem) {
-        if let index = travelItems.firstIndex(where: { $0.id == item.id }) {
-            withAnimation(.easeOut) {
-                travelItems.remove(at: index)
-            }
+    private func loadItems() {
+        if let data = UserDefaults.standard.data(forKey: "travelItems"),
+           let decoded = try? JSONDecoder().decode([TravelItem].self, from: data) {
+            travelItems = decoded
         }
     }
     
@@ -198,137 +94,42 @@ struct TravelListView: View {
             UserDefaults.standard.set(encoded, forKey: "travelItems")
         }
     }
-    
-    private func loadItems() {
-        if let data = UserDefaults.standard.data(forKey: "travelItems") {
-            if let decoded = try? JSONDecoder().decode([TravelItem].self, from: data) {
-                travelItems = decoded
-            }
-        }
-    }
 }
 
-// MARK: - MyListContent
-struct MyListContent: View {
-    @Binding var travelItems: [TravelItem]
-    @Binding var newItemName: String
-    let geometry: GeometryProxy
+struct ChecklistItemRow: View {
+    @Binding var item: TravelItem
     let themeColors: ThemeColors
-    
-    private var isSmallDevice: Bool {
-        geometry.size.height <= 667
-    }
-    
-    var body: some View {
-        VStack(spacing: isSmallDevice ? 8 : 12) {
-            // Dodajemy pole tekstowe + przycisk "Add"
-            HStack {
-                TextField("enter_new_item".appLocalized, text: $newItemName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .font(.system(size: isSmallDevice ? 14 : 16))
-                    .padding(.leading, isSmallDevice ? 16 : 20)
-                
-                Button(action: addItem) {
-                    Text("add".appLocalized)
-                        .font(.system(size: isSmallDevice ? 14 : 16, weight: .semibold))
-                        .frame(width: isSmallDevice ? 70 : 80, height: isSmallDevice ? 32 : 35)
-                        .background(themeColors.primary)
-                        .foregroundColor(.white)
-                        .cornerRadius(15)
-                        .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
-                }
-                .padding(.trailing, isSmallDevice ? 16 : 20)
-            }
-            .padding(.vertical, isSmallDevice ? 8 : 10)
-            
-            // Lista z zadaniami
-            List {
-                ForEach(travelItems) { item in
-                    ItemRow(
-                        item: item,
-                        isSmallDevice: isSmallDevice,
-                        themeColors: themeColors,
-                        toggleCompletion: { toggleItemCompletion(item) },
-                        deleteItem: { deleteItem(item) }
-                    )
-                    .listRowBackground(Color.clear) // tło wiersza puste
-                }
-            }
-            .listStyle(PlainListStyle())
-            // iOS 16+ - usuwa domyślne tło listy, żeby nie pojawiał się biały obszar
-            .background(Color.clear)
-            .onAppear {
-                if #available(iOS 16.0, *) {
-                    UITableView.appearance().backgroundColor = .clear
-                    // lub: .scrollContentBackground(.hidden) na samej Liście,
-                    // ale tak jest bardziej uniwersalnie (i do iOS 15)
-                } else {
-                    UITableView.appearance().backgroundColor = .clear
-                }
-            }
-        }
-    }
-    
-    private func addItem() {
-        guard !newItemName.isEmpty else { return }
-        let newItem = TravelItem(name: newItemName)
-        withAnimation(.spring()) {
-            travelItems.append(newItem)
-        }
-        newItemName = ""
-        HapticManager.shared.impact(style: .medium)
-    }
-    
-    private func toggleItemCompletion(_ item: TravelItem) {
-        if let index = travelItems.firstIndex(where: { $0.id == item.id }) {
-            withAnimation(.easeInOut) {
-                travelItems[index].isCompleted.toggle()
-            }
-            HapticManager.shared.impact(style: .light)
-        }
-    }
-    
-    private func deleteItem(_ item: TravelItem) {
-        withAnimation(.easeOut) {
-            travelItems.removeAll(where: { $0.id == item.id })
-        }
-        HapticManager.shared.notification(type: .success)
-    }
-}
-
-// MARK: - ItemRow
-struct ItemRow: View {
-    let item: TravelItem
     let isSmallDevice: Bool
-    let themeColors: ThemeColors
-    let toggleCompletion: () -> Void
-    let deleteItem: () -> Void
+    let deleteAction: () -> Void
     
     var body: some View {
         HStack {
-            // Checkmark
-            Button(action: toggleCompletion) {
+            Button(action: {
+                withAnimation {
+                    item.isCompleted.toggle()
+                }
+                HapticManager.shared.impact(style: .light)
+            }) {
                 Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(item.isCompleted ? themeColors.success : .white)
                     .font(.system(size: isSmallDevice ? 16 : 18))
-                    .padding(.horizontal, isSmallDevice ? 8 : 10)
             }
-            // Nazwa zadania
+            
             Text(item.name)
                 .strikethrough(item.isCompleted)
-                .foregroundColor(item.isCompleted ? themeColors.secondaryText : .white)
+                .foregroundColor(item.isCompleted ? .gray : .white) // Zmieniony kolor na szary dla ukończonych elementów
                 .font(.system(size: isSmallDevice ? 16 : 18, weight: .semibold))
                 .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
             
-            // Ikona kosza
-            Button(action: deleteItem) {
+            Spacer()
+            
+            Button(action: deleteAction) {
                 Image(systemName: "trash")
                     .foregroundColor(themeColors.error)
                     .font(.system(size: isSmallDevice ? 14 : 16))
             }
-            .padding(.horizontal, isSmallDevice ? 8 : 10)
         }
+        .padding()
         .frame(height: isSmallDevice ? 36 : 40)
         .background(themeColors.primary)
         .cornerRadius(15)
@@ -336,66 +137,200 @@ struct ItemRow: View {
     }
 }
 
-// MARK: - ExportView
+struct BackgroundView: View {
+    let selectedTheme: String
+    let isDarkMode: Bool
+    
+    var body: some View {
+        let imageName = "\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")"
+        Image(imageName)
+            .resizable()
+            .scaledToFill()
+            .ignoresSafeArea()
+    }
+}
+
+struct SegmentedPicker: View {
+    @Binding var selectedTab: Int
+    let themeColors: ThemeColors
+    
+    var body: some View {
+        Picker("", selection: $selectedTab) {
+            Text("my_checklist".appLocalized).tag(0)
+            Text("packing_list".appLocalized).tag(1)
+        }
+        .pickerStyle(.segmented)
+        .tint(themeColors.primary)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(themeColors.primary.opacity(0.7))
+        )
+        .frame(height: 40)
+    }
+}
+
+struct ChecklistContentView: View {
+    @Binding var travelItems: [TravelItem]
+    @Binding var newItemName: String
+    let themeColors: ThemeColors
+    let isSmallDevice: Bool
+    
+    var body: some View {
+        VStack(spacing: isSmallDevice ? 8 : 12) {
+            AddItemView(
+                newItemName: $newItemName,
+                themeColors: themeColors,
+                isSmallDevice: isSmallDevice,
+                addAction: addItem
+            )
+            
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach($travelItems) { $item in
+                        ChecklistItemRow(
+                            item: $item,
+                            themeColors: themeColors,
+                            isSmallDevice: isSmallDevice,
+                            deleteAction: {
+                                deleteItem(item)
+                            }
+                        )
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .background(Color.clear)
+        }
+    }
+    
+    private func addItem() {
+        guard !newItemName.isEmpty else { return }
+        withAnimation(.spring()) {
+            travelItems.append(TravelItem(name: newItemName))
+            newItemName = ""
+        }
+        HapticManager.shared.impact(style: .medium)
+    }
+    
+    private func deleteItem(_ item: TravelItem) {
+        withAnimation(.easeOut) {
+            travelItems.removeAll { $0.id == item.id }
+        }
+        HapticManager.shared.notification(type: .success)
+    }
+}
+
+struct AddItemView: View {
+    @Binding var newItemName: String
+    let themeColors: ThemeColors
+    let isSmallDevice: Bool
+    let addAction: () -> Void
+    
+    var body: some View {
+        HStack {
+            TextField("enter_new_item".appLocalized, text: $newItemName)
+                .textFieldStyle(.roundedBorder)
+                .font(.system(size: isSmallDevice ? 14 : 16))
+                .submitLabel(.done)
+                .onSubmit(addAction)
+            
+            Button("add".appLocalized, action: addAction)
+                .buttonStyle(AddButtonStyle(themeColors: themeColors, isSmallDevice: isSmallDevice))
+        }
+        .padding(.horizontal)
+        .padding(.vertical, isSmallDevice ? 8 : 10)
+    }
+}
+
+struct AddButtonStyle: ButtonStyle {
+    let themeColors: ThemeColors
+    let isSmallDevice: Bool
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: isSmallDevice ? 14 : 16, weight: .semibold))
+            .frame(width: isSmallDevice ? 70 : 80, height: isSmallDevice ? 32 : 35)
+            .background(themeColors.primary)
+            .foregroundColor(.white)
+            .cornerRadius(15)
+            .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
+            .opacity(configuration.isPressed ? 0.8 : 1.0)
+    }
+}
+
+
+
 struct ExportView: View {
     let items: [String]
     let themeColors: ThemeColors
-    @Environment(\.presentationMode) var presentationMode
-    
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var showShareSheet = false
+    @State private var shareItems: [Any] = []
+    @State private var showingError = false
+
     var body: some View {
-        NavigationView {
-            VStack {
+        NavigationStack {
+            VStack(spacing: 20) {
                 Text("exportOptions".appLocalized)
                     .font(.title)
                     .foregroundColor(themeColors.primaryText)
                     .padding()
                 
+                // Przycisk eksportu My Checklist (niezmieniany)
                 ExportButtonView(
                     items: items,
                     title: "myTravelList".appLocalized,
-                    category: "travelChecklist".appLocalized
+                    category: "userChecklist".appLocalized
                 )
                 .padding()
-                
+
+                // Nowy przycisk eksportu gotowego pliku PDF Travel Checklist
+                Button(action: exportStaticTravelChecklist) {
+                    HStack {
+                        Image(systemName: "doc.richtext")
+                            .font(.system(size: 18))
+                        Text(LocalizedStringKey("travel.checklist.button"))
+                    }
+                    .padding()
+                    .background(Color("AccentColor"))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding()
+
                 Spacer()
             }
             .background(themeColors.cardBackground)
-            .navigationBarItems(trailing: Button("done".appLocalized) {
-                presentationMode.wrappedValue.dismiss()
-            })
+            .navigationTitle("Export PDF")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+            .sheet(isPresented: $showShareSheet) {
+                ActivityView(activityItems: shareItems)
+            }
+            .alert("Export error", isPresented: $showingError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Could not export file.")
+            }
         }
     }
-}
-
-// MARK: - Preview
-struct TravelListView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            TravelListView()
-                .previewDevice(PreviewDevice(rawValue: "iPhone SE (2nd generation)"))
-                .previewDisplayName("iPhone SE")
-                .environment(\.colorScheme, .light)
-            
-            TravelListView()
-                .previewDevice(PreviewDevice(rawValue: "iPhone 8"))
-                .previewDisplayName("iPhone 8")
-                .environment(\.colorScheme, .light)
-            
-            TravelListView()
-                .previewDevice(PreviewDevice(rawValue: "iPhone 14"))
-                .previewDisplayName("iPhone 14")
-                .environment(\.colorScheme, .light)
-            
-            TravelListView()
-                .previewDevice(PreviewDevice(rawValue: "iPhone 14 Pro Max"))
-                .previewDisplayName("iPhone 14 Pro Max")
-                .environment(\.colorScheme, .light)
-            
-            TravelListView()
-                .previewDevice(PreviewDevice(rawValue: "iPhone 14"))
-                .previewDisplayName("iPhone 14 (Dark Mode)")
-                .environment(\.colorScheme, .dark)
+    
+    /// Funkcja eksportująca gotowy plik PDF "Travel checklist.pdf" z bundle
+    private func exportStaticTravelChecklist() {
+        // Upewnij się, że plik "Travel checklist.pdf" został dodany do projektu (główny bundle)
+        guard let fileURL = Bundle.main.url(forResource: "Travel checklist", withExtension: "pdf") else {
+            showingError = true
+            return
         }
+        
+        shareItems = [fileURL]
+        showShareSheet = true
     }
 }
-

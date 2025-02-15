@@ -1,30 +1,21 @@
 import Foundation
 import SwiftUI
-import Combine
 
 class KeyboardResponder: ObservableObject {
     @Published var currentHeight: CGFloat = 0
     
-    private var center: NotificationCenter
-    private var keyboardShow: AnyCancellable?
-    private var keyboardHide: AnyCancellable?
-    
-    init(center: NotificationCenter = .default) {
-        self.center = center
-        setupPublishers()
+    init() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
-    private func setupPublishers() {
-        keyboardShow = center.publisher(for: UIResponder.keyboardWillShowNotification)
-            .compactMap { $0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect }
-            .map { $0.height }
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.currentHeight, on: self)
-        
-        keyboardHide = center.publisher(for: UIResponder.keyboardWillHideNotification)
-            .map { _ in CGFloat.zero }
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.currentHeight, on: self)
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            currentHeight = keyboardFrame.cgRectValue.height
+        }
+    }
+    
+    @objc func keyboardWillHide(_ notification: Notification) {
+        currentHeight = 0
     }
 }
-

@@ -1,3 +1,4 @@
+//PDFExporter.swift
 import UIKit
 import PDFKit
 
@@ -45,15 +46,15 @@ class PDFExporter {
                 if let logo = UIImage(named: "AppIcon") {
                     let logoSize = CGSize(width: 40, height: 40)
                     let logoRect = CGRect(x: configuration.margins.left,
-                                        y: configuration.margins.top,
-                                        width: logoSize.width,
-                                        height: logoSize.height)
+                                          y: configuration.margins.top,
+                                          width: logoSize.width,
+                                          height: logoSize.height)
                     logo.draw(in: logoRect)
                 }
                 
                 // Header text
                 let headerPoint = CGPoint(x: configuration.margins.left + 50,
-                                        y: configuration.margins.top + 15)
+                                          y: configuration.margins.top + 15)
                 headerText.draw(at: headerPoint, withAttributes: configuration.styles.header)
                 
                 // Page number
@@ -81,24 +82,70 @@ class PDFExporter {
             
             yPosition += 40
             
-            // Content
-            for item in data.items {
-                let bulletPoint = "• "
-                let fullText = bulletPoint + item
-                
-                if yPosition > configuration.pageSize.height - configuration.margins.bottom - 30 {
-                    addNewPage()
-                }
-                
-                let itemRect = CGRect(
+            // Treść – jeżeli lista jest pusta, wyświetl komunikat
+            if data.items.isEmpty {
+                let noItemsText = NSLocalizedString("No items to export.", comment: "")
+                let noItemsRect = CGRect(
                     x: configuration.margins.left,
                     y: yPosition,
                     width: configuration.pageSize.width - configuration.margins.left - configuration.margins.right,
                     height: 25
                 )
-                (fullText as NSString).draw(in: itemRect, withAttributes: configuration.styles.body)
-                
+                (noItemsText as NSString).draw(in: noItemsRect, withAttributes: configuration.styles.body)
                 yPosition += 25
+            } else {
+                if data.items.isEmpty {
+                    let noItemsText = NSLocalizedString("No items to export.", comment: "")
+                    let noItemsRect = CGRect(
+                        x: configuration.margins.left,
+                        y: yPosition,
+                        width: configuration.pageSize.width - configuration.margins.left - configuration.margins.right,
+                        height: 25
+                    )
+                    (noItemsText as NSString).draw(in: noItemsRect, withAttributes: configuration.styles.body)
+                    yPosition += 25
+                } else {
+                    for item in data.items {
+                        // Ustal wysokość dla pojedynczego wpisu
+                        let itemHeight: CGFloat = 30
+                        
+                        // Rysowanie kółka (checkbox) obok wpisu
+                        let circleDiameter: CGFloat = 12
+                        let circleX = configuration.margins.left
+                        let circleY = yPosition + (itemHeight - circleDiameter) / 2  // wyśrodkowanie kółka w pionie
+                        let circleRect = CGRect(x: circleX, y: circleY, width: circleDiameter, height: circleDiameter)
+                        
+                        let circlePath = UIBezierPath(ovalIn: circleRect)
+                        UIColor.black.setStroke()  // lub możesz użyć innego koloru
+                        circlePath.lineWidth = 1.5
+                        circlePath.stroke()
+                        
+                        // Rysowanie tekstu wpisu – zaczynamy od pozycji po kółku z odstępem
+                        let textX = configuration.margins.left + circleDiameter + 10
+                        
+                        // Zwiększamy czcionkę wpisu o kilka punktów
+                        var itemAttributes = configuration.styles.body
+                        if let currentFont = itemAttributes[.font] as? UIFont {
+                            let biggerFont = UIFont.systemFont(ofSize: currentFont.pointSize + 2)
+                            itemAttributes[.font] = biggerFont
+                        }
+                        
+                        let itemRect = CGRect(
+                            x: textX,
+                            y: yPosition,
+                            width: configuration.pageSize.width - textX - configuration.margins.right,
+                            height: itemHeight
+                        )
+                        (item as NSString).draw(in: itemRect, withAttributes: itemAttributes)
+                        
+                        // Sprawdzenie, czy mamy wystarczająco miejsca na stronie, w przeciwnym wypadku dodajemy nową stronę
+                        yPosition += itemHeight + 5  // 5 punktów odstępu między wpisami
+                        if yPosition > configuration.pageSize.height - configuration.margins.bottom - 30 {
+                            addNewPage()
+                        }
+                    }
+                }
+
             }
         }
     }
