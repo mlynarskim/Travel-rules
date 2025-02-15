@@ -398,3 +398,4 @@ struct TravelListView_Previews: PreviewProvider {
         }
     }
 }
+
