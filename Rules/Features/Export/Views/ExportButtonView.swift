@@ -10,13 +10,21 @@ struct ExportButtonView: View {
     @State private var showingError = false
     @State private var showShareSheet = false
     private let exporter = PDFExporter()
-    
-    // Opcjonalnie oblicz rozmiar urządzenia
+    @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
+
+    private var themeColors: ThemeColors {
+        switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
+        case .classic:  return ThemeColors.classicTheme
+        case .mountain: return ThemeColors.mountainTheme
+        case .beach:    return ThemeColors.beachTheme
+        case .desert:   return ThemeColors.desertTheme
+        case .forest:   return ThemeColors.forestTheme
+        }
+    }
     private var isSmallDevice: Bool {
         UIScreen.main.bounds.height <= 667
     }
     
-    // Dane PDF, które będziemy udostępniać
     @State private var pdfDataToShare: Data?
     
     var body: some View {
@@ -27,9 +35,10 @@ struct ExportButtonView: View {
                 Text(LocalizedStringKey("export.pdf.button"))
             }
             .padding()
-            .background(Color("AccentColor"))
-            .foregroundColor(.white)
+            .background(themeColors.accent)
+            .foregroundColor(themeColors.lightText)
             .cornerRadius(10)
+            .shadow(color: themeColors.cardShadow, radius: 5)
         }
         .alert(Text(LocalizedStringKey("export.error.title")),
                isPresented: $showingError) {

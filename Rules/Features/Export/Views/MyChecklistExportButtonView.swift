@@ -2,13 +2,7 @@
 import SwiftUI
 
 struct TravelChecklistExportButtonView: View {
-    // Przykładowa stała lista – możesz ją zmodyfikować zgodnie z potrzebami
-    let items: [String] = [
-        "Passport - Documents",
-        "Flight Tickets - Travel",
-        "Sunglasses - Accessories",
-        "Swimsuit - Clothing"
-    ]
+    let items: [String] = []
     
     @State private var showingError = false
     @State private var showShareSheet = false
@@ -24,7 +18,7 @@ struct TravelChecklistExportButtonView: View {
             HStack {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: isSmallDevice ? 18 : 20))
-                Text("Export Travel Checklist as PDF")
+                Text("export_travel_checklist".appLocalized)
             }
             .padding()
             .background(Color("AccentColor"))

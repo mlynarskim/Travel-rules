@@ -351,3 +351,8 @@
 
 "back_button" = "Back";
 "travel.checklist.button" = "Travel Checklist";
+
+"export_pdf" = "Export PDF";
+"exit" = "Done";
+"error_pdf" = "Could not export file";
+

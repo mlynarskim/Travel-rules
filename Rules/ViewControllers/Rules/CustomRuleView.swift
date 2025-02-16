@@ -187,9 +187,9 @@ struct CustomTextEditor: View {
                         }
                     }
                 )
-                .onChange(of: text) { newValue in
-                    if newValue.count > maxCharacters {
-                        text = String(newValue.prefix(maxCharacters))
+                .onChange(of: text) {
+                    if text.count > maxCharacters {
+                        text = String(text.prefix(maxCharacters))
                     }
                 }
                 .onTapGesture {
