@@ -117,8 +117,8 @@ struct ChecklistItemRow: View {
             
             Text(item.name)
                 .strikethrough(item.isCompleted)
-                .foregroundColor(item.isCompleted ? .gray : .white) // Zmieniony kolor na szary dla ukończonych elementów
-                .font(.system(size: isSmallDevice ? 16 : 18, weight: .semibold))
+                .foregroundColor(item.isCompleted ? .gray : .white) 
+                .font(.system(size: isSmallDevice ? 16 : 18))
                 .lineLimit(1)
             
             Spacer()
@@ -263,7 +263,7 @@ struct AddButtonStyle: ButtonStyle {
 struct ExportView: View {
     let items: [String]
     let themeColors: ThemeColors
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\ .dismiss) private var dismiss
 
     @State private var showShareSheet = false
     @State private var shareItems: [Any] = []
@@ -272,12 +272,12 @@ struct ExportView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                Text("exportOptions".appLocalized)
+                Text("".appLocalized)
                     .font(.title)
                     .foregroundColor(themeColors.primaryText)
                     .padding()
                 
-                // Przycisk eksportu My Checklist (niezmieniany)
+                // Przycisk eksportu My Checklist
                 ExportButtonView(
                     items: items,
                     title: "myTravelList".appLocalized,
@@ -293,22 +293,23 @@ struct ExportView: View {
                         Text(LocalizedStringKey("travel.checklist.button"))
                     }
                     .padding()
-                    .background(Color("AccentColor"))
-                    .foregroundColor(.white)
+                    .background(themeColors.accent)
+                    .foregroundColor(themeColors.lightText)
                     .cornerRadius(10)
+                    .shadow(color: themeColors.cardShadow, radius: 5)
                 }
                 .padding()
 
                 Spacer()
             }
-            .background(themeColors.cardBackground)
-            .navigationTitle("Export PDF")
+            .background(Color(themeColors.background).ignoresSafeArea())
+            .navigationTitle("export_pdf".appLocalized)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("exit".appLocalized) {
                         dismiss()
                     }
-                    .foregroundColor(.black)
+                    .foregroundColor(themeColors.primaryText)
                 }
             }
             .sheet(isPresented: $showShareSheet) {
@@ -317,14 +318,12 @@ struct ExportView: View {
             .alert("Export error", isPresented: $showingError) {
                 Button("OK", role: .cancel) { }
             } message: {
-                Text("Could not export file.")
+                Text("error_pdf".appLocalized)
             }
         }
     }
     
-    /// Funkcja eksportująca gotowy plik PDF "Travel checklist.pdf" z bundle
     private func exportStaticTravelChecklist() {
-        // Upewnij się, że plik "Travel checklist.pdf" został dodany do projektu (główny bundle)
         guard let fileURL = Bundle.main.url(forResource: "Travel checklist", withExtension: "pdf") else {
             showingError = true
             return

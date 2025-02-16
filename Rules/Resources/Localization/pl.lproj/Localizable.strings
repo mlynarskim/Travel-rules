@@ -348,3 +348,6 @@
 
 "back_button" = "Wróć";
 "travel.checklist.button" = "Lista Podróżna";
+"export_pdf" = "Pobierz PDF";
+"exit" = "Wyjdź";
+"error_pdf" = "Nie można zapisac pliku";

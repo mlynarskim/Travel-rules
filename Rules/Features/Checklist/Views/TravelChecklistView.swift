@@ -17,8 +17,25 @@ struct TravelChecklist: View {
     }
     
     var body: some View {
+        let theme = getThemeColors(for: selectedTheme)
+        
         GeometryReader { geometry in
             VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button(action: resetChecklist) {
+                        Text("Reset")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(theme.error)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
+                            .background(theme.cardBackground)
+                            .cornerRadius(8)
+                    }
+                    .padding(.trailing, 16)
+                }
+                .padding(.top, 16)
+                
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: geometry.size.width <= 375 ? 8 : 12) {
                         ForEach(items) { listItem in
@@ -26,6 +43,7 @@ struct TravelChecklist: View {
                                 listItem: listItem,
                                 selectedTab: $selectedTab,
                                 geometry: geometry,
+                                theme: theme,
                                 action: {
                                     withAnimation(.easeInOut(duration: 0.5)) {
                                         selectedTab = listItem.type
@@ -41,9 +59,8 @@ struct TravelChecklist: View {
                 }
                 
                 Divider()
-                    .background(Color.white.opacity(0.3))
+                    .background(theme.secondaryText.opacity(0.3))
                     .padding(.vertical, adaptiveDividerPadding(geometry))
-                
                 
                 ScrollViewReader { scrollViewProxy in
                     ScrollView {
@@ -53,24 +70,24 @@ struct TravelChecklist: View {
                                     listItem: listItem,
                                     items: getListItems(for: listItem.type),
                                     completedItems: $completedItems,
-                                    geometry: geometry
+                                    geometry: geometry,
+                                    theme: theme
                                 )
                             }
                         }
                         .padding(.vertical, adaptiveVerticalPadding(geometry))
-                        
                     }
                     .onChange(of: selectedTab) { newValue in
                         if let type = newValue, scrollToTop {
                             withAnimation {
                                 scrollViewProxy.scrollTo(type.rawValue, anchor: .top)
-                                
                             }
                             scrollToTop = false
                         }
                     }
                 }
             }
+            .background(theme.background == "" ? Color.clear : Color(theme.background))
         }
         
         .onAppear {
@@ -88,7 +105,25 @@ struct TravelChecklist: View {
         }
     }
     
-    // Adaptive functions
+    private func resetChecklist() {
+        completedItems.removeAll()
+        saveCompletedItems()
+    }
+    
+    private func getThemeColors(for theme: String) -> ThemeColors {
+        switch theme {
+        case "mountain": return ThemeColors.mountainTheme
+        case "beach": return ThemeColors.beachTheme
+        case "desert": return ThemeColors.desertTheme
+        case "forest": return ThemeColors.forestTheme
+        default: return ThemeColors.classicTheme
+        }
+    }
+
+
+
+  
+    
     private func adaptiveDividerPadding(_ geometry: GeometryProxy) -> CGFloat {
         geometry.size.height <= 667 ? 4 : 8
     }
@@ -101,7 +136,6 @@ struct TravelChecklist: View {
         geometry.size.height <= 667 ? 8 : 16
     }
     
-    // Helper functions
     private func updateLocalizedData() {
         items = [
             ListItemView(type: .BathroomItems, title: "bathroom", subtitle: "bathroom_essentials"),
@@ -136,6 +170,8 @@ struct TravelChecklist: View {
         UserDefaults.standard.set(data, forKey: "CompletedItems")
     }
     
+    
+    
     func getListItems(for type: ListItem) -> [String] {
         switch type {
         case .BathroomItems: return getBathroomItems()
@@ -154,20 +190,20 @@ struct CategoryButton: View {
     let listItem: ListItemView
     @Binding var selectedTab: ListItem?
     let geometry: GeometryProxy
+    let theme: ThemeColors
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
             Text(listItem.title.appLocalized)
                 .font(.system(size: geometry.size.width <= 375 ? 13 : 15))
-                .foregroundColor(.black)
+                .foregroundColor(theme.primaryText)
                 .padding(.vertical, 8)
                 .padding(.horizontal, geometry.size.width <= 375 ? 12 : 16)
+               //tło przycisku kategorii
                 .background(
                     Capsule()
-                        .fill(selectedTab == listItem.type ?
-                              Color.white.opacity(0.3) :
-                                Color.white.opacity(0.15))
+                        .fill(selectedTab == listItem.type ? theme.secondary : theme.secondary.opacity(0.5))
                 )
         }
         .buttonStyle(PlainButtonStyle())
@@ -180,12 +216,13 @@ struct CategorySection: View {
     let items: [String]
     @Binding var completedItems: [ListItem: Set<Int>]
     let geometry: GeometryProxy
+    let theme: ThemeColors
     
     var body: some View {
         VStack(alignment: .leading, spacing: geometry.size.height <= 667 ? 8 : 12) {
             Text(listItem.title.appLocalized)
                 .font(.system(size: geometry.size.height <= 667 ? 18 : 20, weight: .bold))
-                .foregroundColor(.white)
+                .foregroundColor(theme.primaryText)
                 .padding(.leading, geometry.size.width <= 375 ? 12 : 16)
             
             ForEach(Array(items.enumerated()), id: \.offset) { index, item in
@@ -193,6 +230,7 @@ struct CategorySection: View {
                     item: item,
                     isCompleted: completedItems[listItem.type]?.contains(index) ?? false,
                     geometry: geometry,
+                    theme: theme,
                     toggleAction: {
                         toggleCompletion(itemIndex: index)
                     }
@@ -202,6 +240,7 @@ struct CategorySection: View {
         .id(listItem.type.rawValue)
         .padding(.horizontal, geometry.size.width <= 375 ? 12 : 16)
     }
+
     
     private func toggleCompletion(itemIndex: Int) {
         var completedSet = completedItems[listItem.type] ?? Set<Int>()
@@ -219,29 +258,34 @@ struct ChecklistItem: View {
     let item: String
     let isCompleted: Bool
     let geometry: GeometryProxy
+    let theme: ThemeColors
     let toggleAction: () -> Void
     
     var body: some View {
         HStack {
             Button(action: toggleAction) {
                 Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isCompleted ? .green : .black)
+                    .foregroundColor(isCompleted ? theme.success : theme.primaryText)
                     .font(.system(size: geometry.size.width <= 375 ? 18 : 20))
             }
+            
             .padding(.leading, geometry.size.width <= 375 ? 12 : 16)
             
             Text(item.appLocalized)
-                .foregroundColor(.black)
+                .foregroundColor(theme.lightText) 
                 .font(.system(size: geometry.size.width <= 375 ? 14 : 16))
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
             Spacer()
         }
         .frame(height: geometry.size.height <= 667 ? 36 : 44)
-        .background(Color.white.opacity(0.5))
+        .background(theme.primary
+            .shadow(color: theme.cardShadow, radius: 5, x: 0, y: 2)
+)
         .cornerRadius(12)
     }
 }
+
 
 // MARK: - Preview
 struct TravelChecklist_Previews: PreviewProvider {

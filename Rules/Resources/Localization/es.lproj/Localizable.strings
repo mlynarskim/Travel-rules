@@ -345,3 +345,6 @@
 
 "back_button" = "Volver";
 "travel.checklist.button" = "Lista de Viaje";
+"export_pdf" = "Exportar PDF";
+"exit" = "salir";
+"error_pdf" = "No se ha podido exportar el archivo";
