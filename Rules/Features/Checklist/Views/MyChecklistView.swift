@@ -4,9 +4,22 @@ struct TravelItem: Identifiable, Codable {
     var id = UUID()
     var name: String
     var isCompleted = false
-
+    
     init(name: String) {
         self.name = name
+    }
+}
+
+struct BackgroundView: View {
+    let selectedTheme: String
+    let isDarkMode: Bool
+    
+    var body: some View {
+        let imageName = "\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")"
+        Image(imageName)
+            .resizable()
+        // .scaledToFill()
+            .ignoresSafeArea()
     }
 }
 
@@ -70,14 +83,14 @@ struct MyChecklistView: View {
             .onAppear(perform: loadItems)
             .onDisappear(perform: saveItems)
             .navigationBarItems(trailing:
-                Button(action: {
-                    HapticManager.shared.impact(style: .medium)
-                    showExportSheet = true
-                }) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: isSmallDevice ? 18 : 20))
-                        .foregroundColor(.white)
-                }
+                                    Button(action: {
+                HapticManager.shared.impact(style: .medium)
+                showExportSheet = true
+            }) {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.system(size: isSmallDevice ? 18 : 20))
+                    .foregroundColor(.white)
+            }
             )
         }
     }
@@ -111,16 +124,17 @@ struct ChecklistItemRow: View {
                 HapticManager.shared.impact(style: .light)
             }) {
                 Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(item.isCompleted ? themeColors.success : .white)
-                    .font(.system(size: isSmallDevice ? 16 : 18))
+                    .foregroundColor(item.isCompleted ? themeColors.success : themeColors.primaryText)
+                    .font(.system(size: isSmallDevice ? 18 : 20))
             }
+            .padding(.leading, isSmallDevice ? 12 : 16)
             
             Text(item.name)
-                .strikethrough(item.isCompleted)
-                .foregroundColor(item.isCompleted ? .gray : .white) 
-                .font(.system(size: isSmallDevice ? 16 : 18))
-                .lineLimit(1)
-            
+                .foregroundColor(themeColors.lightText)
+                .font(.system(size: isSmallDevice ? 14 : 16))
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .strikethrough(item.isCompleted, color: themeColors.lightText)
             Spacer()
             
             Button(action: deleteAction) {
@@ -128,46 +142,15 @@ struct ChecklistItemRow: View {
                     .foregroundColor(themeColors.error)
                     .font(.system(size: isSmallDevice ? 14 : 16))
             }
+            .padding(.trailing, 8) // Poprawienie odstępu ikony trash od prawej krawędzi komórki
         }
-        .padding()
-        .frame(height: isSmallDevice ? 36 : 40)
+        .frame(height: isSmallDevice ? 32 : 36) // Zmniejszenie wysokości komórki o 2-4 punkty
         .background(themeColors.primary)
-        .cornerRadius(15)
+        .cornerRadius(12)
         .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
     }
 }
 
-struct BackgroundView: View {
-    let selectedTheme: String
-    let isDarkMode: Bool
-    
-    var body: some View {
-        let imageName = "\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")"
-        Image(imageName)
-            .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-    }
-}
-
-struct SegmentedPicker: View {
-    @Binding var selectedTab: Int
-    let themeColors: ThemeColors
-    
-    var body: some View {
-        Picker("", selection: $selectedTab) {
-            Text("my_checklist".appLocalized).tag(0)
-            Text("packing_list".appLocalized).tag(1)
-        }
-        .pickerStyle(.segmented)
-        .tint(themeColors.primary)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(themeColors.primary.opacity(0.7))
-        )
-        .frame(height: 40)
-    }
-}
 
 struct ChecklistContentView: View {
     @Binding var travelItems: [TravelItem]
@@ -259,16 +242,34 @@ struct AddButtonStyle: ButtonStyle {
 }
 
 
+struct SegmentedPicker: View {
+    @Binding var selectedTab: Int
+    let themeColors: ThemeColors
+    
+    var body: some View {
+        Picker("", selection: $selectedTab) {
+            Text("my_checklist".appLocalized).tag(0)
+            Text("packing_list".appLocalized).tag(1)
+        }
+        .pickerStyle(.segmented)
+        .tint(themeColors.primary)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(themeColors.primary.opacity(0.7))
+        )
+        .frame(height: 40)
+    }
+}
 
 struct ExportView: View {
     let items: [String]
     let themeColors: ThemeColors
     @Environment(\ .dismiss) private var dismiss
-
+    
     @State private var showShareSheet = false
     @State private var shareItems: [Any] = []
     @State private var showingError = false
-
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -284,7 +285,7 @@ struct ExportView: View {
                     category: "userChecklist".appLocalized
                 )
                 .padding()
-
+                
                 // Nowy przycisk eksportu gotowego pliku PDF Travel Checklist
                 Button(action: exportStaticTravelChecklist) {
                     HStack {
@@ -299,7 +300,7 @@ struct ExportView: View {
                     .shadow(color: themeColors.cardShadow, radius: 5)
                 }
                 .padding()
-
+                
                 Spacer()
             }
             .background(Color(themeColors.background).ignoresSafeArea())

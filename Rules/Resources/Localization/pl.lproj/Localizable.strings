@@ -43,8 +43,8 @@
 "document_reminder_title" =  "Przypomnienie o sprawdzeniu dokumentów";
 "document_reminder_subtitle" =  "Pamiętaj, aby sprawdzić ważność swoich dokumentów!";
 "notification_settings" =  "Ustawienia powiadomień";
-"enable_notifications" =  "Włącz powiadomienia";
-"enable_monthly_reminder" =  "Włącz miesięczne przypomnienie o dokumentach";
+"enable_notifications" =  "Dzienne powiadomienia";
+"enable_monthly_reminder" =  "Miesięczne powiadomienia";
 
 //custom rule
 "add_rule" = "Dodaj";
@@ -67,7 +67,7 @@
 
 //zasady
 "daily_limit" = "Dzienny limit";
-"come_back_tomorrow" = "Osiągnąłeś dzienny limit 3 zasad. Wróć jutro po więcej!";
+"come_back_tomorrow" = "Osiągnąłeś dzienny limit 5 zasad. Wróć jutro po więcej!";
 "daily_limit_reached" = "Osiągnąłeś dzienny limit. Wróć jutro!";
 
 
@@ -290,6 +290,8 @@
 "achievement.first_share.description" = "Udostępnij pierwszą zasadę";
 "achievement.first_location.title" = "Odkrywca";
 "achievement.first_location.description" = "Zapisz pierwszą lokalizację";
+
+
 
 "export.pdf.button" = "Eksportuj do PDF";
 "export.error.title" = "Błąd eksportu";

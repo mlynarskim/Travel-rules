@@ -173,7 +173,7 @@ struct LoadingView: View {
 struct NextView: View {
     let bannerID = "ca-app-pub-5307701268996147/4702587401"
     @State private var shouldShowAd = false
-    private let maxDailyRules = 5
+    private let maxDailyRules = 20
     @State private var randomRule: String = ""
     @State private var lastDrawnRule: String = ""
     @State private var savedRules: [Int] = []
@@ -195,6 +195,9 @@ struct NextView: View {
     @StateObject private var achievementManager = AchievementManager()
     @AppStorage("totalRulesDrawn") private var totalRulesDrawn: Int = 0
     @AppStorage("totalRulesSaved") private var totalRulesSaved: Int = 0
+    @AppStorage("totalCustomRulesAdded") private var totalCustomRulesAdded: Int = 0
+    @AppStorage("totalRulesShared") private var totalRulesShared: Int = 0
+
     
     var body: some View {
         LocalizedView {
@@ -386,8 +389,15 @@ struct NextView: View {
                 saveUsedRulesIndices()
                 dailyRulesCount += 1
                 saveLastDrawnRule()
+                
                 totalRulesDrawn += 1
-                achievementManager.checkAchievements(rulesDrawn: totalRulesDrawn, rulesSaved: totalRulesSaved)
+                achievementManager.checkAchievements(
+                    rulesDrawn: totalRulesDrawn,
+                    rulesSaved: totalRulesSaved,
+                    customRulesAdded: totalCustomRulesAdded,
+                    rulesShared: totalRulesShared
+                    //packingListsCreated: 0
+                );
                 
                 if dailyRulesCount % 2 == 0 {
                     withAnimation {
@@ -489,9 +499,17 @@ struct NextView: View {
                 savedRules.append(index)
                 saveRules()
                 getRandomRule()
+                
                 totalRulesSaved += 1
-                achievementManager.checkAchievements(rulesDrawn: totalRulesDrawn, rulesSaved: totalRulesSaved)
-                saveAlertMessage = "rule_saved".appLocalized
+                achievementManager.checkAchievements(
+                    rulesDrawn: totalRulesDrawn,
+                    rulesSaved: totalRulesSaved,
+                    customRulesAdded: totalCustomRulesAdded,
+                    rulesShared: totalRulesShared
+                    //packingListsCreated: 0
+                );
+
+                saveAlertMessage = "rule_saved".appLocalized 
                 showSaveAlert = true
             } else {
                 saveAlertMessage = "rule_exists".appLocalized

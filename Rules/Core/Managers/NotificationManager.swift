@@ -1,3 +1,5 @@
+
+// MARK: - NotificationManager
 class NotificationManager {
     static let instance = NotificationManager()
     
@@ -26,6 +28,7 @@ class NotificationManager {
         }
     }
     
+    // Dzienna powiadomienie o 9
     func scheduleNotification() {
         let content = UNMutableNotificationContent()
         content.title = "Daily Reminder"
@@ -33,7 +36,7 @@ class NotificationManager {
         content.sound = .default
         
         var dateComponents = DateComponents()
-        dateComponents.hour = 9
+        dateComponents.hour = 11
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         let request = UNNotificationRequest(identifier: "daily_rule_notification", content: content, trigger: trigger)
@@ -41,6 +44,8 @@ class NotificationManager {
         UNUserNotificationCenter.current().add(request)
     }
     
+    // Ustaw powiadomienie co miesiąc, ale w tym kodzie
+    // nie używamy go bezpośrednio, tylko w scheduleDocumentNotifications() w PushView
     func scheduleMonthlyDocumentCheckNotification() {
         let content = UNMutableNotificationContent()
         content.title = "Monthly Reminder"
@@ -48,8 +53,8 @@ class NotificationManager {
         content.sound = .default
         
         var dateComponents = DateComponents()
-        dateComponents.day = 1
-        dateComponents.hour = 10
+        dateComponents.day = 19
+        dateComponents.hour = 11
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         let request = UNNotificationRequest(identifier: "monthly_document_check", content: content, trigger: trigger)

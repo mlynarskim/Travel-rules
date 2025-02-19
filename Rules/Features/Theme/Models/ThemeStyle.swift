@@ -74,22 +74,23 @@ struct ThemeColors {
     )
     
     static let beachTheme = ThemeColors(
-        primary: Color(hex: "#1E88A8"),
-        secondary: Color(hex: "#FFA07A"),
-        accent: Color(hex: "#FFD700"),
+        primary: Color(hex: "#1B6C8A"), // Niebieski inspirowany wodą i niebem
+        secondary: Color(hex: "#e8723f"), // Ciepły pomarańczowy z zachodu słońca
+        accent: Color(hex: "#FFD166"), // Złoty odcień odbijającego światła na wodzie
         background: "beach-bg",
         darkBackground: "beach-bg-dark",
-        primaryText: Color(hex: "#1A1A1A"),
-        secondaryText: Color(hex: "#666666"),
+        primaryText: Color(hex: "#1A1A1A"), // Ciemny dla czytelności
+        secondaryText: Color(hex: "#4E4E4E"), // Delikatny kontrast dla subtelnych elementów UI
         lightText: .white,
-        cardShadow: Color.black.opacity(0.1),
-        cardBackground: Color.white.opacity(0.95),
-        overlay: Color.black.opacity(0.4),
-        success: Color(hex: "#4CAF50"),
-        warning: Color(hex: "#FFC107"),
-        error: Color(hex: "#FF5252"),
-        buttonHighlight: Color.white.opacity(0.2)
+        cardShadow: Color.black.opacity(0.2),
+        cardBackground: Color.white.opacity(0.9),
+        overlay: Color.black.opacity(0.3),
+        success: Color(hex: "#48A999"), // Turkusowy akcent
+        warning: Color(hex: "#FF9F1C"), // Jasny pomarańczowy dla ostrzeżeń
+        error: Color(hex: "#D7263D"), // Intensywny czerwony dla błędów
+        buttonHighlight: Color.white.opacity(0.25)
     )
+
     
     static let desertTheme = ThemeColors(
         primary: Color(hex: "#C19A6B"),

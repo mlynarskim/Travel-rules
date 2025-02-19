@@ -169,9 +169,8 @@ struct SettingsView: View {
         }
     }
     
-    // Pomocnicze funkcje pozostają bez zmian...
     private func shareApp() {
-        let appLink = "[TUTAJ WKLEJ LINK]"
+        let appLink = "https://apps.apple.com/pl/app/travel-rules/id6451070215?l=pl"
         let activityController = UIActivityViewController(
             activityItems: [appLink],
             applicationActivities: nil
@@ -184,13 +183,13 @@ struct SettingsView: View {
     }
     
     private func rateApp() {
-        if let url = URL(string: "[TUTAJ WKLEJ LINK]") {
+        if let url = URL(string: "https://apps.apple.com/app/id6451070215?action=write-review") {
             UIApplication.shared.open(url)
         }
     }
     
     private func sendFeedback() {
-        if let url = URL(string: "mailto:example@example.com") {
+        if let url = URL(string: "mlynarski.mateusz@gmail.com") {
             UIApplication.shared.open(url)
         }
     }
@@ -261,7 +260,6 @@ struct SettingsView: View {
     }
 }
 
-// Komponenty pomocnicze
 struct SettingsCard<Content: View>: View {
     let content: Content
     
