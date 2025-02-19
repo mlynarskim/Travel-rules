@@ -69,7 +69,7 @@
 
 //rules
 "daily_limit" = "Daily Limit";
-"come_back_tomorrow" = "You've reached your daily limit of 3 rules. Come back tomorrow for more!";
+"come_back_tomorrow" = "You've reached your daily limit of 5 rules. Come back tomorrow for more!";
 "daily_limit_reached" = "You've reached your daily limit. Come back tomorrow!";
 
 

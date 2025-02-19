@@ -20,7 +20,6 @@ struct AchievementsView: View {
        NavigationView {
            ZStack {
                Color(theme.background)
-                   //.edgesIgnoringSafeArea(.all)
                    .ignoresSafeArea()
                List {
                    ForEach(achievementManager.achievements) { achievement in
@@ -57,7 +56,7 @@ struct AchievementsView: View {
                }
                .listStyle(InsetGroupedListStyle())
            }
-           .navigationTitle("Osiągnięcia")
+           .navigationTitle("achievements.title".appLocalized)
            .navigationBarTitleDisplayMode(.inline)
            .toolbar {
                ToolbarItem(placement: .navigationBarTrailing) {

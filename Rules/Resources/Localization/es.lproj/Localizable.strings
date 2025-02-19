@@ -67,7 +67,7 @@
 
 //zasady
 "daily_limit" = "Límite diario";
-"come_back_tomorrow" = "Has alcanzado tu límite diario de 3 reglas. ¡Vuelve mañana para más!";
+"come_back_tomorrow" = "Has alcanzado tu límite diario de 5 reglas. ¡Vuelve mañana para más!";
 "daily_limit_reached" = "Has alcanzado tu límite diario. ¡Vuelve mañana!";
 
 // Localización
