@@ -353,3 +353,32 @@
 "export_pdf" = "Pobierz PDF";
 "exit" = "Wyjdź";
 "error_pdf" = "Nie można zapisac pliku";
+
+//powiadomienia
+
+"notification_settings" = "Ustawienia powiadomień";
+"enable_notifications" = "Włącz powiadomienia";
+"enable_monthly_reminder" = "Włącz miesięczne powiadomienia";
+"rule_notifications_title" = "Powiadomienia o zasadach";
+"document_validity_notifications_title" = "Powiadomienia o ważności dokumentów";
+"choose_date" = "Wybierz datę";
+"choose_document" = "Wybierz dokument";
+"save_button" = "Zapisz";
+"duplicate_document_message" = "Ten dokument z taką samą datą już istnieje, pomijam dodawanie.";
+"no_documents_message" = "Brak dodanych dokumentów";
+"monthly_notification_title" = "Twoje dokumenty stracą ważność";
+"monthly_notification_error" = "Błąd przy dodawaniu miesięcznego powiadomienia:";
+
+// Dokumenty
+"dowod_osobisty" = "Dowód osobisty";
+"paszport" = "Paszport";
+"ubezpieczenie_zdrowotne" = "Ubezpieczenie zdrowotne";
+"polisa_ubezpieczeniowa" = "Polisa ubezpieczeniowa";
+"karty_platnicze" = "Karty płatnicze";
+"wiza" = "Wiza";
+"karta_ekuz" = "Karta EKUZ";
+"ksiazeczka_szczepien" = "Książeczka szczepień";
+"prawo_jazdy" = "Prawo jazdy";
+"miedzynarodowe_prawo_jazdy" = "Międzynarodowe prawo jazdy";
+"ubezpieczenie_oc" = "Ubezpieczenie OC";
+
