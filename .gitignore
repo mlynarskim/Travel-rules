@@ -42,8 +42,8 @@ timeline.xctimeline
 playground.xcworkspace
 
 ### CocoaPods ###
-Pods/
-Podfile.lock
+##Pods/
+##Podfile.lock
 
 ### Google Services (Firebase, AdMob) ###
 GoogleService-Info.plist

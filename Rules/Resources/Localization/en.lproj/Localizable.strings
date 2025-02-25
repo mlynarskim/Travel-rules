@@ -356,3 +356,30 @@
 "exit" = "Done";
 "error_pdf" = "Could not export file";
 
+//powiadomienia
+"notification_settings" = "Notification Settings";
+"enable_notifications" = "Enable Notifications";
+"enable_monthly_reminder" = "Enable Monthly Reminder";
+"rule_notifications_title" = "Notifications about rules";
+"document_validity_notifications_title" = "Document validity notifications";
+"choose_date" = "Choose Date";
+"choose_document" = "Choose Document";
+"save_button" = "Save";
+"duplicate_document_message" = "A document with the same date already exists, skipping.";
+"no_documents_message" = "No documents added.";
+"monthly_notification_title" = "Your documents will expire soon";
+"monthly_notification_error" = "Error adding monthly notification:";
+
+// Documents
+"dowod_osobisty" = "ID Card";
+"paszport" = "Passport";
+"ubezpieczenie_zdrowotne" = "Health Insurance";
+"polisa_ubezpieczeniowa" = "Insurance Policy";
+"karty_platnicze" = "Payment Cards";
+"wiza" = "Visa";
+"karta_ekuz" = "EHIC Card";
+"ksiazeczka_szczepien" = "Vaccination Record";
+"prawo_jazdy" = "Driving License";
+"miedzynarodowe_prawo_jazdy" = "International Driving Permit";
+"ubezpieczenie_oc" = "Liability Insurance";
+

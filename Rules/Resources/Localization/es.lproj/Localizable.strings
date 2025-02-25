@@ -348,3 +348,30 @@
 "export_pdf" = "Exportar PDF";
 "exit" = "salir";
 "error_pdf" = "No se ha podido exportar el archivo";
+
+//powiadomienia
+"notification_settings" = "Configuración de notificaciones";
+"enable_notifications" = "Activar notificaciones";
+"enable_monthly_reminder" = "Activar recordatorio mensual";
+"rule_notifications_title" = "Notificaciones sobre reglas";
+"document_validity_notifications_title" = "Notificaciones de validez de documentos";
+"choose_date" = "Elige la fecha";
+"choose_document" = "Elige el documento";
+"save_button" = "Guardar";
+"duplicate_document_message" = "Ese documento con la misma fecha ya existe, se omite la adición.";
+"no_documents_message" = "No se agregaron documentos.";
+"monthly_notification_title" = "Tus documentos caducarán pronto";
+"monthly_notification_error" = "Error al añadir la notificación mensual:";
+
+// Documentos
+"dowod_osobisty" = "DNI";
+"paszport" = "Pasaporte";
+"ubezpieczenie_zdrowotne" = "Seguro de salud";
+"polisa_ubezpieczeniowa" = "Póliza de seguro";
+"karty_platnicze" = "Tarjetas de pago";
+"wiza" = "Visado";
+"karta_ekuz" = "Tarjeta Sanitaria Europea";
+"ksiazeczka_szczepien" = "Carné de vacunación";
+"prawo_jazdy" = "Licencia de conducir";
+"miedzynarodowe_prawo_jazdy" = "Permiso de conducir internacional";
+"ubezpieczenie_oc" = "Seguro de responsabilidad civil";

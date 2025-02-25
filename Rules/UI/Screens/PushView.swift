@@ -3,25 +3,27 @@ import UserNotifications
 
 // MARK: - DocumentEntry
 struct DocumentEntry: Identifiable, Hashable, Codable {
-    let id = UUID()
+    var id = UUID()
     let date: Date
-    let document: String
+    let documentKey: String
 }
 
 // MARK: - PushView
 struct PushView: View {
     @Binding var showPushView: Bool
+    
     @AppStorage("isNotificationEnabled") private var isNotificationEnabled = false
     @AppStorage("isMonthlyReminderEnabled") private var isMonthlyReminderEnabled = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
+    
     @StateObject private var languageManager = LanguageManager.shared
     @State private var viewRefresh = false
     
     // Pola do dodawania nowego dokumentu:
     @State private var selectedDate = Date()
-    @State private var selectedDocument = "Dowód osobisty"
+    @State private var selectedDocumentKey = "dowod_osobisty" // Przechowujemy surowy klucz
     
-    // Lista zapisanych dokumentów:
+    // Lista zapisanych dokumentów (z kluczami dokumentów):
     @State private var savedDocuments: [DocumentEntry] = [] {
         didSet {
             saveDocuments()
@@ -29,14 +31,22 @@ struct PushView: View {
         }
     }
     
-    // Wybór typu dokumentów, np. w Pickerze:
-    private let documentOptions = [
-        "Dowód osobisty", "Paszport", "Ubezpieczenie zdrowotne", "Polisa ubezpieczeniowa",
-        "Karty płatnicze", "Wiza", "Karta EKUZ", "Książeczka szczepień",
-        "Prawo jazdy", "Międzynarodowe prawo jazdy", "Ubezpieczenie OC"
+    // Dostępne klucze dokumentów (bez .appLocalized)
+    private let documentKeys = [
+        "dowod_osobisty",
+        "paszport",
+        "ubezpieczenie_zdrowotne",
+        "polisa_ubezpieczeniowa",
+        "karty_platnicze",
+        "wiza",
+        "karta_ekuz",
+        "ksiazeczka_szczepien",
+        "prawo_jazdy",
+        "miedzynarodowe_prawo_jazdy",
+        "ubezpieczenie_oc"
     ]
     
-    // Tu zdefiniuj swoje motywy/themes:
+    // Tu zdefiniuj swoje motywy/themes
     private var themeColors: ThemeColors {
         switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
         case .classic: return ThemeColors.classicTheme
@@ -53,21 +63,30 @@ struct PushView: View {
                 themeColors.secondary.ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    // Nagłówek:
+                    
+                    // Nagłówek
                     HStack {
-                       Spacer()
-                       Spacer()
-                       Text("notification_settings".appLocalized).font(.title).foregroundColor(themeColors.primaryText).padding()
-                       Spacer()
-                       Button(action: { showPushView = false }) { Image(systemName: "xmark.circle").font(.system(size: 24)).foregroundColor(themeColors.primaryText).padding() }
+                        Spacer()
+                        Spacer()
+                        Text("notification_settings".appLocalized)
+                            .font(.title)
+                            .foregroundColor(themeColors.primaryText)
+                            .padding()
+                        Spacer()
+                        Button(action: { showPushView = false }) {
+                            Image(systemName: "xmark.circle")
+                                .font(.system(size: 24))
+                                .foregroundColor(themeColors.primaryText)
+                                .padding()
+                        }
                     }
                     
                     // Główna sekcja: opisy + przełączniki + dodawanie dokumentów
                     VStack(spacing: 20) {
                         
-                        // Krótki opis + przełącznik głównych (codziennych) powiadomień
+                        // 1. Powiadomienia o zasadach
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("Powiadomienia o zasadach")
+                            Text("rule_notifications_title".appLocalized)
                                 .foregroundColor(themeColors.primaryText)
                                 .font(.subheadline)
                             
@@ -79,26 +98,25 @@ struct PushView: View {
                                             DispatchQueue.main.async {
                                                 self.isNotificationEnabled = granted
                                                 if granted {
-                                                    // Ustaw dzienny alarm
                                                     NotificationManager.instance.scheduleNotification()
                                                 }
                                             }
                                         }
                                     } else {
-                                        // Usuń dzienne powiadomienia
                                         NotificationManager.instance.removeNotification(identifier: "daily_rule_notification")
                                     }
                                 }
-                                .padding()
+                                .padding(8)
                                 .tint(themeColors.primary)
                                 .foregroundColor(themeColors.primaryText)
                                 .background(themeColors.cardBackground)
                                 .cornerRadius(10)
                         }
+                        .padding(.horizontal, 16)
                         
-                        // Krótki opis + przełącznik powiadomień miesięcznych
+                        // 2. Powiadomienia o ważności dokumentów
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("Powiadomienia o ważności dokumentów")
+                            Text("document_validity_notifications_title".appLocalized)
                                 .foregroundColor(themeColors.primaryText)
                                 .font(.subheadline)
                             
@@ -106,93 +124,103 @@ struct PushView: View {
                                 .onChange(of: isMonthlyReminderEnabled) { _, newValue in
                                     UserDefaults.standard.set(newValue, forKey: "isMonthlyReminderEnabled")
                                     if newValue {
-                                        // Ustaw powiadomienie co miesiąc
                                         scheduleDocumentNotifications()
                                     } else {
-                                        // Usuń powiadomienie co miesiąc
                                         NotificationManager.instance.removeNotification(identifier: "monthly_document_check")
                                     }
                                 }
-                                .padding()
+                                .padding(8)
                                 .tint(themeColors.primary)
                                 .foregroundColor(themeColors.primaryText)
                                 .background(themeColors.cardBackground)
                                 .cornerRadius(10)
                         }
+                        .padding(.horizontal, 16)
                         
-                        // Pole wyboru daty
-                        DatePicker("Wybierz datę", selection: $selectedDate, displayedComponents: [.date])
-                            .padding()
+                        // 3. Data
+                        DatePicker("choose_date".appLocalized, selection: $selectedDate, displayedComponents: [.date])
+                            .datePickerStyle(.automatic)
+                            .padding(8)
                             .background(themeColors.cardBackground)
                             .cornerRadius(10)
                             .foregroundColor(themeColors.primaryText)
+                            .padding(.horizontal, 16)
                         
-                        // Picker dokumentu
-                        Picker("Wybierz dokument", selection: $selectedDocument) {
-                            ForEach(documentOptions, id: \.self) { document in
-                                Text(document).tag(document)
+                        // 4. Picker dokumentu (klucze) + Zapisz
+                        HStack {
+                            Picker("choose_document".appLocalized, selection: $selectedDocumentKey) {
+                                ForEach(documentKeys, id: \.self) { key in
+                                    // Tu lokalizujemy dopiero przy wyświetlaniu
+                                    Text(key.appLocalized)
+                                }
                             }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                        .padding()
-                        .background(themeColors.cardBackground)
-                        .cornerRadius(10)
-                        .foregroundColor(themeColors.primaryText)
-                        
-                        // Przycisk zapisu dokumentu do listy (z blokadą duplikatów)
-                        Button("Zapisz") {
-                            // Blokada duplikatów: sprawdzamy, czy jest już zapisany dokument z taką samą datą
-                            let isDuplicate = savedDocuments.contains(where: {
-                                $0.document == selectedDocument && Calendar.current.isDate($0.date, inSameDayAs: selectedDate)
-                            })
+                            .pickerStyle(MenuPickerStyle())
+                            .padding(8)
+                            .background(themeColors.cardBackground)
+                            .cornerRadius(10)
+                            .foregroundColor(themeColors.primaryText)
                             
-                            guard !isDuplicate else {
-                                // Jeśli wolisz, możesz wyświetlać alert
-                                print("Ten dokument z taką samą datą już istnieje, pomijam dodawanie.")
-                                return
+                            Button("save_button".appLocalized) {
+                                // Sprawdzamy duplikat (porównujemy klucz)
+                                let isDuplicate = savedDocuments.contains { doc in
+                                    doc.documentKey == selectedDocumentKey &&
+                                    Calendar.current.isDate(doc.date, inSameDayAs: selectedDate)
+                                }
+                                guard !isDuplicate else {
+                                    print("duplicate_document_message".appLocalized)
+                                    return
+                                }
+                                
+                                let newEntry = DocumentEntry(date: selectedDate, documentKey: selectedDocumentKey)
+                                savedDocuments.append(newEntry)
                             }
-                            
-                            let newEntry = DocumentEntry(date: selectedDate, document: selectedDocument)
-                            savedDocuments.append(newEntry)
+                            .padding()
+                            .background(themeColors.primary)
+                            .foregroundColor(themeColors.secondary)
+                            .cornerRadius(10)
                         }
-                        .padding()
-                        .background(themeColors.primary)
-                        .foregroundColor(themeColors.secondary)
-                        .cornerRadius(10)
+                        .padding(.top, 20)
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 20)
                     
-                    // Lista dokumentów
+                    // 5. Lista dokumentów
                     List {
                         ForEach(savedDocuments) { entry in
                             HStack {
-                                Text("\(entry.document) - \(entry.date, formatter: dateFormatter)")
+                                // Tu lokalizujemy w momencie wyświetlania
+                                Text("\(entry.documentKey.appLocalized) - \(entry.date, formatter: dateFormatter)")
                                 Spacer()
                                 Button(action: {
                                     savedDocuments.removeAll { $0.id == entry.id }
-                                    // Ewentualnie usuń powiadomienia, jeśli chcesz, aby zniknęły przy usunięciu wszystkich dokumentów
                                     NotificationManager.instance.removeNotification(identifier: "monthly_document_check")
                                 }) {
                                     Image(systemName: "trash")
                                         .foregroundColor(.red)
                                 }
                             }
+                            .padding(8)
+                            .background(themeColors.cardBackground)
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(themeColors.primary, lineWidth: 1)
+                            )
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 3, leading: 3, bottom: 3, trailing: 3))
                         }
                     }
                     .padding()
                     .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                     
                     Spacer()
                 }
             }
             .onAppear {
-                // Ładujemy dokumenty z UserDefaults
                 loadDocuments()
-                // Aktualizujemy/ustawiamy powiadomienie, jeśli włączone
                 scheduleDocumentNotifications()
             }
-            // Odświeżanie widoku po zmianie języka
+            // Odświeżenie widoku po zmianie języka
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
                 viewRefresh.toggle()
             }
@@ -200,7 +228,7 @@ struct PushView: View {
         }
     }
     
-    // Formatter wyświetlania dat w liście
+    // MARK: - Formatter daty
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -208,14 +236,13 @@ struct PushView: View {
         return formatter
     }
     
-    // Zapis dokumentów w UserDefaults (JSON)
+    // MARK: - Zapis i odczyt dokumentów
     private func saveDocuments() {
         if let encoded = try? JSONEncoder().encode(savedDocuments) {
             UserDefaults.standard.set(encoded, forKey: "savedDocuments")
         }
     }
     
-    // Odczyt dokumentów z UserDefaults (JSON)
     private func loadDocuments() {
         if let savedData = UserDefaults.standard.data(forKey: "savedDocuments"),
            let decoded = try? JSONDecoder().decode([DocumentEntry].self, from: savedData) {
@@ -223,38 +250,37 @@ struct PushView: View {
         }
     }
     
-    // Ustawia powiadomienie na pierwszy dzień miesiąca o 9:00
-    // Jeśli isMonthlyReminderEnabled == true, to utworzy/odświeży
-    // powiadomienie "monthly_document_check" z listą aktualnych dokumentów
+    // MARK: - Powiadomienia
     private func scheduleDocumentNotifications() {
         guard isMonthlyReminderEnabled else { return }
         
         let content = UNMutableNotificationContent()
-        content.title = "Twoje dokumenty stracą ważność"
+        content.title = "monthly_notification_title".appLocalized
         
-        // Tworzymy listę dokumentów z datami
-        let docLines = savedDocuments.map {
-            "\($0.document) - \(dateFormatter.string(from: $0.date))"
+        // Lokalizujemy dopiero tutaj
+        let docLines = savedDocuments.map { entry in
+            "\(entry.documentKey.appLocalized) - \(dateFormatter.string(from: entry.date))"
         }.joined(separator: "\n")
         
-        // Jeśli ktoś nie doda żadnego dokumentu:
-        content.body = docLines.isEmpty ? "Brak dodanych dokumentów" : docLines
+        content.body = docLines.isEmpty
+            ? String(localized: "no_documents_message")
+            : docLines
+        
         content.sound = .default
         
-        // Pierwszy dzień miesiąca, godzina 9
         var dateComponents = DateComponents()
-        dateComponents.day = 19
-        dateComponents.hour = 12
+        dateComponents.day = 20
+        dateComponents.hour = 11
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-        let request = UNNotificationRequest(identifier: "monthly_document_check", content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: "monthly_document_check",
+                                            content: content,
+                                            trigger: trigger)
         
-        // Dodajemy/odświeżamy powiadomienie
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("Błąd przy dodawaniu miesięcznego powiadomienia: \(error)")
+                print("monthly_notification_error".appLocalized, error)
             }
         }
     }
 }
-
