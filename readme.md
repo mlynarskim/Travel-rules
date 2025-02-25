@@ -66,10 +66,11 @@ Here's a step-by-step guide on how to use the "Travel Rules" application:
 The "Travel Rules" application offers a convenient and informative way for users to explore daily rules and guidelines related to the vanlife lifestyle. With its user-friendly interface and customizable features, the app provides a valuable resource for vanlife enthusiasts to enhance their experience and make the most out of their journey.
 
 <div style="display: flex;">
-  <img src="https://github.com/mlynarskim/Rules/blob/main/Screenshots/Simulator%20screenshots1.png" width="400" alt="Screenshot1">
-  <img src="https://github.com/mlynarskim/Rules/blob/main/Screenshots/Simulator%20screenshots2.png" width="400" alt="Screenshot2">
-  <img src="https://github.com/mlynarskim/Rules/blob/main/Screenshots/Simulator%20screenshots3.png" width="400" alt="Screenshot3">
+  <img src="https://github.com/mlynarskim/Travel-rules/blob/main/Screenshots/Simulator%20screenshots1.png" width="400" alt="Screenshot1">
+  <img src="https://github.com/mlynarskim/Travel-rules/blob/main/Screenshots/Simulator%20screenshots2.png" width="400" alt="Screenshot2">
+  <img src="https://github.com/mlynarskim/Travel-rules/blob/main/Screenshots/Simulator%20screenshots3.png" width="400" alt="Screenshot3">
 </div>
+
 
 
 
