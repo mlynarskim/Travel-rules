@@ -182,10 +182,3 @@ struct CheckInOptionsView: View {
     }
 }
 
-#if DEBUG
-struct LocationSharingSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        LocationSharingSettingsView()
-    }
-}
-#endif

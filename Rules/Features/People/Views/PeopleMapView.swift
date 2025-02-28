@@ -193,8 +193,8 @@ struct CheckInView: View {
     }
 }
 
-struct PeopleMapView_Previews: PreviewProvider {
-    static var previews: some View {
-        PeopleMapView()
-    }
-}
+//struct PeopleMapView_Previews: PreviewProvider {
+  //  static var previews: some View {
+    //    PeopleMapView()
+    //}
+//}
