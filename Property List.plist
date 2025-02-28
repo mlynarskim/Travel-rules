@@ -2,68 +2,24 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleVersion</key>
-    <string>1</string>
-
-    <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
-    
-    <key>CFBundleIdentifier</key>
-    <string>com.twojaprojekt.travelrules</string>
-    
-    <key>CFBundleName</key>
-    <string>Travel Rules</string>
-    
-    <key>CFBundleExecutable</key>
-    <string>$(EXECUTABLE_NAME)</string>
-    
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-
-    <!-- Launch Screen -->
-    <key>UILaunchStoryboardName</key>
-    <string>LaunchScreen</string>
-    
-    <key>UIViewControllerBasedStatusBarAppearance</key>
-    <true/>
-    
-    <!-- Location Services -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>The app needs access to your location in order to personalize features near you.</string>
-    
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Potrzebujemy dostępu do Twojej lokalizacji, aby pokazać Twoją aktualną pozycję.</string>
-    
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Aplikacja potrzebuje stałego dostępu do lokalizacji, aby działać w tle.</string>
-    
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>location</string>
-        <string>fetch</string>
-    </array>
-
-    <!-- Advertising -->
-    <key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-3940256099942544~1458002511</string>
-
-    <!-- Google Sign In -->
-    <key>GIDClientID</key>
-    <string>1037418769624-hk1a1p8q56bctrs539kcpim2k9e02fk4.apps.googleusercontent.com</string>
-
-    <key>SKAdNetworkItems</key>
-    <array>
-      <dict>
-        <key>SKAdNetworkIdentifier</key>
-        <string>cstr6suwn9.skadnetwork</string>
-      </dict>
-    </array>
-    
-    <!-- Location Usage -->
-    <key>UIRequiredDeviceCapabilities</key>
-    <array>
-        <string>location-services</string>
-        <string>gps</string>
-    </array>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>GIDClientID</key>
+	<string>1037418769624-hk1a1p8q56bctrs539kcpim2k9e02fk4.apps.googleusercontent.com</string>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
 </dict>
 </plist>

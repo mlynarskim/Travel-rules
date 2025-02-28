@@ -103,10 +103,3 @@ struct RulesListView: View {
         _ = themeColors.primary
     }
 }
-
-// MARK: - Podgląd
-struct RulesListView_Previews: PreviewProvider {
-    static var previews: some View {
-        RulesListView()
-    }
-}

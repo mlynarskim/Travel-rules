@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		071485002D48A7000063B774 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 071484FF2D48A7000063B774 /* GoogleService-Info.plist */; };
 		071485022D48A7250063B774 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 071485012D48A7250063B774 /* Podfile */; };
+		0720CA602D705D270077DB2B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0720CA5F2D705D270077DB2B /* StoreKit.framework */; };
 		07211A042D29B04100B501B9 /* RulesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A032D29B03C00B501B9 /* RulesListViewController.swift */; };
 		07211A062D29B0C000B501B9 /* SavedRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */; };
 		07211A082D29B0FE00B501B9 /* MyRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */; };
@@ -36,19 +37,16 @@
 		07DD836E2D267182004C5C5F /* Podfile.lock in Resources */ = {isa = PBXBuildFile; fileRef = 07DD82EB2D267182004C5C5F /* Podfile.lock */; };
 		07DD836F2D267182004C5C5F /* Lato-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83282D267182004C5C5F /* Lato-Thin.ttf */; };
 		07DD83712D267182004C5C5F /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83222D267182004C5C5F /* Lato-Bold.ttf */; };
-		07DD83722D267182004C5C5F /* Simulator screenshots2.png in Resources */ = {isa = PBXBuildFile; fileRef = 07DD835B2D267182004C5C5F /* Simulator screenshots2.png */; };
 		07DD83732D267182004C5C5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83502D267182004C5C5F /* Assets.xcassets */; };
 		07DD83742D267182004C5C5F /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 07DD832A2D267182004C5C5F /* OFL.txt */; };
 		07DD83752D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83332D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 */; };
 		07DD83772D267182004C5C5F /* Lato-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83202D267182004C5C5F /* Lato-Black.ttf */; };
 		07DD83782D267182004C5C5F /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83262D267182004C5C5F /* Lato-LightItalic.ttf */; };
-		07DD83792D267182004C5C5F /* Simulator screenshots3.png in Resources */ = {isa = PBXBuildFile; fileRef = 07DD835C2D267182004C5C5F /* Simulator screenshots3.png */; };
 		07DD837A2D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83342D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 */; };
 		07DD837C2D267182004C5C5F /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83232D267182004C5C5F /* Lato-BoldItalic.ttf */; };
 		07DD837D2D267182004C5C5F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07DD831E2D267182004C5C5F /* Preview Assets.xcassets */; };
 		07DD837E2D267182004C5C5F /* Lato-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83212D267182004C5C5F /* Lato-BlackItalic.ttf */; };
 		07DD837F2D267182004C5C5F /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 07DD82ED2D267182004C5C5F /* readme.md */; };
-		07DD83802D267182004C5C5F /* Simulator screenshots1.png in Resources */ = {isa = PBXBuildFile; fileRef = 07DD835A2D267182004C5C5F /* Simulator screenshots1.png */; };
 		07DD83812D267182004C5C5F /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83242D267182004C5C5F /* Lato-Italic.ttf */; };
 		07DD83822D267182004C5C5F /* Lato-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83292D267182004C5C5F /* Lato-ThinItalic.ttf */; };
 		07DD83852D267182004C5C5F /* ambient-wave-48-tribute-17243.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83322D267182004C5C5F /* ambient-wave-48-tribute-17243.mp3 */; };
@@ -85,7 +83,6 @@
 		07DD83AB2D267182004C5C5F /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD834D2D267182004C5C5F /* AppTheme.swift */; };
 		07DD83AC2D267182004C5C5F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DD82EE2D267182004C5C5F /* ContentView.swift */; };
 		07F01DC82D51FC44003CA72E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 07F01DC72D51FC44003CA72E /* LaunchScreen.storyboard */; };
-		07F01DCC2D54C210003CA72E /* info.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F01DCB2D54C20C003CA72E /* info.swift */; };
 		07FC28E42D3A85BF00A4A34A /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FC28E32D3A85BC00A4A34A /* UserProfile.swift */; };
 		07FC28E62D3A85C900A4A34A /* UserLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FC28E52D3A85C700A4A34A /* UserLocation.swift */; };
 		07FC28E82D3A85D800A4A34A /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07FC28E72D3A85D500A4A34A /* Message.swift */; };
@@ -102,11 +99,26 @@
 		583EC0D98AB948860A8A1C23 /* Pods_Rules.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51576FEBCC7CE96E7C6DF159 /* Pods_Rules.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		0720CA5D2D705C880077DB2B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		070E0F232D5DEA3000B59A53 /* grpc.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = grpc.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		070E0F272D5DEA4500B59A53 /* nanopb.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = nanopb.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		071484FF2D48A7000063B774 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		071485012D48A7250063B774 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		0720CA4D2D705C870077DB2B /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
+		0720CA5F2D705D270077DB2B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		07211A032D29B03C00B501B9 /* RulesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesListViewController.swift; sourceTree = "<group>"; };
 		07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRulesViewController.swift; sourceTree = "<group>"; };
 		07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRulesViewController.swift; sourceTree = "<group>"; };
@@ -185,14 +197,10 @@
 		07DD83502D267182004C5C5F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		07DD83522D267182004C5C5F /* Rules.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Rules.entitlements; sourceTree = "<group>"; };
 		07DD83532D267182004C5C5F /* RulesRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RulesRelease.entitlements; sourceTree = "<group>"; };
-		07DD835A2D267182004C5C5F /* Simulator screenshots1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Simulator screenshots1.png"; sourceTree = "<group>"; };
-		07DD835B2D267182004C5C5F /* Simulator screenshots2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Simulator screenshots2.png"; sourceTree = "<group>"; };
-		07DD835C2D267182004C5C5F /* Simulator screenshots3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Simulator screenshots3.png"; sourceTree = "<group>"; };
 		07DD83612D267182004C5C5F /* Travel rules.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "Travel rules.xcodeproj"; sourceTree = "<group>"; };
 		07DD83622D267182004C5C5F /* Travel rules.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = wrapper.workspace; path = "Travel rules.xcworkspace"; sourceTree = "<group>"; };
 		07F01DC52D51D979003CA72E /* Property List.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Property List.plist"; sourceTree = "<group>"; };
 		07F01DC72D51FC44003CA72E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		07F01DCB2D54C20C003CA72E /* info.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = info.swift; sourceTree = "<group>"; };
 		07FC28E32D3A85BC00A4A34A /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		07FC28E52D3A85C700A4A34A /* UserLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLocation.swift; sourceTree = "<group>"; };
 		07FC28E72D3A85D500A4A34A /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
@@ -211,11 +219,20 @@
 		85CD48C738AE96DAA00C9512 /* Pods-Rules.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rules.release.xcconfig"; path = "Target Support Files/Pods-Rules/Pods-Rules.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		0720CA4F2D705C880077DB2B /* Travel Rules */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Travel Rules";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		0707D99E2A1453D800186248 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0720CA602D705D270077DB2B /* StoreKit.framework in Frameworks */,
 				079A312A2D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework in Frameworks */,
 				583EC0D98AB948860A8A1C23 /* Pods_Rules.framework in Frameworks */,
 			);
@@ -240,6 +257,7 @@
 				07DD83622D267182004C5C5F /* Travel rules.xcworkspace */,
 				072ECB322D26728B00BC81F0 /* Rules.app */,
 				9DF8F672B894140EA68A4FAA /* Pods */,
+				0720CA4F2D705C880077DB2B /* Travel Rules */,
 				134206E0AB2799B4F21080A0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -257,7 +275,6 @@
 			children = (
 				076C07172D5F2F3300C12DB1 /* Lists */,
 				075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */,
-				07F01DCB2D54C20C003CA72E /* info.swift */,
 				07DD83172D267182004C5C5F /* CustomRuleView.swift */,
 				07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */,
 				07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */,
@@ -674,9 +691,6 @@
 		07DD835D2D267182004C5C5F /* Screenshots */ = {
 			isa = PBXGroup;
 			children = (
-				07DD835A2D267182004C5C5F /* Simulator screenshots1.png */,
-				07DD835B2D267182004C5C5F /* Simulator screenshots2.png */,
-				07DD835C2D267182004C5C5F /* Simulator screenshots3.png */,
 			);
 			path = Screenshots;
 			sourceTree = "<group>";
@@ -739,11 +753,13 @@
 		134206E0AB2799B4F21080A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0720CA5F2D705D270077DB2B /* StoreKit.framework */,
 				070E0F272D5DEA4500B59A53 /* nanopb.framework */,
 				070E0F232D5DEA3000B59A53 /* grpc.framework */,
 				079DEF4E2D4AA8A800582CD7 /* FirebaseAuth.framework */,
 				079A31292D4A9D1D003DBC70 /* Google_Mobile_Ads_SDK.framework */,
 				51576FEBCC7CE96E7C6DF159 /* Pods_Rules.framework */,
+				0720CA4D2D705C870077DB2B /* AuthenticationServices.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -770,6 +786,7 @@
 				0707D99F2A1453D800186248 /* Resources */,
 				F0A839569AF4A46CBF4A4A09 /* [CP] Embed Pods Frameworks */,
 				E771B1FB11F14529EF3A57FB /* [CP] Copy Pods Resources */,
+				0720CA5D2D705C880077DB2B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -787,7 +804,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					0707D9A02A1453D800186248 = {
@@ -835,20 +852,17 @@
 				07DD836E2D267182004C5C5F /* Podfile.lock in Resources */,
 				07DD836F2D267182004C5C5F /* Lato-Thin.ttf in Resources */,
 				07DD83712D267182004C5C5F /* Lato-Bold.ttf in Resources */,
-				07DD83722D267182004C5C5F /* Simulator screenshots2.png in Resources */,
 				07DD83732D267182004C5C5F /* Assets.xcassets in Resources */,
 				07DD83742D267182004C5C5F /* OFL.txt in Resources */,
 				07DD83752D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 in Resources */,
 				07DD83772D267182004C5C5F /* Lato-Black.ttf in Resources */,
 				07DD83782D267182004C5C5F /* Lato-LightItalic.ttf in Resources */,
 				071485002D48A7000063B774 /* GoogleService-Info.plist in Resources */,
-				07DD83792D267182004C5C5F /* Simulator screenshots3.png in Resources */,
 				07DD837A2D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 in Resources */,
 				07DD837C2D267182004C5C5F /* Lato-BoldItalic.ttf in Resources */,
 				07DD837D2D267182004C5C5F /* Preview Assets.xcassets in Resources */,
 				07DD837E2D267182004C5C5F /* Lato-BlackItalic.ttf in Resources */,
 				07DD837F2D267182004C5C5F /* readme.md in Resources */,
-				07DD83802D267182004C5C5F /* Simulator screenshots1.png in Resources */,
 				07DD83812D267182004C5C5F /* Lato-Italic.ttf in Resources */,
 				07DD83822D267182004C5C5F /* Lato-ThinItalic.ttf in Resources */,
 				071485022D48A7250063B774 /* Podfile in Resources */,
@@ -980,7 +994,6 @@
 				07FC28E62D3A85C900A4A34A /* UserLocation.swift in Sources */,
 				073A7B622D26F6CB0030C39B /* ThemeStyle.swift in Sources */,
 				07DD83A92D267182004C5C5F /* CustomRuleView.swift in Sources */,
-				07F01DCC2D54C210003CA72E /* info.swift in Sources */,
 				076C07192D60A12100C12DB1 /* ActivityView.swift in Sources */,
 				07DD83AA2D267182004C5C5F /* CountryInfo.swift in Sources */,
 				07FC28EB2D3A860500A4A34A /* PeopleLocationService.swift in Sources */,
@@ -1181,10 +1194,13 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel Rules";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Potrzebujemy dostępu do Twojej lokalizacji, aby pokazać Twoją aktualną pozycję.";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Aplikacja potrzebuje stałego dostępu do lokalizacji, aby działać w tle.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "The app needs access to your location in order to personalize features near you.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "location-services gps";
 				INFOPLIST_KEY_UIRequiresFullScreen = NO;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -1269,10 +1285,13 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel Rules";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Potrzebujemy dostępu do Twojej lokalizacji, aby pokazać Twoją aktualną pozycję.";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Aplikacja potrzebuje stałego dostępu do lokalizacji, aby działać w tle.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "The app needs access to your location in order to personalize features near you.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "location-services gps";
 				INFOPLIST_KEY_UIRequiresFullScreen = NO;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

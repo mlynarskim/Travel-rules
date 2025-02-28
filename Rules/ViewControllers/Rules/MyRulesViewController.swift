@@ -22,15 +22,9 @@ struct MyRulesView: View {
     }
 
     var body: some View {
-        ZStack {
-            Image(isDarkMode ? themeColors.darkBackground : themeColors.background)
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                Spacer()
-                    .frame(height: 90)
+            VStack {
+
                 
                 ScrollView {
                     LazyVStack(spacing: 8) {
@@ -49,8 +43,8 @@ struct MyRulesView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                    
-                    Spacer()
+                    .padding(.vertical, 8)
+
                 }
                 
                 VStack {
@@ -64,9 +58,9 @@ struct MyRulesView: View {
                     .padding(.vertical, 10)
                 }
                 
-                .padding(.bottom, 100)
+                .padding(.bottom, 20)
             }
-        }
+        
         NavigationLink(destination: AddRuleView { newRule in
                               ruleList.rules.append(newRule)
                           }, isActive: $showingAddRuleView) {
