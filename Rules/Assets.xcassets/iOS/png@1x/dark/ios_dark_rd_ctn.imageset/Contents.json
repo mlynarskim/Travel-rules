@@ -1,17 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "ios_dark_rd_ctn@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "3x"
+      "idiom" : "universal"
     }
   ],
   "info" : {
