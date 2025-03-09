@@ -41,7 +41,7 @@ struct ThemeColors {
         primary: Color(hex: "#29606D"),
         secondary: Color(hex: "#DDAA4F"),
         accent: Color("AccentColor"),
-        background: "classic-bg",
+        background: "theme-classic-preview",
         darkBackground: "classic-bg-dark",
         primaryText: Color(hex: "#1A1A1A"),
         secondaryText: Color(hex: "#666666"),
@@ -59,7 +59,7 @@ struct ThemeColors {
         primary: Color(hex: "#2B4C7E"),
         secondary: Color(hex: "#738FA7"),
         accent: Color(hex: "#A8C6FA"),
-        background: "mountain-bg",
+        background: "theme-mountain-preview",
         darkBackground: "mountain-bg-dark",
         primaryText: Color(hex: "#1A1A1A"),
         secondaryText: Color(hex: "#666666"),
@@ -74,20 +74,20 @@ struct ThemeColors {
     )
     
     static let beachTheme = ThemeColors(
-        primary: Color(hex: "#1B6C8A"), // Niebieski inspirowany wodą i niebem
-        secondary: Color(hex: "#e8723f"), // Ciepły pomarańczowy z zachodu słońca
-        accent: Color(hex: "#FFD166"), // Złoty odcień odbijającego światła na wodzie
-        background: "beach-bg",
+        primary: Color(hex: "#1B6C8A"),
+        secondary: Color(hex: "#e8723f"),
+        accent: Color(hex: "#FFD166"),
+        background: "theme-beach-preview",
         darkBackground: "beach-bg-dark",
-        primaryText: Color(hex: "#1A1A1A"), // Ciemny dla czytelności
-        secondaryText: Color(hex: "#4E4E4E"), // Delikatny kontrast dla subtelnych elementów UI
+        primaryText: Color(hex: "#1A1A1A"),
+        secondaryText: Color(hex: "#4E4E4E"),
         lightText: .white,
         cardShadow: Color.black.opacity(0.2),
         cardBackground: Color.white.opacity(0.9),
         overlay: Color.black.opacity(0.3),
-        success: Color(hex: "#48A999"), // Turkusowy akcent
-        warning: Color(hex: "#FF9F1C"), // Jasny pomarańczowy dla ostrzeżeń
-        error: Color(hex: "#D7263D"), // Intensywny czerwony dla błędów
+        success: Color(hex: "#48A999"),
+        warning: Color(hex: "#FF9F1C"),
+        error: Color(hex: "#D7263D"), 
         buttonHighlight: Color.white.opacity(0.25)
     )
 
@@ -96,7 +96,7 @@ struct ThemeColors {
         primary: Color(hex: "#C19A6B"),
         secondary: Color(hex: "#FFB347"),
         accent: Color(hex: "#CD853F"),
-        background: "desert-bg",
+        background: "theme-desert-preview",
         darkBackground: "desert-bg-dark",
         primaryText: Color(hex: "#1A1A1A"),
         secondaryText: Color(hex: "#666666"),
@@ -114,7 +114,7 @@ struct ThemeColors {
         primary: Color(hex: "#2E8B57"),
         secondary: Color(hex: "#4CAF50"),
         accent: Color(hex: "#556B2F"),
-        background: "forest-bg",
+        background: "theme-forest-preview",
         darkBackground: "forest-bg-dark",
         primaryText: Color(hex: "#1A1A1A"),
         secondaryText: Color(hex: "#666666"),

@@ -19,6 +19,8 @@
 #ifndef GRPC_SRC_CORE_LOAD_BALANCING_GRPCLB_GRPCLB_CLIENT_STATS_H
 #define GRPC_SRC_CORE_LOAD_BALANCING_GRPCLB_GRPCLB_CLIENT_STATS_H
 
+#include <grpc/support/port_platform.h>
+
 #include <stdint.h>
 
 #include <memory>
@@ -28,7 +30,6 @@
 #include "absl/container/inlined_vector.h"
 
 #include <grpc/support/atm.h>
-#include <grpc/support/port_platform.h>
 
 #include "src/core/lib/gprpp/memory.h"
 #include "src/core/lib/gprpp/ref_counted.h"
@@ -36,7 +37,7 @@
 
 namespace grpc_core {
 
-class GrpcLbClientStats final : public RefCounted<GrpcLbClientStats> {
+class GrpcLbClientStats : public RefCounted<GrpcLbClientStats> {
  public:
   struct DropTokenCount {
     UniquePtr<char> token;

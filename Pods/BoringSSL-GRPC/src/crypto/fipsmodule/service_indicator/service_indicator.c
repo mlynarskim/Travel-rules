@@ -171,6 +171,7 @@ static int is_md_fips_approved_for_signing(int md_type) {
 // type is FIPS approved for verifying, and zero otherwise.
 static int is_md_fips_approved_for_verifying(int md_type) {
   switch (md_type) {
+    case NID_sha1:
     case NID_sha224:
     case NID_sha256:
     case NID_sha384:
@@ -183,6 +184,7 @@ static int is_md_fips_approved_for_verifying(int md_type) {
 }
 
 static void evp_md_ctx_verify_service_indicator(const EVP_MD_CTX *ctx,
+                                                int rsa_1024_ok,
                                                 int (*md_ok)(int md_type)) {
   if (EVP_MD_CTX_md(ctx) == NULL) {
     // Signature schemes without a prehash are currently never FIPS approved.
@@ -230,7 +232,8 @@ static void evp_md_ctx_verify_service_indicator(const EVP_MD_CTX *ctx,
 
     // Check if the MD type and the RSA key size are approved.
     if (md_ok(md_type) &&
-        (pkey_size == 256 || pkey_size == 384 || pkey_size == 512)) {
+        ((rsa_1024_ok && pkey_size == 128) || pkey_size == 256 ||
+         pkey_size == 384 || pkey_size == 512)) {
       FIPS_service_indicator_update_state();
     }
   } else if (pkey_type == EVP_PKEY_EC) {
@@ -277,12 +280,12 @@ void EVP_Cipher_verify_service_indicator(const EVP_CIPHER_CTX *ctx) {
 }
 
 void EVP_DigestVerify_verify_service_indicator(const EVP_MD_CTX *ctx) {
-  return evp_md_ctx_verify_service_indicator(ctx,
+  return evp_md_ctx_verify_service_indicator(ctx, /*rsa_1024_ok=*/1,
                                              is_md_fips_approved_for_verifying);
 }
 
 void EVP_DigestSign_verify_service_indicator(const EVP_MD_CTX *ctx) {
-  return evp_md_ctx_verify_service_indicator(ctx,
+  return evp_md_ctx_verify_service_indicator(ctx, /*rsa_1024_ok=*/0,
                                              is_md_fips_approved_for_signing);
 }
 

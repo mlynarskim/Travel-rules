@@ -15,14 +15,12 @@
 import Foundation
 
 /**
- * Class which represents the metadata on an object in Firebase Storage.
- *
- * This metadata is
+ * Class which represents the metadata on an object in Firebase Storage. This metadata is
  * returned on successful operations, and can be used to retrieve download URLs, content types,
- * and a Storage reference to the object in question. Full documentation can be found in the
- * [GCS documentation](https://cloud.google.com/storage/docs/json_api/v1/objects#resource)
+ * and a Storage reference to the object in question. Full documentation can be found at the GCS
+ * Objects#resource docs.
+ * @see https://cloud.google.com/storage/docs/json_api/v1/objects#resource
  */
-@available(iOS 13, tvOS 13, macOS 10.15, macCatalyst 13, watchOS 7, *)
 @objc(FIRStorageMetadata) open class StorageMetadata: NSObject {
   // MARK: - Public APIs
 
@@ -147,10 +145,6 @@ import Foundation
 
   // MARK: - Public Initializers
 
-  /**
-   * Creates an empty instance of StorageMetadata.
-   * @return An empty instance of StorageMetadata.
-   */
   @objc override public convenience init() {
     self.init(dictionary: [:])
   }
@@ -208,17 +202,17 @@ import Foundation
 
   // MARK: - Internal APIs
 
-  func updatedMetadata() -> [String: AnyHashable] {
+  internal func updatedMetadata() -> [String: AnyHashable] {
     return remove(matchingMetadata: dictionaryRepresentation(), oldMetadata: initialMetadata)
   }
 
-  enum StorageMetadataType {
+  internal enum StorageMetadataType {
     case unknown
     case file
     case folder
   }
 
-  var fileType: StorageMetadataType
+  internal var fileType: StorageMetadataType
 
   // MARK: - Private APIs and data
 
@@ -231,7 +225,7 @@ import Foundation
     return 0
   }
 
-  private static let dateFormatter: DateFormatter = {
+  private static var dateFormatter: DateFormatter = {
     let dateFormatter = DateFormatter()
     dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
     dateFormatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZZZZZ"
@@ -246,7 +240,7 @@ import Foundation
     return nil
   }
 
-  static func RFC3339StringFromDate(_ date: Date) -> String {
+  internal static func RFC3339StringFromDate(_ date: Date) -> String {
     return dateFormatter.string(from: date)
   }
 

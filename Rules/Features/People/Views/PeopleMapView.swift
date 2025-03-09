@@ -1,4 +1,3 @@
-//PeopleMapView.swift
 import SwiftUI
 import MapKit
 import CoreLocation
@@ -146,7 +145,9 @@ struct UserAnnotationView: View {
             }
         }
         .sheet(isPresented: $showingDetails) {
-            UserProfileView(user: user)
+            // Jeśli UserProfileView nie przyjmuje argumentów, wywołaj bez parametrów.
+            // Jeśli chcesz przekazywać 'user', musisz dodać odpowiedni inicjalizator w UserProfileView.
+            UserProfileView()
         }
     }
     
@@ -192,9 +193,3 @@ struct CheckInView: View {
         }
     }
 }
-
-//struct PeopleMapView_Previews: PreviewProvider {
-  //  static var previews: some View {
-    //    PeopleMapView()
-    //}
-//}

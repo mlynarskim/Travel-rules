@@ -16,31 +16,37 @@
 //
 //
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/lib/iomgr/executor.h"
 
 #include <string.h>
 
-#include "absl/log/check.h"
-
 #include <grpc/support/alloc.h>
 #include <grpc/support/cpu.h>
 #include <grpc/support/log.h>
-#include <grpc/support/port_platform.h>
 #include <grpc/support/sync.h>
 
+#include "src/core/lib/gpr/useful.h"
 #include "src/core/lib/gprpp/crash.h"
 #include "src/core/lib/gprpp/memory.h"
 #include "src/core/lib/iomgr/exec_ctx.h"
 #include "src/core/lib/iomgr/iomgr_internal.h"
-#include "src/core/util/useful.h"
 
 #define MAX_DEPTH 2
 
 #define EXECUTOR_TRACE(format, ...)                       \
   do {                                                    \
-    if (GRPC_TRACE_FLAG_ENABLED(executor)) {              \
+    if (GRPC_TRACE_FLAG_ENABLED(executor_trace)) {        \
       gpr_log(GPR_INFO, "EXECUTOR " format, __VA_ARGS__); \
     }                                                     \
+  } while (0)
+
+#define EXECUTOR_TRACE0(str)                       \
+  do {                                             \
+    if (GRPC_TRACE_FLAG_ENABLED(executor_trace)) { \
+      gpr_log(GPR_INFO, "EXECUTOR " str);          \
+    }                                              \
   } while (0)
 
 namespace grpc_core {
@@ -79,6 +85,8 @@ const EnqueueFunc
                               {resolver_enqueue_short, resolver_enqueue_long}};
 
 }  // namespace
+
+TraceFlag executor_trace(false, "executor");
 
 Executor::Executor(const char* name) : name_(name) {
   adding_thread_lock_ = GPR_SPINLOCK_STATIC_INITIALIZER;
@@ -139,7 +147,7 @@ void Executor::SetThreading(bool threading) {
       return;
     }
 
-    CHECK_EQ(num_threads_, 0);
+    GPR_ASSERT(num_threads_ == 0);
     gpr_atm_rel_store(&num_threads_, 1);
     thd_state_ = static_cast<ThreadState*>(
         gpr_zalloc(sizeof(ThreadState) * max_threads_));
@@ -359,11 +367,12 @@ void Executor::Enqueue(grpc_closure* closure, grpc_error_handle error,
 // the grpc_init() and grpc_shutdown() code paths which are protected by a
 // global mutex. So it is okay to assume that these functions are thread-safe
 void Executor::InitAll() {
-  GRPC_TRACE_LOG(executor, INFO) << "Executor::InitAll() enter";
+  EXECUTOR_TRACE0("Executor::InitAll() enter");
 
   // Return if Executor::InitAll() is already called earlier
   if (executors[static_cast<size_t>(ExecutorType::DEFAULT)] != nullptr) {
-    CHECK(executors[static_cast<size_t>(ExecutorType::RESOLVER)] != nullptr);
+    GPR_ASSERT(executors[static_cast<size_t>(ExecutorType::RESOLVER)] !=
+               nullptr);
     return;
   }
 
@@ -375,7 +384,7 @@ void Executor::InitAll() {
   executors[static_cast<size_t>(ExecutorType::DEFAULT)]->Init();
   executors[static_cast<size_t>(ExecutorType::RESOLVER)]->Init();
 
-  GRPC_TRACE_LOG(executor, INFO) << "Executor::InitAll() done";
+  EXECUTOR_TRACE0("Executor::InitAll() done");
 }
 
 void Executor::Run(grpc_closure* closure, grpc_error_handle error,
@@ -385,11 +394,12 @@ void Executor::Run(grpc_closure* closure, grpc_error_handle error,
 }
 
 void Executor::ShutdownAll() {
-  GRPC_TRACE_LOG(executor, INFO) << "Executor::ShutdownAll() enter";
+  EXECUTOR_TRACE0("Executor::ShutdownAll() enter");
 
   // Return if Executor:SshutdownAll() is already called earlier
   if (executors[static_cast<size_t>(ExecutorType::DEFAULT)] == nullptr) {
-    CHECK(executors[static_cast<size_t>(ExecutorType::RESOLVER)] == nullptr);
+    GPR_ASSERT(executors[static_cast<size_t>(ExecutorType::RESOLVER)] ==
+               nullptr);
     return;
   }
 
@@ -413,11 +423,11 @@ void Executor::ShutdownAll() {
   executors[static_cast<size_t>(ExecutorType::DEFAULT)] = nullptr;
   executors[static_cast<size_t>(ExecutorType::RESOLVER)] = nullptr;
 
-  GRPC_TRACE_LOG(executor, INFO) << "Executor::ShutdownAll() done";
+  EXECUTOR_TRACE0("Executor::ShutdownAll() done");
 }
 
 bool Executor::IsThreaded(ExecutorType executor_type) {
-  CHECK(executor_type < ExecutorType::NUM_EXECUTORS);
+  GPR_ASSERT(executor_type < ExecutorType::NUM_EXECUTORS);
   return executors[static_cast<size_t>(executor_type)]->IsThreaded();
 }
 

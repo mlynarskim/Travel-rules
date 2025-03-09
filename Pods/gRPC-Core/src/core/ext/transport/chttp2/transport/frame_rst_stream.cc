@@ -16,11 +16,12 @@
 //
 //
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/ext/transport/chttp2/transport/frame_rst_stream.h"
 
 #include <stddef.h>
 
-#include "absl/log/check.h"
 #include "absl/random/distributions.h"
 #include "absl/status/status.h"
 #include "absl/strings/str_cat.h"
@@ -28,8 +29,8 @@
 
 #include <grpc/slice_buffer.h>
 #include <grpc/support/log.h>
-#include <grpc/support/port_platform.h>
 
+#include "src/core/ext/transport/chttp2/transport/http_trace.h"
 #include "src/core/ext/transport/chttp2/transport/internal.h"
 #include "src/core/ext/transport/chttp2/transport/legacy_frame.h"
 #include "src/core/ext/transport/chttp2/transport/ping_callbacks.h"
@@ -105,12 +106,12 @@ grpc_error_handle grpc_chttp2_rst_stream_parser_parse(void* parser,
   s->stats.incoming.framing_bytes += static_cast<uint64_t>(end - cur);
 
   if (p->byte == 4) {
-    CHECK(is_last);
+    GPR_ASSERT(is_last);
     uint32_t reason = ((static_cast<uint32_t>(p->reason_bytes[0])) << 24) |
                       ((static_cast<uint32_t>(p->reason_bytes[1])) << 16) |
                       ((static_cast<uint32_t>(p->reason_bytes[2])) << 8) |
                       ((static_cast<uint32_t>(p->reason_bytes[3])));
-    if (GRPC_TRACE_FLAG_ENABLED(http)) {
+    if (GRPC_TRACE_FLAG_ENABLED(grpc_http_trace)) {
       gpr_log(GPR_INFO,
               "[chttp2 transport=%p stream=%p] received RST_STREAM(reason=%d)",
               t, s, reason);

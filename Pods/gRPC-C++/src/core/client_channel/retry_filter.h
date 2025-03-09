@@ -24,7 +24,6 @@
 
 #include <new>
 
-#include "absl/log/check.h"
 #include "absl/types/optional.h"
 
 #include <grpc/event_engine/event_engine.h>
@@ -38,14 +37,18 @@
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/channel/channel_fwd.h"
 #include "src/core/lib/channel/channel_stack.h"
+#include "src/core/lib/channel/context.h"
+#include "src/core/lib/debug/trace.h"
+#include "src/core/lib/gpr/useful.h"
 #include "src/core/lib/gprpp/ref_counted_ptr.h"
 #include "src/core/lib/iomgr/error.h"
 #include "src/core/lib/transport/transport.h"
-#include "src/core/util/useful.h"
+
+extern grpc_core::TraceFlag grpc_retry_trace;
 
 namespace grpc_core {
 
-class RetryFilter final {
+class RetryFilter {
  public:
   static const grpc_channel_filter kVtable;
 
@@ -62,7 +65,8 @@ class RetryFilter final {
   // any even moderately compelling reason to do so.
   static double BackoffJitter() { return 0.2; }
 
-  const internal::RetryMethodConfig* GetRetryPolicy(Arena* arena);
+  const internal::RetryMethodConfig* GetRetryPolicy(
+      const grpc_call_context_element* context);
 
   RefCountedPtr<internal::ServerRetryThrottleData> retry_throttle_data() const {
     return retry_throttle_data_;
@@ -88,8 +92,8 @@ class RetryFilter final {
 
   static grpc_error_handle Init(grpc_channel_element* elem,
                                 grpc_channel_element_args* args) {
-    CHECK(args->is_last);
-    CHECK(elem->filter == &kVtable);
+    GPR_ASSERT(args->is_last);
+    GPR_ASSERT(elem->filter == &kVtable);
     grpc_error_handle error;
     new (elem->channel_data) RetryFilter(args->channel_args, &error);
     return error;

@@ -15,13 +15,12 @@
 #ifndef GRPC_SRC_CORE_LIB_PROMISE_POLL_H
 #define GRPC_SRC_CORE_LIB_PROMISE_POLL_H
 
+#include <grpc/support/port_platform.h>
+
 #include <string>
 #include <utility>
 
-#include "absl/log/check.h"
-
 #include <grpc/support/log.h>
-#include <grpc/support/port_platform.h>
 
 #include "src/core/lib/gprpp/construct_destruct.h"
 
@@ -97,12 +96,12 @@ class Poll {
   bool ready() const { return ready_; }
 
   T& value() {
-    DCHECK(ready());
+    GPR_DEBUG_ASSERT(ready());
     return value_;
   }
 
   const T& value() const {
-    DCHECK(ready());
+    GPR_DEBUG_ASSERT(ready());
     return value_;
   }
 
@@ -156,7 +155,7 @@ class Poll<Empty> {
   bool ready() const { return ready_; }
 
   Empty value() const {
-    DCHECK(ready());
+    GPR_DEBUG_ASSERT(ready());
     return Empty{};
   }
 

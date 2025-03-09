@@ -15,15 +15,14 @@
 #ifndef GRPC_SRC_CORE_LIB_PROMISE_TRY_JOIN_H
 #define GRPC_SRC_CORE_LIB_PROMISE_TRY_JOIN_H
 
+#include <grpc/support/port_platform.h>
+
 #include <tuple>
 #include <variant>
 
-#include "absl/log/check.h"
 #include "absl/meta/type_traits.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
-
-#include <grpc/support/port_platform.h>
 
 #include "src/core/lib/promise/detail/join_state.h"
 #include "src/core/lib/promise/map.h"
@@ -84,7 +83,7 @@ struct TryJoinTraits {
   }
   template <typename R, typename T>
   static R EarlyReturn(const ValueOrFailure<T>& x) {
-    CHECK(!x.ok());
+    GPR_ASSERT(!x.ok());
     return FailureStatusCast<R>(Failure{});
   }
   template <typename... A>

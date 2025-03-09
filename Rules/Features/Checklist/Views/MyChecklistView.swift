@@ -10,18 +10,7 @@ struct TravelItem: Identifiable, Codable {
     }
 }
 
-struct BackgroundView: View {
-    let selectedTheme: String
-    let isDarkMode: Bool
-    
-    var body: some View {
-        let imageName = "\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")"
-        Image(imageName)
-            .resizable()
-        // .scaledToFill()
-            .ignoresSafeArea()
-    }
-}
+
 
 struct MyChecklistView: View {
     @State private var travelItems: [TravelItem] = []
@@ -41,73 +30,89 @@ struct MyChecklistView: View {
         case .forest:   return ThemeColors.forestTheme
         }
     }
-    
+
+    // MARK: - Background Image
+    private var backgroundImageView: some View {
+        let imageName: String
+        switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
+        case .classic:   imageName = isDarkMode ? "classic-bg-dark" : "theme-classic-preview"
+        case .mountain:  imageName = isDarkMode ? "mountain-bg-dark" : "theme-mountain-preview"
+        case .beach:     imageName = isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
+        case .desert:    imageName = isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
+        case .forest:    imageName = isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
+        }
+        return Image(imageName)
+            .resizable()
+           // .scaledToFill()
+            .ignoresSafeArea()
+    }
+
     private var isSmallDevice: Bool {
         UIScreen.main.bounds.height <= 667
     }
-    
+
     var body: some View {
         NavigationView {
-            GeometryReader { geometry in
-                ZStack {
-                    BackgroundView(selectedTheme: selectedTheme, isDarkMode: isDarkMode)
+            ZStack {
+                backgroundImageView
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 16) {
+                    Spacer()
+                        .frame(height: 40)
                     
-                    VStack(spacing: 16) {
-                        Spacer()
-                            .frame(height: 40)
-                        
-                        SegmentedPicker(selectedTab: $selectedTab, themeColors: themeColors)
-                            .padding(.horizontal)
-                            .padding(.top, 80)
-                        
-                        if selectedTab == 0 {
-                            ChecklistContentView(
-                                travelItems: $travelItems,
-                                newItemName: $newItemName,
-                                themeColors: themeColors,
-                                isSmallDevice: isSmallDevice
-                            )
-                        } else {
-                            TravelChecklist()
-                        }
-                        
-                        Spacer()
+                    SegmentedPicker(selectedTab: $selectedTab, themeColors: themeColors)
+                        .padding(.horizontal)
+                        //.padding(.top, 80)
+
+                    if selectedTab == 0 {
+                        ChecklistContentView(
+                            travelItems: $travelItems,
+                            newItemName: $newItemName,
+                            themeColors: themeColors,
+                            isSmallDevice: isSmallDevice
+                        )
+                    } else {
+                        TravelChecklist()
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    
+                    Spacer()
                 }
+                //.frame(maxWidth: .infinity)
+               // .padding(.horizontal)
             }
-            .ignoresSafeArea()
+            .navigationBarItems(trailing:
+                Button(action: {
+                    HapticManager.shared.impact(style: .medium)
+                    showExportSheet = true
+                }) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: isSmallDevice ? 18 : 20))
+                        .foregroundColor(.white)
+                }
+            )
             .sheet(isPresented: $showExportSheet) {
                 ExportView(items: travelItems.map { $0.name }, themeColors: themeColors)
             }
             .onAppear(perform: loadItems)
             .onDisappear(perform: saveItems)
-            .navigationBarItems(trailing:
-                                    Button(action: {
-                HapticManager.shared.impact(style: .medium)
-                showExportSheet = true
-            }) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: isSmallDevice ? 18 : 20))
-                    .foregroundColor(.white)
-            }
-            )
         }
     }
-    
+
     private func loadItems() {
         if let data = UserDefaults.standard.data(forKey: "travelItems"),
            let decoded = try? JSONDecoder().decode([TravelItem].self, from: data) {
             travelItems = decoded
         }
     }
-    
+
     private func saveItems() {
         if let encoded = try? JSONEncoder().encode(travelItems) {
             UserDefaults.standard.set(encoded, forKey: "travelItems")
         }
     }
 }
+
 
 struct ChecklistItemRow: View {
     @Binding var item: TravelItem

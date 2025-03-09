@@ -14,6 +14,8 @@
 // limitations under the License.
 //
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/load_balancing/ring_hash/ring_hash.h"
 
 #include <inttypes.h>
@@ -29,7 +31,6 @@
 
 #include "absl/base/attributes.h"
 #include "absl/container/inlined_vector.h"
-#include "absl/log/check.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
@@ -40,9 +41,9 @@
 #include <grpc/impl/connectivity_state.h>
 #include <grpc/support/json.h>
 #include <grpc/support/log.h>
-#include <grpc/support/port_platform.h>
 
 #include "src/core/client_channel/client_channel_internal.h"
+#include "src/core/load_balancing/pick_first/pick_first.h"
 #include "src/core/lib/address_utils/sockaddr_utils.h"
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/config/core_configuration.h"
@@ -60,16 +61,17 @@
 #include "src/core/lib/iomgr/exec_ctx.h"
 #include "src/core/lib/iomgr/pollset_set.h"
 #include "src/core/lib/iomgr/resolved_address.h"
+#include "src/core/lib/json/json.h"
 #include "src/core/lib/transport/connectivity_state.h"
 #include "src/core/load_balancing/delegating_helper.h"
 #include "src/core/load_balancing/lb_policy.h"
 #include "src/core/load_balancing/lb_policy_factory.h"
 #include "src/core/load_balancing/lb_policy_registry.h"
-#include "src/core/load_balancing/pick_first/pick_first.h"
 #include "src/core/resolver/endpoint_addresses.h"
-#include "src/core/util/json/json.h"
 
 namespace grpc_core {
+
+TraceFlag grpc_lb_ring_hash_trace(false, "ring_hash_lb");
 
 UniqueTypeName RequestHashAttribute::TypeName() {
   static UniqueTypeName::Factory kFactory("request_hash");
@@ -112,7 +114,7 @@ namespace {
 
 constexpr absl::string_view kRingHash = "ring_hash_experimental";
 
-class RingHashLbConfig final : public LoadBalancingPolicy::Config {
+class RingHashLbConfig : public LoadBalancingPolicy::Config {
  public:
   RingHashLbConfig(size_t min_ring_size, size_t max_ring_size)
       : min_ring_size_(min_ring_size), max_ring_size_(max_ring_size) {}
@@ -131,7 +133,7 @@ class RingHashLbConfig final : public LoadBalancingPolicy::Config {
 
 constexpr size_t kRingSizeCapDefault = 4096;
 
-class RingHash final : public LoadBalancingPolicy {
+class RingHash : public LoadBalancingPolicy {
  public:
   explicit RingHash(Args args);
 
@@ -142,7 +144,7 @@ class RingHash final : public LoadBalancingPolicy {
 
  private:
   // A ring computed based on a config and address list.
-  class Ring final : public RefCounted<Ring> {
+  class Ring : public RefCounted<Ring> {
    public:
     struct RingEntry {
       uint64_t hash;
@@ -158,7 +160,7 @@ class RingHash final : public LoadBalancingPolicy {
   };
 
   // State for a particular endpoint.  Delegates to a pick_first child policy.
-  class RingHashEndpoint final : public InternallyRefCounted<RingHashEndpoint> {
+  class RingHashEndpoint : public InternallyRefCounted<RingHashEndpoint> {
    public:
     // index is the index into RingHash::endpoints_ of this endpoint.
     RingHashEndpoint(RefCountedPtr<RingHash> ring_hash, size_t index)
@@ -168,7 +170,7 @@ class RingHash final : public LoadBalancingPolicy {
 
     size_t index() const { return index_; }
 
-    absl::Status UpdateLocked(size_t index);
+    void UpdateLocked(size_t index);
 
     grpc_connectivity_state connectivity_state() const {
       return connectivity_state_;
@@ -195,7 +197,7 @@ class RingHash final : public LoadBalancingPolicy {
     class Helper;
 
     void CreateChildPolicy();
-    absl::Status UpdateChildPolicyLocked();
+    void UpdateChildPolicyLocked();
 
     // Called when the child policy reports a connectivity state update.
     void OnStateUpdate(grpc_connectivity_state new_state,
@@ -214,7 +216,7 @@ class RingHash final : public LoadBalancingPolicy {
     RefCountedPtr<SubchannelPicker> picker_;
   };
 
-  class Picker final : public SubchannelPicker {
+  class Picker : public SubchannelPicker {
    public:
     explicit Picker(RefCountedPtr<RingHash> ring_hash)
         : ring_hash_(std::move(ring_hash)),
@@ -230,7 +232,7 @@ class RingHash final : public LoadBalancingPolicy {
    private:
     // A fire-and-forget class that schedules endpoint connection attempts
     // on the control plane WorkSerializer.
-    class EndpointConnectionAttempter final {
+    class EndpointConnectionAttempter {
      public:
       EndpointConnectionAttempter(RefCountedPtr<RingHash> ring_hash,
                                   RefCountedPtr<RingHashEndpoint> endpoint)
@@ -460,7 +462,7 @@ RingHash::Ring::Ring(RingHash* ring_hash, RingHashLbConfig* config) {
 // RingHash::RingHashEndpoint::Helper
 //
 
-class RingHash::RingHashEndpoint::Helper final
+class RingHash::RingHashEndpoint::Helper
     : public LoadBalancingPolicy::DelegatingChannelControlHelper {
  public:
   explicit Helper(RefCountedPtr<RingHashEndpoint> endpoint)
@@ -497,10 +499,9 @@ void RingHash::RingHashEndpoint::Orphan() {
   Unref();
 }
 
-absl::Status RingHash::RingHashEndpoint::UpdateLocked(size_t index) {
+void RingHash::RingHashEndpoint::UpdateLocked(size_t index) {
   index_ = index;
-  if (child_policy_ == nullptr) return absl::OkStatus();
-  return UpdateChildPolicyLocked();
+  if (child_policy_ != nullptr) UpdateChildPolicyLocked();
 }
 
 void RingHash::RingHashEndpoint::ResetBackoffLocked() {
@@ -516,7 +517,7 @@ void RingHash::RingHashEndpoint::RequestConnectionLocked() {
 }
 
 void RingHash::RingHashEndpoint::CreateChildPolicy() {
-  CHECK(child_policy_ == nullptr);
+  GPR_ASSERT(child_policy_ == nullptr);
   LoadBalancingPolicy::Args lb_policy_args;
   lb_policy_args.work_serializer = ring_hash_->work_serializer();
   lb_policy_args.args =
@@ -528,7 +529,7 @@ void RingHash::RingHashEndpoint::CreateChildPolicy() {
   child_policy_ =
       CoreConfiguration::Get().lb_policy_registry().CreateLoadBalancingPolicy(
           "pick_first", std::move(lb_policy_args));
-  if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+  if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
     const EndpointAddresses& endpoint = ring_hash_->endpoints_[index_];
     gpr_log(GPR_INFO,
             "[RH %p] endpoint %p (index %" PRIuPTR " of %" PRIuPTR
@@ -541,38 +542,31 @@ void RingHash::RingHashEndpoint::CreateChildPolicy() {
   // this policy, which in turn is tied to the application's call.
   grpc_pollset_set_add_pollset_set(child_policy_->interested_parties(),
                                    ring_hash_->interested_parties());
-  // If the child policy returns a non-OK status, request re-resolution.
-  // Note that this will initially cause fixed backoff delay in the
-  // resolver instead of exponential delay.  However, once the
-  // resolver returns the initial re-resolution, we will be able to
-  // return non-OK from UpdateLocked(), which will trigger
-  // exponential backoff instead.
-  absl::Status status = UpdateChildPolicyLocked();
-  if (!status.ok()) {
-    ring_hash_->channel_control_helper()->RequestReresolution();
-  }
+  UpdateChildPolicyLocked();
 }
 
-absl::Status RingHash::RingHashEndpoint::UpdateChildPolicyLocked() {
+void RingHash::RingHashEndpoint::UpdateChildPolicyLocked() {
   // Construct pick_first config.
   auto config =
       CoreConfiguration::Get().lb_policy_registry().ParseLoadBalancingConfig(
           Json::FromArray(
               {Json::FromObject({{"pick_first", Json::FromObject({})}})}));
-  CHECK(config.ok());
+  GPR_ASSERT(config.ok());
   // Update child policy.
   LoadBalancingPolicy::UpdateArgs update_args;
   update_args.addresses =
       std::make_shared<SingleEndpointIterator>(ring_hash_->endpoints_[index_]);
   update_args.args = ring_hash_->args_;
   update_args.config = std::move(*config);
-  return child_policy_->UpdateLocked(std::move(update_args));
+  // TODO(roth): If the child reports a non-OK status with the update,
+  // we need to propagate that back to the resolver somehow.
+  (void)child_policy_->UpdateLocked(std::move(update_args));
 }
 
 void RingHash::RingHashEndpoint::OnStateUpdate(
     grpc_connectivity_state new_state, const absl::Status& status,
     RefCountedPtr<SubchannelPicker> picker) {
-  if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+  if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
     gpr_log(
         GPR_INFO,
         "[RH %p] connectivity changed for endpoint %p (%s, child_policy=%p): "
@@ -600,19 +594,19 @@ void RingHash::RingHashEndpoint::OnStateUpdate(
 //
 
 RingHash::RingHash(Args args) : LoadBalancingPolicy(std::move(args)) {
-  if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+  if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
     gpr_log(GPR_INFO, "[RH %p] Created", this);
   }
 }
 
 RingHash::~RingHash() {
-  if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+  if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
     gpr_log(GPR_INFO, "[RH %p] Destroying Ring Hash policy", this);
   }
 }
 
 void RingHash::ShutdownLocked() {
-  if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+  if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
     gpr_log(GPR_INFO, "[RH %p] Shutting down", this);
   }
   shutdown_ = true;
@@ -628,7 +622,7 @@ void RingHash::ResetBackoffLocked() {
 absl::Status RingHash::UpdateLocked(UpdateArgs args) {
   // Check address list.
   if (args.addresses.ok()) {
-    if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+    if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
       gpr_log(GPR_INFO, "[RH %p] received update", this);
     }
     // De-dup endpoints, taking weight into account.
@@ -644,7 +638,7 @@ absl::Status RingHash::UpdateLocked(UpdateArgs args) {
             endpoint.args().GetInt(GRPC_ARG_ADDRESS_WEIGHT).value_or(1);
         int prev_weight_arg =
             prev_endpoint.args().GetInt(GRPC_ARG_ADDRESS_WEIGHT).value_or(1);
-        if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+        if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
           gpr_log(GPR_INFO,
                   "[RH %p] merging duplicate endpoint for %s, combined "
                   "weight %d",
@@ -659,7 +653,7 @@ absl::Status RingHash::UpdateLocked(UpdateArgs args) {
       }
     });
   } else {
-    if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+    if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
       gpr_log(GPR_INFO, "[RH %p] received update with addresses error: %s",
               this, args.addresses.status().ToString().c_str());
     }
@@ -674,18 +668,13 @@ absl::Status RingHash::UpdateLocked(UpdateArgs args) {
       this, static_cast<RingHashLbConfig*>(args.config.get()));
   // Update endpoint map.
   std::map<EndpointAddressSet, OrphanablePtr<RingHashEndpoint>> endpoint_map;
-  std::vector<std::string> errors;
   for (size_t i = 0; i < endpoints_.size(); ++i) {
     const EndpointAddresses& addresses = endpoints_[i];
     const EndpointAddressSet address_set(addresses.addresses());
     // If present in old map, retain it; otherwise, create a new one.
     auto it = endpoint_map_.find(address_set);
     if (it != endpoint_map_.end()) {
-      absl::Status status = it->second->UpdateLocked(i);
-      if (!status.ok()) {
-        errors.emplace_back(absl::StrCat("endpoint ", address_set.ToString(),
-                                         ": ", status.ToString()));
-      }
+      it->second->UpdateLocked(i);
       endpoint_map.emplace(address_set, std::move(it->second));
     } else {
       endpoint_map.emplace(address_set, MakeOrphanable<RingHashEndpoint>(
@@ -707,10 +696,6 @@ absl::Status RingHash::UpdateLocked(UpdateArgs args) {
   // Return a new picker.
   UpdateAggregatedConnectivityStateLocked(/*entered_transient_failure=*/false,
                                           absl::OkStatus());
-  if (!errors.empty()) {
-    return absl::UnavailableError(absl::StrCat(
-        "errors from children: [", absl::StrJoin(errors, "; "), "]"));
-  }
   return absl::OkStatus();
 }
 
@@ -769,7 +754,7 @@ void RingHash::UpdateAggregatedConnectivityStateLocked(
     state = GRPC_CHANNEL_TRANSIENT_FAILURE;
     start_connection_attempt = true;
   }
-  if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+  if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
     gpr_log(GPR_INFO,
             "[RH %p] setting connectivity state to %s (num_idle=%" PRIuPTR
             ", num_connecting=%" PRIuPTR ", num_ready=%" PRIuPTR
@@ -833,7 +818,7 @@ void RingHash::UpdateAggregatedConnectivityStateLocked(
     for (size_t i = 0; i < endpoints_.size(); ++i) {
       auto it =
           endpoint_map_.find(EndpointAddressSet(endpoints_[i].addresses()));
-      CHECK(it != endpoint_map_.end());
+      GPR_ASSERT(it != endpoint_map_.end());
       if (it->second->connectivity_state() == GRPC_CHANNEL_CONNECTING) {
         first_idle_index = endpoints_.size();
         break;
@@ -846,8 +831,8 @@ void RingHash::UpdateAggregatedConnectivityStateLocked(
     if (first_idle_index != endpoints_.size()) {
       auto it = endpoint_map_.find(
           EndpointAddressSet(endpoints_[first_idle_index].addresses()));
-      CHECK(it != endpoint_map_.end());
-      if (GRPC_TRACE_FLAG_ENABLED(ring_hash_lb)) {
+      GPR_ASSERT(it != endpoint_map_.end());
+      if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace)) {
         gpr_log(GPR_INFO,
                 "[RH %p] triggering internal connection attempt for endpoint "
                 "%p (%s) (index %" PRIuPTR " of %" PRIuPTR ")",
@@ -864,7 +849,7 @@ void RingHash::UpdateAggregatedConnectivityStateLocked(
 // factory
 //
 
-class RingHashFactory final : public LoadBalancingPolicyFactory {
+class RingHashFactory : public LoadBalancingPolicyFactory {
  public:
   OrphanablePtr<LoadBalancingPolicy> CreateLoadBalancingPolicy(
       LoadBalancingPolicy::Args args) const override {

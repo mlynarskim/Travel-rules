@@ -18,7 +18,6 @@
 #include <AvailabilityMacros.h>
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
 
-#include "absl/log/check.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
 
@@ -35,9 +34,11 @@ namespace experimental {
 void DNSServiceResolverImpl::LookupHostname(
     EventEngine::DNSResolver::LookupHostnameCallback on_resolve,
     absl::string_view name, absl::string_view default_port) {
-  GRPC_TRACE_LOG(event_engine_dns, INFO)
-      << "DNSServiceResolverImpl::LookupHostname: name: " << name
-      << ", default_port: " << default_port << ", this: " << this;
+  GRPC_EVENT_ENGINE_DNS_TRACE(
+      "DNSServiceResolverImpl::LookupHostname: name: %.*s, default_port: %.*s, "
+      "this: %p",
+      static_cast<int>(name.length()), name.data(),
+      static_cast<int>(default_port.length()), default_port.data(), this);
 
   absl::string_view host;
   absl::string_view port_string;
@@ -137,12 +138,13 @@ void DNSServiceResolverImpl::ResolveCallback(
     DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex,
     DNSServiceErrorType errorCode, const char* hostname,
     const struct sockaddr* address, uint32_t ttl, void* context) {
-  GRPC_TRACE_LOG(event_engine_dns, INFO)
-      << "DNSServiceResolverImpl::ResolveCallback: sdRef: " << sdRef
-      << ", flags: " << flags << ", interface: " << interfaceIndex
-      << ", errorCode: " << errorCode << ", hostname: " << hostname
-      << ", addressFamily: " << address->sa_family << ", ttl: " << ttl
-      << ", this: " << context;
+  GRPC_EVENT_ENGINE_DNS_TRACE(
+      "DNSServiceResolverImpl::ResolveCallback: sdRef: %p, flags: %x, "
+      "interface: %d, errorCode: %d, hostname: %s, addressFamily: %d, ttl: "
+      "%d, "
+      "this: %p",
+      sdRef, flags, interfaceIndex, errorCode, hostname, address->sa_family,
+      ttl, context);
 
   // no need to increase refcount here, since ResolveCallback and Shutdown is
   // called from the serial queue and it is guarenteed that it won't be called
@@ -151,7 +153,7 @@ void DNSServiceResolverImpl::ResolveCallback(
 
   grpc_core::ReleasableMutexLock lock(&that->request_mu_);
   auto request_it = that->requests_.find(sdRef);
-  CHECK(request_it != that->requests_.end());
+  GPR_ASSERT(request_it != that->requests_.end());
 
   if (errorCode != kDNSServiceErr_NoError &&
       errorCode != kDNSServiceErr_NoSuchRecord) {
@@ -192,11 +194,12 @@ void DNSServiceResolverImpl::ResolveCallback(
           ->sin6_port = htons(request.port);
     }
 
-    GRPC_TRACE_LOG(event_engine_dns, INFO)
-        << "DNSServiceResolverImpl::ResolveCallback: sdRef: " << sdRef
-        << ", hostname: " << hostname << ", addressPort: "
-        << ResolvedAddressToString(resolved_address).value_or("ERROR")
-        << ", this: " << context;
+    GRPC_EVENT_ENGINE_DNS_TRACE(
+        "DNSServiceResolverImpl::ResolveCallback: "
+        "sdRef: %p, hostname: %s, addressPort: %s, this: %p",
+        sdRef, hostname,
+        ResolvedAddressToString(resolved_address).value_or("ERROR").c_str(),
+        context);
   }
 
   // received both ipv4 and ipv6 responses, and no more responses (e.g. multiple
@@ -227,9 +230,10 @@ void DNSServiceResolverImpl::Shutdown() {
     for (auto& kv : that->requests_) {
       auto& sdRef = kv.first;
       auto& request = kv.second;
-      GRPC_TRACE_LOG(event_engine_dns, INFO)
-          << "DNSServiceResolverImpl::Shutdown sdRef: " << sdRef
-          << ", this: " << thatPtr;
+      GRPC_EVENT_ENGINE_DNS_TRACE(
+          "DNSServiceResolverImpl::Shutdown sdRef: %p, this: %p", sdRef,
+          thatPtr);
+
       request.on_resolve(
           absl::CancelledError("DNSServiceResolverImpl::Shutdown"));
       DNSServiceRefDeallocate(static_cast<DNSServiceRef>(sdRef));

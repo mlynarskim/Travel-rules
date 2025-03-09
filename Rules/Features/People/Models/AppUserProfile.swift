@@ -1,33 +1,49 @@
 import Foundation
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
-/// Model profilu użytkownika w Twojej aplikacji
 public struct AppUserProfile: Codable {
-    public let id: UUID
-    public var name: String
-    public var description: String?
+    public let id: String            // UID z Firebase
+    public var email: String         // Email użytkownika (wymagany)
+    public var name: String          // Nazwa użytkownika (wymagana)
+    public var lastActiveTime: Date
+    public var helpProvidedCount: Int
+    public var activeDaysCount: Int
+    public var thanksReceivedCount: Int
+    public var distance: Double
     
-    /// Bezpośrednie odwołanie do typów zdefiniowanych w NearbyUser
-    public var category: NearbyUser.UserCategory
-    public var status: NearbyUser.UserStatus
-    public var shareLevel: NearbyUser.LocationShareLevel
+    public var category: UserCategory
+    public var status: UserStatus
+    public var shareLevel: LocationShareLevel
     
     public var helpOffered: [HelpType]
+    
     public var preferences: UserPreferences
     
-    // Inicjalizator
+    // Konstruktor z wartościami domyślnymi
     public init(
-        id: UUID = UUID(),
+        id: String,
+        email: String,
         name: String,
-        description: String? = nil,
-        category: NearbyUser.UserCategory,
-        status: NearbyUser.UserStatus,
-        shareLevel: NearbyUser.LocationShareLevel,
+        lastActiveTime: Date = Date(),
+        helpProvidedCount: Int = 0,
+        activeDaysCount: Int = 0,
+        thanksReceivedCount: Int = 0,
+        distance: Double = 0.0,
+        category: UserCategory = .social,
+        status: UserStatus = .available,
+        shareLevel: LocationShareLevel = .approximate,
         helpOffered: [HelpType] = [],
-        preferences: UserPreferences
+        preferences: UserPreferences = UserPreferences()
     ) {
         self.id = id
+        self.email = email
         self.name = name
-        self.description = description
+        self.lastActiveTime = lastActiveTime
+        self.helpProvidedCount = helpProvidedCount
+        self.activeDaysCount = activeDaysCount
+        self.thanksReceivedCount = thanksReceivedCount
+        self.distance = distance
         self.category = category
         self.status = status
         self.shareLevel = shareLevel
@@ -35,72 +51,25 @@ public struct AppUserProfile: Codable {
         self.preferences = preferences
     }
     
-    // MARK: - HelpType
+    // MARK: - Typy pomocnicze
     public enum HelpType: String, Codable {
-        case technical
-        case tools
-        case transport
-        case social
-        case resources
-        case childcare
-        
-        public var localizedName: String {
-            switch self {
-            case .technical:
-                return NSLocalizedString("Pomoc techniczna", comment: "")
-            case .tools:
-                return NSLocalizedString("Narzędzia", comment: "")
-            case .transport:
-                return NSLocalizedString("Transport/holowanie", comment: "")
-            case .social:
-                return NSLocalizedString("Towarzystwo", comment: "")
-            case .resources:
-                return NSLocalizedString("Dzielenie się zasobami", comment: "")
-            case .childcare:
-                return NSLocalizedString("Opieka nad dziećmi", comment: "")
-            }
-        }
+        case technical, tools, transport, social, resources, childcare
     }
     
-    // MARK: - UserPreferences
     public struct UserPreferences: Codable {
-        public var visibleToGroups: [String]
-        public var automaticCheckin: Bool
-        public var checkinRadius: Double
-        public var notificationPreferences: NotificationPreferences
-        
-        public init(
-            visibleToGroups: [String] = [],
-            automaticCheckin: Bool = false,
-            checkinRadius: Double = 5.0,
-            notificationPreferences: NotificationPreferences = NotificationPreferences()
-        ) {
-            self.visibleToGroups = visibleToGroups
-            self.automaticCheckin = automaticCheckin
-            self.checkinRadius = checkinRadius
-            self.notificationPreferences = notificationPreferences
-        }
-        
-        public struct NotificationPreferences: Codable {
-            public var newNearbyUsers: Bool
-            public var messages: Bool
-            public var locationRequests: Bool
-            
-            public init(
-                newNearbyUsers: Bool = true,
-                messages: Bool = true,
-                locationRequests: Bool = true
-            ) {
-                self.newNearbyUsers = newNearbyUsers
-                self.messages = messages
-                self.locationRequests = locationRequests
-            }
-        }
+        public init() { }
+        // Dodaj pola i inicjalizatory według potrzeb
+    }
+    
+    public enum UserCategory: String, Codable {
+        case social, help, info
+    }
+    
+    public enum UserStatus: String, Codable {
+        case available, busy, needsHelp
+    }
+    
+    public enum LocationShareLevel: String, Codable {
+        case approximate, exact
     }
 }
-
-
-// Dodajemy importy typów z NearbyUser
-//public typealias UserCategory = NearbyUser.UserCategory
-//public typealias UserStatus = NearbyUser.UserStatus
-//public typealias LocationShareLevel = NearbyUser.LocationShareLevel

@@ -21,7 +21,6 @@
 #include <utility>
 #include <vector>
 
-#include <grpc/credentials.h>
 #include <grpc/grpc.h>
 #include <grpc/grpc_posix.h>
 #include <grpc/grpc_security.h>

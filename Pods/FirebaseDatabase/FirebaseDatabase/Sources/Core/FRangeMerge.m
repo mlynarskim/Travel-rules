@@ -63,7 +63,7 @@
                      [currentPath contains:self.optInclusiveEnd];
     if (startComparison == NSOrderedDescending &&
         endComparison == NSOrderedAscending && !endInNode) {
-        // child is completely contained
+        // child is completly contained
         return updates;
     } else if (startComparison == NSOrderedDescending && endInNode &&
                [updates isLeafNode]) {

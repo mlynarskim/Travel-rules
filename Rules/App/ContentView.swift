@@ -4,6 +4,8 @@ import Foundation
 import AVFoundation
 import CoreLocation
 import MapKit
+import GoogleMobileAds
+
 
 struct ContentView: View {
     @State private var savedRules: [Int] = []
@@ -15,11 +17,11 @@ struct ContentView: View {
     var backgroundImage: String {
         let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
         switch theme {
-        case .classic: return isDarkMode ? "classic-bg-dark" : "classic-bg"
-        case .mountain: return isDarkMode ? "mountain-bg-dark" : "mountain-bg"
-        case .beach: return isDarkMode ? "beach-bg-dark" : "beach-bg"
-        case .desert: return isDarkMode ? "desert-bg-dark" : "desert-bg"
-        case .forest: return isDarkMode ? "forest-bg-dark" : "forest-bg"
+        case .classic: return isDarkMode ? "classic-bg-dark" : "theme-classic-preview"
+        case .mountain: return isDarkMode ? "mountain-bg-dark" : "theme-mountain-preview"
+        case .beach: return isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
+        case .desert: return isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
+        case .forest: return isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
         }
     }
     
@@ -171,7 +173,9 @@ struct LoadingView: View {
 }
 
 struct NextView: View {
-    let bannerID = "ca-app-pub-5307701268996147/4702587401"
+    let bannerID = "ca-app-pub-5307701268996147~2371937539"
+    let bannerAdUnitID = "ca-app-pub-5307701268996147/4702587401"
+
     @State private var shouldShowAd = false
     private let maxDailyRules = 20
     @State private var randomRule: String = ""
@@ -237,7 +241,7 @@ struct NextView: View {
                                     .padding()
                                 
                                 if shouldShowAd {
-                                    AdBannerView(adUnitID: bannerID)
+                                    AdBannerView(adUnitID: bannerAdUnitID)
                                         .frame(height: 50)
                                         .padding(.horizontal)
                                 }
@@ -554,16 +558,16 @@ struct BottomNavigationMenu: View {
     
     var body: some View {
         HStack {
-            NavigationButton(destination: PeopleTabView(user: NearbyUser(
-                id: UUID(),
-                name: "Użytkownik",
-                status: .available,
-                category: .social,
-                location: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                distance: 0,
-                shareLevel: .approximate,
-                description: nil
-            )), icon: "person.2")
+            //NavigationButton(destination: PeopleTabView(user: NearbyUser(
+              //  id: UUID(),
+               // name: "Użytkownik",
+              //  status: .available,
+             //   category: .social,
+             //   location: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+            //    distance: 0,
+           //     shareLevel: .approximate,
+             //   description: nil
+         //   )), icon: "person.2")
             NavigationButton(destination: MyChecklistView(), icon: "checkmark.circle")
             NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
             NavigationButton(destination: RulesListView(), icon: "list.star")
@@ -622,9 +626,3 @@ struct ScaleButtonStyle: ButtonStyle {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .environment(\.colorScheme, .light)
-    }
-}

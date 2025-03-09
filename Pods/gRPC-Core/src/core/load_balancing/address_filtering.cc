@@ -14,6 +14,8 @@
 // limitations under the License.
 //
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/load_balancing/address_filtering.h"
 
 #include <stddef.h>
@@ -21,8 +23,6 @@
 #include <utility>
 
 #include "absl/functional/function_ref.h"
-
-#include <grpc/support/port_platform.h>
 
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/gprpp/ref_counted_ptr.h"
@@ -47,7 +47,7 @@ int HierarchicalPathArg::ChannelArgsCompare(const HierarchicalPathArg* a,
 
 namespace {
 
-class HierarchicalAddressIterator final : public EndpointAddressesIterator {
+class HierarchicalAddressIterator : public EndpointAddressesIterator {
  public:
   HierarchicalAddressIterator(
       std::shared_ptr<EndpointAddressesIterator> parent_it,

@@ -14,9 +14,9 @@
 // limitations under the License.
 //
 
-#include <string>
-
 #include <grpc/support/port_platform.h>
+
+#include <string>
 
 // IWYU pragma: no_include <bits/struct_stat.h>
 
@@ -27,8 +27,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include "absl/log/check.h"
-#include "absl/log/log.h"
+#include <grpc/support/log.h>
 
 #include "src/core/lib/gprpp/stat.h"
 #include "src/core/lib/gprpp/strerror.h"
@@ -36,13 +35,13 @@
 namespace grpc_core {
 
 absl::Status GetFileModificationTime(const char* filename, time_t* timestamp) {
-  CHECK_NE(filename, nullptr);
-  CHECK_NE(timestamp, nullptr);
+  GPR_ASSERT(filename != nullptr);
+  GPR_ASSERT(timestamp != nullptr);
   struct stat buf;
   if (stat(filename, &buf) != 0) {
     std::string error_msg = StrError(errno);
-    LOG(ERROR) << "stat failed for filename " << filename << " with error "
-               << error_msg;
+    gpr_log(GPR_ERROR, "stat failed for filename %s with error %s.", filename,
+            error_msg.c_str());
     return absl::Status(absl::StatusCode::kInternal, error_msg);
   }
   // Last file/directory modification time.

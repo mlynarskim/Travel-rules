@@ -18,10 +18,7 @@
 #ifndef GRPCPP_IMPL_SERVER_CALLBACK_HANDLERS_H
 #define GRPCPP_IMPL_SERVER_CALLBACK_HANDLERS_H
 
-#include "absl/log/absl_check.h"
-
 #include <grpc/grpc.h>
-#include <grpc/impl/call.h>
 #include <grpc/support/log.h>
 #include <grpcpp/impl/rpc_service_method.h>
 #include <grpcpp/server_context.h>
@@ -149,7 +146,7 @@ class CallbackUnaryHandler : public grpc::internal::MethodHandler {
     }
 
     void SendInitialMetadata() override {
-      ABSL_CHECK(!ctx_->sent_initial_metadata_);
+      GPR_ASSERT(!ctx_->sent_initial_metadata_);
       this->Ref();
       // The callback for this function should not be marked inline because it
       // is directly invoking a user-controlled reaction
@@ -188,8 +185,6 @@ class CallbackUnaryHandler : public grpc::internal::MethodHandler {
           call_requester_(std::move(call_requester)) {
       ctx_->set_message_allocator_state(allocator_state);
     }
-
-    grpc_call* call() override { return call_.call(); }
 
     /// SetupReactor binds the reactor (which also releases any queued
     /// operations), maybe calls OnCancel if possible/needed, and maybe marks
@@ -337,7 +332,7 @@ class CallbackClientStreamingHandler : public grpc::internal::MethodHandler {
     }
 
     void SendInitialMetadata() override {
-      ABSL_CHECK(!ctx_->sent_initial_metadata_);
+      GPR_ASSERT(!ctx_->sent_initial_metadata_);
       this->Ref();
       // The callback for this function should not be inlined because it invokes
       // a user-controlled reaction, but any resulting OnDone can be inlined in
@@ -374,8 +369,6 @@ class CallbackClientStreamingHandler : public grpc::internal::MethodHandler {
                              grpc::internal::Call* call,
                              std::function<void()> call_requester)
         : ctx_(ctx), call_(*call), call_requester_(std::move(call_requester)) {}
-
-    grpc_call* call() override { return call_.call(); }
 
     void SetupReactor(ServerReadReactor<RequestType>* reactor) {
       reactor_.store(reactor, std::memory_order_relaxed);
@@ -541,7 +534,7 @@ class CallbackServerStreamingHandler : public grpc::internal::MethodHandler {
     }
 
     void SendInitialMetadata() override {
-      ABSL_CHECK(!ctx_->sent_initial_metadata_);
+      GPR_ASSERT(!ctx_->sent_initial_metadata_);
       this->Ref();
       // The callback for this function should not be inlined because it invokes
       // a user-controlled reaction, but any resulting OnDone can be inlined in
@@ -579,7 +572,7 @@ class CallbackServerStreamingHandler : public grpc::internal::MethodHandler {
         ctx_->sent_initial_metadata_ = true;
       }
       // TODO(vjpai): don't assert
-      ABSL_CHECK(write_ops_.SendMessagePtr(resp, options).ok());
+      GPR_ASSERT(write_ops_.SendMessagePtr(resp, options).ok());
       call_.PerformOps(&write_ops_);
     }
 
@@ -587,7 +580,7 @@ class CallbackServerStreamingHandler : public grpc::internal::MethodHandler {
                         grpc::Status s) override {
       // This combines the write into the finish callback
       // TODO(vjpai): don't assert
-      ABSL_CHECK(finish_ops_.SendMessagePtr(resp, options).ok());
+      GPR_ASSERT(finish_ops_.SendMessagePtr(resp, options).ok());
       Finish(std::move(s));
     }
 
@@ -601,8 +594,6 @@ class CallbackServerStreamingHandler : public grpc::internal::MethodHandler {
           call_(*call),
           req_(req),
           call_requester_(std::move(call_requester)) {}
-
-    grpc_call* call() override { return call_.call(); }
 
     void SetupReactor(ServerWriteReactor<ResponseType>* reactor) {
       reactor_.store(reactor, std::memory_order_relaxed);
@@ -753,7 +744,7 @@ class CallbackBidiHandler : public grpc::internal::MethodHandler {
     }
 
     void SendInitialMetadata() override {
-      ABSL_CHECK(!ctx_->sent_initial_metadata_);
+      GPR_ASSERT(!ctx_->sent_initial_metadata_);
       this->Ref();
       // The callback for this function should not be inlined because it invokes
       // a user-controlled reaction, but any resulting OnDone can be inlined in
@@ -791,14 +782,14 @@ class CallbackBidiHandler : public grpc::internal::MethodHandler {
         ctx_->sent_initial_metadata_ = true;
       }
       // TODO(vjpai): don't assert
-      ABSL_CHECK(write_ops_.SendMessagePtr(resp, options).ok());
+      GPR_ASSERT(write_ops_.SendMessagePtr(resp, options).ok());
       call_.PerformOps(&write_ops_);
     }
 
     void WriteAndFinish(const ResponseType* resp, grpc::WriteOptions options,
                         grpc::Status s) override {
       // TODO(vjpai): don't assert
-      ABSL_CHECK(finish_ops_.SendMessagePtr(resp, options).ok());
+      GPR_ASSERT(finish_ops_.SendMessagePtr(resp, options).ok());
       Finish(std::move(s));
     }
 
@@ -815,8 +806,6 @@ class CallbackBidiHandler : public grpc::internal::MethodHandler {
                                    grpc::internal::Call* call,
                                    std::function<void()> call_requester)
         : ctx_(ctx), call_(*call), call_requester_(std::move(call_requester)) {}
-
-    grpc_call* call() override { return call_.call(); }
 
     void SetupReactor(ServerBidiReactor<RequestType, ResponseType>* reactor) {
       reactor_.store(reactor, std::memory_order_relaxed);

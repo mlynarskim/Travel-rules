@@ -16,6 +16,8 @@
 //
 //
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/lib/channel/status_util.h"
 
 #include <string.h>
@@ -25,9 +27,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 
-#include <grpc/support/port_platform.h>
-
-#include "src/core/util/useful.h"
+#include "src/core/lib/gpr/useful.h"
 
 struct status_string_entry {
   const char* str;

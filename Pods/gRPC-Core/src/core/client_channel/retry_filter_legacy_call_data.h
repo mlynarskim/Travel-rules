@@ -37,6 +37,7 @@
 #include "src/core/lib/backoff/backoff.h"
 #include "src/core/lib/channel/channel_fwd.h"
 #include "src/core/lib/channel/channel_stack.h"
+#include "src/core/lib/channel/context.h"
 #include "src/core/lib/gprpp/debug_location.h"
 #include "src/core/lib/gprpp/orphanable.h"
 #include "src/core/lib/gprpp/ref_counted.h"
@@ -53,7 +54,7 @@
 
 namespace grpc_core {
 
-class RetryFilter::LegacyCallData final {
+class RetryFilter::LegacyCallData {
  public:
   static grpc_error_handle Init(grpc_call_element* elem,
                                 const grpc_call_element_args* args);
@@ -77,7 +78,7 @@ class RetryFilter::LegacyCallData final {
   };
 
   // State associated with each call attempt.
-  class CallAttempt final : public RefCounted<CallAttempt> {
+  class CallAttempt : public RefCounted<CallAttempt> {
    public:
     CallAttempt(LegacyCallData* calld, bool is_transparent_retry);
     ~CallAttempt() override;
@@ -101,7 +102,7 @@ class RetryFilter::LegacyCallData final {
     // structures needed to populate the ops in the batch.
     // We allocate one struct on the arena for each attempt at starting a
     // batch on a given LB call.
-    class BatchData final
+    class BatchData
         : public RefCounted<BatchData, PolymorphicRefCount, UnrefCallDtor> {
      public:
       BatchData(RefCountedPtr<CallAttempt> call_attempt, int refcount,
@@ -265,11 +266,11 @@ class RetryFilter::LegacyCallData final {
     // BatchData.batch.payload points to this.
     grpc_transport_stream_op_batch_payload batch_payload_;
     // For send_initial_metadata.
-    grpc_metadata_batch send_initial_metadata_;
+    grpc_metadata_batch send_initial_metadata_{calld_->arena_};
     // For send_trailing_metadata.
-    grpc_metadata_batch send_trailing_metadata_;
+    grpc_metadata_batch send_trailing_metadata_{calld_->arena_};
     // For intercepting recv_initial_metadata.
-    grpc_metadata_batch recv_initial_metadata_;
+    grpc_metadata_batch recv_initial_metadata_{calld_->arena_};
     grpc_closure recv_initial_metadata_ready_;
     bool trailing_metadata_available_ = false;
     // For intercepting recv_message.
@@ -277,7 +278,7 @@ class RetryFilter::LegacyCallData final {
     absl::optional<SliceBuffer> recv_message_;
     uint32_t recv_message_flags_;
     // For intercepting recv_trailing_metadata.
-    grpc_metadata_batch recv_trailing_metadata_;
+    grpc_metadata_batch recv_trailing_metadata_{calld_->arena_};
     grpc_transport_stream_stats collect_stats_;
     grpc_closure recv_trailing_metadata_ready_;
     // These fields indicate which ops have been started and completed on
@@ -379,6 +380,7 @@ class RetryFilter::LegacyCallData final {
   Arena* arena_;
   grpc_call_stack* owning_call_;
   CallCombiner* call_combiner_;
+  grpc_call_context_element* call_context_;
 
   grpc_error_handle cancelled_from_surface_;
 
@@ -418,7 +420,7 @@ class RetryFilter::LegacyCallData final {
   // Cached data for retrying send ops.
   // send_initial_metadata
   bool seen_send_initial_metadata_ = false;
-  grpc_metadata_batch send_initial_metadata_;
+  grpc_metadata_batch send_initial_metadata_{arena_};
   // send_message
   // When we get a send_message op, we replace the original byte stream
   // with a CachingByteStream that caches the slices to a local buffer for
@@ -433,7 +435,7 @@ class RetryFilter::LegacyCallData final {
   absl::InlinedVector<CachedSendMessage, 3> send_messages_;
   // send_trailing_metadata
   bool seen_send_trailing_metadata_ = false;
-  grpc_metadata_batch send_trailing_metadata_;
+  grpc_metadata_batch send_trailing_metadata_{arena_};
 };
 
 }  // namespace grpc_core

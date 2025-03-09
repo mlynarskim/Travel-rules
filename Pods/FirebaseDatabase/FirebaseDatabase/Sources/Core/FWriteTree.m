@@ -36,7 +36,7 @@
 @property(nonatomic, strong) FCompoundWrite *visibleWrites;
 /**
  * A list of pending writes, regardless of visibility and shadowed-ness. Used to
- * calculate arbitrary sets of the changed data, such as hidden writes (from
+ * calcuate arbitrary sets of the changed data, such as hidden writes (from
  * transactions) or changes with certain writes excluded (also used by
  * transactions). Contains FWriteRecords.
  */
@@ -46,7 +46,7 @@
 
 /**
  * FWriteTree tracks all pending user-initiated writes and has methods to
- * calculate the result of merging them with underlying server data (to create
+ * calcuate the result of merging them with underlying server data (to create
  * "event cache" data). Pending writes are added with addOverwriteAtPath: and
  * addMergeAtPath: and removed with removeWriteId:.
  */

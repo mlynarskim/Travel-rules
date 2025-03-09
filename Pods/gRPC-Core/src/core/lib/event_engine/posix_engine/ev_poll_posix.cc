@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/lib/event_engine/posix_engine/ev_poll_posix.h"
 
 #include <stdint.h>
@@ -23,7 +25,6 @@
 
 #include "absl/container/inlined_vector.h"
 #include "absl/functional/any_invocable.h"
-#include "absl/log/check.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_format.h"
@@ -31,7 +32,6 @@
 #include <grpc/event_engine/event_engine.h>
 #include <grpc/status.h>
 #include <grpc/support/log.h>
-#include <grpc/support/port_platform.h>
 #include <grpc/support/sync.h>
 #include <grpc/support/time.h>
 
@@ -340,7 +340,7 @@ EventHandle* PollPoller::CreateHandle(int fd, absl::string_view /*name*/,
                                       bool track_err) {
   // Avoid unused-parameter warning for debug-only parameter
   (void)track_err;
-  DCHECK(track_err == false);
+  GPR_DEBUG_ASSERT(track_err == false);
   PollEventHandle* handle = new PollEventHandle(fd, shared_from_this());
   ForkFdListAddHandle(handle);
   // We need to send a kick to the thread executing Work(..) so that it can
@@ -360,7 +360,7 @@ void PollEventHandle::OrphanHandle(PosixEngineClosure* on_done, int* release_fd,
     if (release_fd != nullptr) {
       *release_fd = fd_;
     }
-    CHECK(!is_orphaned_);
+    GPR_ASSERT(!is_orphaned_);
     is_orphaned_ = true;
     // Perform shutdown operations if not already done so.
     if (!is_shutdown_) {
@@ -574,7 +574,7 @@ void PollPoller::KickExternal(bool ext) {
   }
   was_kicked_ = true;
   was_kicked_ext_ = ext;
-  CHECK(wakeup_fd_->Wakeup().ok());
+  GPR_ASSERT(wakeup_fd_->Wakeup().ok());
 }
 
 void PollPoller::Kick() { KickExternal(true); }
@@ -613,7 +613,7 @@ PollPoller::PollPoller(Scheduler* scheduler)
       poll_handles_list_head_(nullptr),
       closed_(false) {
   wakeup_fd_ = *CreateWakeupFd();
-  CHECK(wakeup_fd_ != nullptr);
+  GPR_ASSERT(wakeup_fd_ != nullptr);
   ForkPollerListAddPoller(this);
 }
 
@@ -626,15 +626,15 @@ PollPoller::PollPoller(Scheduler* scheduler, bool use_phony_poll)
       poll_handles_list_head_(nullptr),
       closed_(false) {
   wakeup_fd_ = *CreateWakeupFd();
-  CHECK(wakeup_fd_ != nullptr);
+  GPR_ASSERT(wakeup_fd_ != nullptr);
   ForkPollerListAddPoller(this);
 }
 
 PollPoller::~PollPoller() {
   // Assert that no active handles are present at the time of destruction.
   // They should have been orphaned before reaching this state.
-  CHECK_EQ(num_poll_handles_, 0);
-  CHECK_EQ(poll_handles_list_head_, nullptr);
+  GPR_ASSERT(num_poll_handles_ == 0);
+  GPR_ASSERT(poll_handles_list_head_ == nullptr);
 }
 
 Poller::WorkResult PollPoller::Work(
@@ -686,7 +686,7 @@ Poller::WorkResult PollPoller::Work(
         // There shouldn't be any orphaned fds at this point. This is because
         // prior to marking a handle as orphaned it is first removed from
         // poll handle list for the poller under the poller lock.
-        CHECK(!head->IsOrphaned());
+        GPR_ASSERT(!head->IsOrphaned());
         if (!head->IsPollhup()) {
           pfds[pfd_count].fd = head->WrappedFd();
           watchers[pfd_count] = head;
@@ -762,7 +762,7 @@ Poller::WorkResult PollPoller::Work(
       }
     } else {
       if (pfds[0].revents & kPollinCheck) {
-        CHECK(wakeup_fd_->ConsumeWakeup().ok());
+        GPR_ASSERT(wakeup_fd_->ConsumeWakeup().ok());
       }
       for (i = 1; i < pfd_count; i++) {
         PollEventHandle* head = watchers[i];

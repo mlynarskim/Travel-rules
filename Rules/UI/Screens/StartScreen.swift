@@ -5,7 +5,7 @@ import CoreLocation
 import MapKit
 
 struct MainView: View {
-    let bannerID = "ca-app-pub-5307701268996147/4702587401"
+    let bannerID = "ca-app-pub-5307701268996147~2371937539"
     @State private var shouldShowAd = false
     @State private var animateTravel = false
     @State private var animateRules = false
@@ -169,11 +169,11 @@ struct BackgroundImage: View {
     private func getBackgroundImageName() -> String {
         let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
         switch theme {
-        case .classic: return isDarkMode ? "classic-bg-dark" : "classic-bg"
-        case .mountain: return isDarkMode ? "mountain-bg-dark" : "mountain-bg"
-        case .beach: return isDarkMode ? "beach-bg-dark" : "beach-bg"
-        case .desert: return isDarkMode ? "desert-bg-dark" : "desert-bg"
-        case .forest: return isDarkMode ? "forest-bg-dark" : "forest-bg"
+        case .classic: return isDarkMode ? "classic-bg-dark" : "theme-classic-preview"
+        case .mountain: return isDarkMode ? "mountain-bg-dark" : "theme-mountain-preview"
+        case .beach: return isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
+        case .desert: return isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
+        case .forest: return isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
         }
     }
 }
@@ -285,9 +285,4 @@ struct StartButton: View {
     }
 }
 
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView()
-            .environment(\.colorScheme, .light)
-    }
-}
+

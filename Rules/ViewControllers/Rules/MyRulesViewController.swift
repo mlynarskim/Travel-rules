@@ -67,6 +67,8 @@ struct MyRulesView: View {
                               EmptyView()
                           
         }
+        
+        
         .alert(isPresented: $showingDeleteAlert) {
             Alert(
                 title: Text("delete_rule_title".appLocalized),

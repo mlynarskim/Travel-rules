@@ -21,6 +21,7 @@
 #import "FirebaseCore/Extension/FirebaseCoreInternal.h"
 #import "FirebaseMessaging/Sources/FIRMessagingLogger.h"
 
+static const uint64_t kBytesToMegabytesDivisor = 1024 * 1024LL;
 NSString *const kFIRMessagingInstanceIDUserDefaultsKeyLocale =
     @"com.firebase.instanceid.user_defaults.locale";  // locale key stored in GULUserDefaults
 static NSString *const kFIRMessagingAPNSSandboxPrefix = @"s_";
@@ -28,16 +29,12 @@ static NSString *const kFIRMessagingAPNSProdPrefix = @"p_";
 
 static NSString *const kFIRMessagingWatchKitExtensionPoint = @"com.apple.watchkit";
 
-#if TARGET_OS_OSX
-// macOS uses a different entitlement key than the rest of Apple's platforms:
-// https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_aps-environment
+#if TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH
+static NSString *const kEntitlementsAPSEnvironmentKey = @"Entitlements.aps-environment";
+#else
 static NSString *const kEntitlementsAPSEnvironmentKey =
     @"Entitlements.com.apple.developer.aps-environment";
-#else
-// Entitlement key for all non-macOS platforms:
-// https://developer.apple.com/documentation/bundleresources/entitlements/aps-environment
-static NSString *const kEntitlementsAPSEnvironmentKey = @"Entitlements.aps-environment";
-#endif  // TARGET_OS_OSX
+#endif
 static NSString *const kAPSEnvironmentDevelopmentValue = @"development";
 
 #pragma mark - URL Helpers
@@ -89,9 +86,9 @@ NSString *FIRMessagingAppIdentifier(void) {
   } else {
     return bundleID;
   }
-#else   // TARGET_OS_WATCH
+#else
   return bundleID;
-#endif  // TARGET_OS_WATCH
+#endif
 }
 
 NSString *FIRMessagingFirebaseAppID(void) {
@@ -112,17 +109,39 @@ BOOL FIRMessagingIsWatchKitExtension(void) {
   } else {
     return NO;
   }
-#else   // TARGET_OS_WATCH
+#else
   return NO;
-#endif  // TARGET_OS_WATCH
+#endif
+}
+
+uint64_t FIRMessagingGetFreeDiskSpaceInMB(void) {
+  NSError *error;
+  NSArray *paths =
+      NSSearchPathForDirectoriesInDomains(FIRMessagingSupportedDirectory(), NSUserDomainMask, YES);
+
+  NSDictionary *attributesMap =
+      [[NSFileManager defaultManager] attributesOfFileSystemForPath:[paths lastObject]
+                                                              error:&error];
+  if (attributesMap) {
+    uint64_t totalSizeInBytes __unused = [attributesMap[NSFileSystemSize] longLongValue];
+    uint64_t freeSizeInBytes = [attributesMap[NSFileSystemFreeSize] longLongValue];
+    FIRMessagingLoggerDebug(
+        kFIRMessagingMessageCodeUtilities001, @"Device has capacity %llu MB with %llu MB free.",
+        totalSizeInBytes / kBytesToMegabytesDivisor, freeSizeInBytes / kBytesToMegabytesDivisor);
+    return ((double)freeSizeInBytes) / kBytesToMegabytesDivisor;
+  } else {
+    FIRMessagingLoggerError(kFIRMessagingMessageCodeUtilities002,
+                            @"Error in retreiving device's free memory %@", error);
+    return 0;
+  }
 }
 
 NSSearchPathDirectory FIRMessagingSupportedDirectory(void) {
 #if TARGET_OS_TV
   return NSCachesDirectory;
-#else   // TARGET_OS_TV
+#else
   return NSApplicationSupportDirectory;
-#endif  // TARGET_OS_TV
+#endif
 }
 
 #pragma mark - Locales
@@ -315,10 +334,11 @@ BOOL FIRMessagingIsProductionApp(void) {
 #if TARGET_OS_OSX || TARGET_OS_MACCATALYST
   NSString *path = [[[[NSBundle mainBundle] resourcePath] stringByDeletingLastPathComponent]
       stringByAppendingPathComponent:@"embedded.provisionprofile"];
-#else   // TARGET_OS_OSX || TARGET_OS_MACCATALYST
+#elif TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH || \
+    (defined(TARGET_OS_VISION) && TARGET_OS_VISION)
   NSString *path = [[[NSBundle mainBundle] bundlePath]
       stringByAppendingPathComponent:@"embedded.mobileprovision"];
-#endif  // TARGET_OS_OSX || TARGET_OS_MACCATALYST
+#endif
 
   if ([GULAppEnvironmentUtil isAppStoreReceiptSandbox] && !path.length) {
     // Distributed via TestFlight

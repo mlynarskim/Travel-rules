@@ -68,19 +68,13 @@ static NSString *const kFIRInstanceIDAPNSInfoSandboxKey = @"sandbox";
   return clone;
 }
 
-#pragma mark - NSSecureCoding
-
-+ (BOOL)supportsSecureCoding {
-  return YES;
-}
+#pragma mark - NSCoding
 
 - (nullable instancetype)initWithCoder:(NSCoder *)aDecoder {
-  NSData *deviceToken = [aDecoder decodeObjectOfClass:[NSData class]
-                                               forKey:kFIRInstanceIDAPNSInfoTokenKey];
-  if (!deviceToken) {
+  id deviceToken = [aDecoder decodeObjectForKey:kFIRInstanceIDAPNSInfoTokenKey];
+  if (![deviceToken isKindOfClass:[NSData class]]) {
     return nil;
   }
-
   BOOL isSandbox = [aDecoder decodeBoolForKey:kFIRInstanceIDAPNSInfoSandboxKey];
   return [self initWithDeviceToken:(NSData *)deviceToken isSandbox:isSandbox];
 }

@@ -35,11 +35,8 @@ class HttpClientFilter : public ImplementChannelFilter<HttpClientFilter> {
  public:
   static const grpc_channel_filter kFilter;
 
-  static absl::StatusOr<std::unique_ptr<HttpClientFilter>> Create(
+  static absl::StatusOr<HttpClientFilter> Create(
       const ChannelArgs& args, ChannelFilter::Args filter_args);
-
-  HttpClientFilter(HttpSchemeMetadata::ValueType scheme, Slice user_agent,
-                   bool test_only_use_put_requests);
 
   class Call {
    public:
@@ -47,15 +44,17 @@ class HttpClientFilter : public ImplementChannelFilter<HttpClientFilter> {
     absl::Status OnServerInitialMetadata(ServerMetadata& md);
     absl::Status OnServerTrailingMetadata(ServerMetadata& md);
     static const NoInterceptor OnClientToServerMessage;
-    static const NoInterceptor OnClientToServerHalfClose;
     static const NoInterceptor OnServerToClientMessage;
     static const NoInterceptor OnFinalize;
   };
 
  private:
+  HttpClientFilter(HttpSchemeMetadata::ValueType scheme, Slice user_agent,
+                   bool test_only_use_put_requests);
+
   HttpSchemeMetadata::ValueType scheme_;
-  bool test_only_use_put_requests_;
   Slice user_agent_;
+  bool test_only_use_put_requests_;
 };
 
 // A test-only channel arg to allow testing gRPC Core server behavior on PUT

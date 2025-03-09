@@ -19,8 +19,6 @@
 #ifndef GRPCPP_SUPPORT_METHOD_HANDLER_H
 #define GRPCPP_SUPPORT_METHOD_HANDLER_H
 
-#include "absl/log/absl_check.h"
-
 #include <grpc/byte_buffer.h>
 #include <grpc/support/log.h>
 #include <grpcpp/impl/rpc_service_method.h>
@@ -59,7 +57,7 @@ template <class Callable>
 template <class ResponseType>
 void UnaryRunHandlerHelper(const MethodHandler::HandlerParameter& param,
                            ResponseType* rsp, grpc::Status& status) {
-  ABSL_CHECK(!param.server_context->sent_initial_metadata_);
+  GPR_ASSERT(!param.server_context->sent_initial_metadata_);
   grpc::internal::CallOpSet<grpc::internal::CallOpSendInitialMetadata,
                             grpc::internal::CallOpSendMessage,
                             grpc::internal::CallOpServerSendStatus>

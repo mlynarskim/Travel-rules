@@ -11,10 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include <grpc/support/port_platform.h>
+
 #include "src/core/lib/event_engine/tcp_socket_utils.h"
 
 #include <grpc/event_engine/event_engine.h>
-#include <grpc/support/port_platform.h>
 
 #include "src/core/lib/address_utils/parse_address.h"
 #include "src/core/lib/iomgr/port.h"
@@ -31,15 +32,8 @@
 #endif  //  GRPC_POSIX_SOCKET_UTILS_COMMON
 
 #ifdef GRPC_HAVE_UNIX_SOCKET
-#ifdef GPR_WINDOWS
-// clang-format off
-#include <ws2def.h>
-#include <afunix.h>
-// clang-format on
-#else
 #include <sys/stat.h>  // IWYU pragma: keep
 #include <sys/un.h>
-#endif  // GPR_WINDOWS
 #endif
 
 #ifdef GRPC_HAVE_VSOCK
@@ -53,11 +47,11 @@
 
 #include <utility>
 
-#include "absl/log/check.h"
-#include "absl/log/log.h"
 #include "absl/status/status.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
+
+#include <grpc/support/log.h>
 
 #include "src/core/lib/gprpp/host_port.h"
 #include "src/core/lib/gprpp/status_helper.h"
@@ -223,7 +217,7 @@ bool ResolvedAddressIsV4Mapped(
 bool ResolvedAddressToV4Mapped(
     const EventEngine::ResolvedAddress& resolved_addr,
     EventEngine::ResolvedAddress* resolved_addr6_out) {
-  CHECK(&resolved_addr != resolved_addr6_out);
+  GPR_ASSERT(&resolved_addr != resolved_addr6_out);
   const sockaddr* addr = resolved_addr.address();
   sockaddr_in6* addr6_out = const_cast<sockaddr_in6*>(
       reinterpret_cast<const sockaddr_in6*>(resolved_addr6_out->address()));
@@ -245,8 +239,7 @@ EventEngine::ResolvedAddress ResolvedAddressMakeWild6(int port) {
   EventEngine::ResolvedAddress resolved_wild_out;
   sockaddr_in6* wild_out = reinterpret_cast<sockaddr_in6*>(
       const_cast<sockaddr*>(resolved_wild_out.address()));
-  CHECK_GE(port, 0);
-  CHECK_LT(port, 65536);
+  GPR_ASSERT(port >= 0 && port < 65536);
   memset(wild_out, 0, sizeof(sockaddr_in6));
   wild_out->sin6_family = AF_INET6;
   wild_out->sin6_port = htons(static_cast<uint16_t>(port));
@@ -259,8 +252,7 @@ EventEngine::ResolvedAddress ResolvedAddressMakeWild4(int port) {
   EventEngine::ResolvedAddress resolved_wild_out;
   sockaddr_in* wild_out = reinterpret_cast<sockaddr_in*>(
       const_cast<sockaddr*>(resolved_wild_out.address()));
-  CHECK_GE(port, 0);
-  CHECK_LT(port, 65536);
+  GPR_ASSERT(port >= 0 && port < 65536);
   memset(wild_out, 0, sizeof(sockaddr_in));
   wild_out->sin_family = AF_INET;
   wild_out->sin_port = htons(static_cast<uint16_t>(port));
@@ -285,8 +277,8 @@ int ResolvedAddressGetPort(const EventEngine::ResolvedAddress& resolved_addr) {
       return 1;
 #endif
     default:
-      LOG(ERROR) << "Unknown socket family " << addr->sa_family
-                 << " in ResolvedAddressGetPort";
+      gpr_log(GPR_ERROR, "Unknown socket family %d in ResolvedAddressGetPort",
+              addr->sa_family);
       abort();
   }
 }
@@ -296,25 +288,23 @@ void ResolvedAddressSetPort(EventEngine::ResolvedAddress& resolved_addr,
   sockaddr* addr = const_cast<sockaddr*>(resolved_addr.address());
   switch (addr->sa_family) {
     case AF_INET:
-      CHECK_GE(port, 0);
-      CHECK_LT(port, 65536);
+      GPR_ASSERT(port >= 0 && port < 65536);
       (reinterpret_cast<sockaddr_in*>(addr))->sin_port =
           htons(static_cast<uint16_t>(port));
       return;
     case AF_INET6:
-      CHECK_GE(port, 0);
-      CHECK_LT(port, 65536);
+      GPR_ASSERT(port >= 0 && port < 65536);
       (reinterpret_cast<sockaddr_in6*>(addr))->sin6_port =
           htons(static_cast<uint16_t>(port));
       return;
     default:
-      LOG(ERROR) << "Unknown socket family " << addr->sa_family
-                 << " in grpc_sockaddr_set_port";
+      gpr_log(GPR_ERROR, "Unknown socket family %d in grpc_sockaddr_set_port",
+              addr->sa_family);
       abort();
   }
 }
 
-absl::optional<int> MaybeGetWildcardPortFromAddress(
+absl::optional<int> ResolvedAddressIsWildcard(
     const EventEngine::ResolvedAddress& addr) {
   const EventEngine::ResolvedAddress* resolved_addr = &addr;
   EventEngine::ResolvedAddress addr4_normalized;
@@ -445,10 +435,11 @@ absl::StatusOr<EventEngine::ResolvedAddress> URIToResolvedAddress(
   grpc_resolved_address addr;
   absl::StatusOr<grpc_core::URI> uri = grpc_core::URI::Parse(address_str);
   if (!uri.ok()) {
-    LOG(ERROR) << "Failed to parse URI. Error: " << uri.status();
+    gpr_log(GPR_ERROR, "Failed to parse URI. Error: %s",
+            uri.status().ToString().c_str());
   }
   GRPC_RETURN_IF_ERROR(uri.status());
-  CHECK(grpc_parse_uri(*uri, &addr));
+  GPR_ASSERT(grpc_parse_uri(*uri, &addr));
   return EventEngine::ResolvedAddress(
       reinterpret_cast<const sockaddr*>(addr.addr), addr.len);
 }

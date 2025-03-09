@@ -86,11 +86,11 @@ struct RulesListView: View {
     private var backgroundImageView: some View {
         let imageName: String
         switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
-        case .classic:   imageName = isDarkMode ? "classic-bg-dark" : "classic-bg"
-        case .mountain:  imageName = isDarkMode ? "mountain-bg-dark" : "mountain-bg"
-        case .beach:     imageName = isDarkMode ? "beach-bg-dark" : "beach-bg"
-        case .desert:    imageName = isDarkMode ? "desert-bg-dark" : "desert-bg"
-        case .forest:    imageName = isDarkMode ? "forest-bg-dark" : "forest-bg"
+        case .classic:   imageName = isDarkMode ? "classic-bg-dark" : "theme-classic-preview"
+        case .mountain:  imageName = isDarkMode ? "mountain-bg-dark" : "theme-mountain-preview"
+        case .beach:     imageName = isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
+        case .desert:    imageName = isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
+        case .forest:    imageName = isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
         }
         return Image(imageName)
             .resizable()
@@ -99,7 +99,6 @@ struct RulesListView: View {
     
     // MARK: - Update tła
     private func updateBackgroundImage() {
-        // Triggers a UI update when theme changes
         _ = themeColors.primary
     }
 }

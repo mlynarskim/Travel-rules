@@ -33,6 +33,6 @@
 - (FPruneForest *)keepAll:(NSSet *)children atPath:(FPath *)path;
 - (FPruneForest *)pruneAll:(NSSet *)children atPath:(FPath *)path;
 
-- (void)enumerateKeptNodesUsingBlock:(void (^)(FPath *path))block;
+- (void)enumarateKeptNodesUsingBlock:(void (^)(FPath *path))block;
 
 @end

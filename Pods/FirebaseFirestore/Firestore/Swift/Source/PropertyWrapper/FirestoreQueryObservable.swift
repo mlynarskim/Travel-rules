@@ -23,7 +23,7 @@ import SwiftUI
 #endif // SWIFT_PACKAGE
 
 @available(iOS 14.0, macOS 11.0, macCatalyst 14.0, tvOS 14.0, watchOS 7.0, *)
-class FirestoreQueryObservable<T>: ObservableObject {
+internal class FirestoreQueryObservable<T>: ObservableObject {
   @Published var items: T
 
   private let firestore = Firestore.firestore()
@@ -31,8 +31,8 @@ class FirestoreQueryObservable<T>: ObservableObject {
 
   private var setupListener: (() -> Void)!
 
-  var shouldUpdateListener = true
-  var configuration: FirestoreQuery<T>.Configuration {
+  internal var shouldUpdateListener = true
+  internal var configuration: FirestoreQuery<T>.Configuration {
     didSet {
       // prevent never-ending update cycle when updating the error field
       guard shouldUpdateListener else { return }
@@ -47,7 +47,7 @@ class FirestoreQueryObservable<T>: ObservableObject {
     self.configuration = configuration
     setupListener = createListener { [weak self] querySnapshot, error in
       guard let self = self else { return }
-      if let error {
+      if let error = error {
         self.animated {
           self.items = []
           self.projectError(error)
@@ -104,7 +104,7 @@ class FirestoreQueryObservable<T>: ObservableObject {
     self.configuration = configuration
     setupListener = createListener { [weak self] querySnapshot, error in
       guard let self = self else { return }
-      if let error {
+      if let error = error {
         self.animated {
           self.items = .failure(error)
           self.projectError(error)

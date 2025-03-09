@@ -38,8 +38,7 @@ namespace grpc_core {
 namespace internal {
 
 /// Tracks retry throttling data for an individual server name.
-class ServerRetryThrottleData final
-    : public RefCounted<ServerRetryThrottleData> {
+class ServerRetryThrottleData : public RefCounted<ServerRetryThrottleData> {
  public:
   ServerRetryThrottleData(uintptr_t max_milli_tokens,
                           uintptr_t milli_token_ratio,
@@ -69,7 +68,7 @@ class ServerRetryThrottleData final
 };
 
 /// Global map of server name to retry throttle data.
-class ServerRetryThrottleMap final {
+class ServerRetryThrottleMap {
  public:
   static ServerRetryThrottleMap* Get();
 

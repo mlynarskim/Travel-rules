@@ -20,8 +20,8 @@
   @_exported import FirebaseFirestoreInternal
 #endif // SWIFT_PACKAGE
 
-@_implementationOnly import FirebaseCoreExtension
 import FirebaseSharedSwift
+@_implementationOnly import FirebaseCoreExtension
 
 extension CodingUserInfoKey {
   static let documentRefUserInfoKey =
@@ -66,7 +66,7 @@ extension DocumentReference: DocumentIDWrappable {
 /// existential type for protocols though, so this protocol (to which DocumentID
 /// conforms) indirectly makes it possible to test for and act on any
 /// `DocumentID<Value>`.
-protocol DocumentIDProtocol {
+internal protocol DocumentIDProtocol {
   /// Initializes the DocumentID from a DocumentReference.
   init(from documentReference: DocumentReference?) throws
 }
@@ -113,7 +113,7 @@ public struct DocumentID<Value: DocumentIDWrappable & Codable>:
   private var value: Value? = nil
 
   public init(wrappedValue value: Value?) {
-    if let value {
+    if let value = value {
       logIgnoredValueWarning(value: value)
     }
     self.value = value
@@ -121,13 +121,18 @@ public struct DocumentID<Value: DocumentIDWrappable & Codable>:
 
   public var wrappedValue: Value? {
     get { value }
-    set { value = newValue }
+    set {
+      if let someNewValue = newValue {
+        logIgnoredValueWarning(value: someNewValue)
+      }
+      value = newValue
+    }
   }
 
   private func logIgnoredValueWarning(value: Value) {
     FirebaseLogger.log(
       level: .warning,
-      service: "[FirebaseFirestore]",
+      service: "[FirebaseFirestoreSwift]",
       code: "I-FST000002",
       message: """
       Attempting to initialize or set a @DocumentID property with a non-nil \
@@ -140,8 +145,8 @@ public struct DocumentID<Value: DocumentIDWrappable & Codable>:
 }
 
 extension DocumentID: DocumentIDProtocol {
-  init(from documentReference: DocumentReference?) throws {
-    if let documentReference {
+  internal init(from documentReference: DocumentReference?) throws {
+    if let documentReference = documentReference {
       value = try Value.wrap(documentReference)
     } else {
       value = nil

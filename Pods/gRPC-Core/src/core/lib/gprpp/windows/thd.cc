@@ -23,9 +23,6 @@
 
 #include <string.h>
 
-#include "absl/log/check.h"
-#include "absl/log/log.h"
-
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
 #include <grpc/support/sync.h>
@@ -104,7 +101,7 @@ class ThreadInternalsWindows
 
   void Join() override {
     DWORD ret = WaitForSingleObject(info_->join_event, INFINITE);
-    CHECK(ret == WAIT_OBJECT_0);
+    GPR_ASSERT(ret == WAIT_OBJECT_0);
     destroy_thread();
   }
 
@@ -124,7 +121,7 @@ class ThreadInternalsWindows
     g_thd_info->body(g_thd_info->arg);
     if (g_thd_info->joinable) {
       BOOL ret = SetEvent(g_thd_info->join_event);
-      CHECK(ret);
+      GPR_ASSERT(ret);
     } else {
       gpr_free(g_thd_info);
     }
@@ -150,12 +147,12 @@ namespace grpc_core {
 
 void Thread::Signal(gpr_thd_id /* tid */, int /* sig */) {
   // TODO(hork): Implement
-  VLOG(2) << "Thread signals are not supported on Windows.";
+  gpr_log(GPR_DEBUG, "Thread signals are not supported on Windows.");
 }
 
 void Thread::Kill(gpr_thd_id /* tid */) {
   // TODO(hork): Implement
-  VLOG(2) << "Thread::Kill is not supported on Windows.";
+  gpr_log(GPR_DEBUG, "Thread::Kill is not supported on Windows.");
 }
 
 Thread::Thread(const char* /* thd_name */, void (*thd_body)(void* arg),

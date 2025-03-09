@@ -45,7 +45,7 @@ struct PeopleTabView: View {
                
                Group {
                    if authService.isAuthenticated {
-                       UserProfileView(user: user)
+                       UserProfileView()
                    } else {
                        LoginView()
                    }

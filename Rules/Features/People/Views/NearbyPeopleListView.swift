@@ -1,4 +1,3 @@
-//NearbyPeopleListView.swift
 import SwiftUI
 
 struct NearbyPeopleListView: View {
@@ -11,9 +10,9 @@ struct NearbyPeopleListView: View {
     @State private var viewMode: ViewMode = .list
 
     enum ViewMode {
-            case list
-            case map
-        }
+        case list
+        case map
+    }
     
     var filteredUsers: [NearbyUser] {
         var users = peopleService.nearbyUsers
@@ -32,46 +31,46 @@ struct NearbyPeopleListView: View {
     }
     
     var body: some View {
-            VStack(spacing: 0) {
-                // Przełącznik widoku
-                Picker("Widok", selection: $viewMode) {
-                    Image(systemName: "list.bullet")
-                        .tag(ViewMode.list)
-                    Image(systemName: "map")
-                        .tag(ViewMode.map)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding()
-                
-                // Zawartość
-                if viewMode == .list {
-                    if filteredUsers.isEmpty {
-                        //EmptyStateView()
-                    } else {
-                        List(filteredUsers) { user in
-                            UserListRow(user: user)
-                        }
-                        .listStyle(InsetGroupedListStyle())
-                    }
+        VStack(spacing: 0) {
+            // Przełącznik widoku
+            Picker("Widok", selection: $viewMode) {
+                Image(systemName: "list.bullet")
+                    .tag(ViewMode.list)
+                Image(systemName: "map")
+                    .tag(ViewMode.map)
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding()
+            
+            // Zawartość
+            if viewMode == .list {
+                if filteredUsers.isEmpty {
+                    //EmptyStateView()
                 } else {
-                    PeopleMapView()
+                    List(filteredUsers) { user in
+                        UserListRow(user: user)
+                    }
+                    .listStyle(InsetGroupedListStyle())
                 }
-            }
-            .navigationTitle("Osoby w pobliżu")
-            .searchable(text: $searchText, prompt: Text("Szukaj"))
-            .refreshable {
-                peopleService.refreshData()
-            }
-            .navigationBarItems(trailing: Button(action: {
-                showingFilters = true
-            }) {
-                Image(systemName: "line.3.horizontal.decrease.circle")
-            })
-            .sheet(isPresented: $showingFilters) {
-                FilterView(showOnlyAvailable: $showOnlyAvailable)
+            } else {
+                PeopleMapView()
             }
         }
+        .navigationTitle("Osoby w pobliżu")
+        .searchable(text: $searchText, prompt: Text("Szukaj"))
+        .refreshable {
+            peopleService.refreshData()
+        }
+        .navigationBarItems(trailing: Button(action: {
+            showingFilters = true
+        }) {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+        })
+        .sheet(isPresented: $showingFilters) {
+            FilterView(showOnlyAvailable: $showOnlyAvailable)
+        }
     }
+}
 
 struct UserStatusView: View {
     let status: NearbyUser.UserStatus
@@ -133,18 +132,8 @@ struct UserListRow: View {
             .padding(.vertical, 4)
         }
         .sheet(isPresented: $showingProfile) {
-            UserProfileView(user: user)
-        }
-    }
-}
-
-struct NearbyPeopleListView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            NearbyPeopleListView()
-                .preferredColorScheme(.light)
-            NearbyPeopleListView()
-                .preferredColorScheme(.dark)
+            // Jeśli widok UserProfileView nie przyjmuje argumentu, wywołaj go bez parametrów:
+            UserProfileView()
         }
     }
 }

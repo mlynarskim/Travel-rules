@@ -17,6 +17,8 @@
 #ifndef GRPC_SRC_CORE_LOAD_BALANCING_HEALTH_CHECK_CLIENT_INTERNAL_H
 #define GRPC_SRC_CORE_LOAD_BALANCING_HEALTH_CHECK_CLIENT_INTERNAL_H
 
+#include <grpc/support/port_platform.h>
+
 #include <map>
 #include <memory>
 #include <set>
@@ -29,7 +31,6 @@
 #include "absl/types/optional.h"
 
 #include <grpc/impl/connectivity_state.h>
-#include <grpc/support/port_platform.h>
 
 #include "src/core/client_channel/subchannel.h"
 #include "src/core/client_channel/subchannel_interface_internal.h"
@@ -51,12 +52,14 @@ class HealthWatcher;
 // health watch call for each health check service name that is being
 // watched and reports the resulting connectivity state to all
 // registered watchers.
-class HealthProducer final : public Subchannel::DataProducerInterface {
+class HealthProducer : public Subchannel::DataProducerInterface {
  public:
   HealthProducer() : interested_parties_(grpc_pollset_set_create()) {}
   ~HealthProducer() override { grpc_pollset_set_destroy(interested_parties_); }
 
   void Start(RefCountedPtr<Subchannel> subchannel);
+
+  void Orphan() override;
 
   static UniqueTypeName Type() {
     static UniqueTypeName::Factory kFactory("health_check");
@@ -76,7 +79,7 @@ class HealthProducer final : public Subchannel::DataProducerInterface {
 
   // Health checker for a given health check service name.  Contains the
   // health check client and the list of watchers.
-  class HealthChecker final : public InternallyRefCounted<HealthChecker> {
+  class HealthChecker : public InternallyRefCounted<HealthChecker> {
    public:
     HealthChecker(WeakRefCountedPtr<HealthProducer> producer,
                   absl::string_view health_check_service_name);
@@ -136,7 +139,6 @@ class HealthProducer final : public Subchannel::DataProducerInterface {
   // Handles a connectivity state change on the subchannel.
   void OnConnectivityStateChange(grpc_connectivity_state state,
                                  const absl::Status& status);
-  void Orphaned() override;
 
   RefCountedPtr<Subchannel> subchannel_;
   ConnectivityWatcher* connectivity_watcher_;
@@ -154,7 +156,7 @@ class HealthProducer final : public Subchannel::DataProducerInterface {
 };
 
 // A data watcher that handles health checking.
-class HealthWatcher final : public InternalSubchannelDataWatcherInterface {
+class HealthWatcher : public InternalSubchannelDataWatcherInterface {
  public:
   HealthWatcher(
       std::shared_ptr<WorkSerializer> work_serializer,

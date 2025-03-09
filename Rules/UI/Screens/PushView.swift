@@ -21,7 +21,7 @@ struct PushView: View {
     
     // Pola do dodawania nowego dokumentu:
     @State private var selectedDate = Date()
-    @State private var selectedDocumentKey = "dowod_osobisty" // Przechowujemy surowy klucz
+    @State private var selectedDocumentKey = "dowod_osobisty"
     
     // Lista zapisanych dokumentów (z kluczami dokumentów):
     @State private var savedDocuments: [DocumentEntry] = [] {
@@ -46,7 +46,6 @@ struct PushView: View {
         "ubezpieczenie_oc"
     ]
     
-    // Tu zdefiniuj swoje motywy/themes
     private var themeColors: ThemeColors {
         switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
         case .classic: return ThemeColors.classicTheme
@@ -150,7 +149,6 @@ struct PushView: View {
                         HStack {
                             Picker("choose_document".appLocalized, selection: $selectedDocumentKey) {
                                 ForEach(documentKeys, id: \.self) { key in
-                                    // Tu lokalizujemy dopiero przy wyświetlaniu
                                     Text(key.appLocalized)
                                 }
                             }
@@ -186,16 +184,21 @@ struct PushView: View {
                     List {
                         ForEach(savedDocuments) { entry in
                             HStack {
-                                // Tu lokalizujemy w momencie wyświetlania
                                 Text("\(entry.documentKey.appLocalized) - \(entry.date, formatter: dateFormatter)")
+                                    .foregroundColor(themeColors.primaryText)
+                                    .padding(.leading, 10)
+
                                 Spacer()
+
+                                // Przycisk usuwania
                                 Button(action: {
-                                    savedDocuments.removeAll { $0.id == entry.id }
-                                    NotificationManager.instance.removeNotification(identifier: "monthly_document_check")
+                                    deleteDocument(entry)
                                 }) {
                                     Image(systemName: "trash")
                                         .foregroundColor(.red)
+                                        .padding(8)
                                 }
+                                .buttonStyle(BorderlessButtonStyle())
                             }
                             .padding(8)
                             .background(themeColors.cardBackground)
@@ -212,6 +215,7 @@ struct PushView: View {
                     .padding()
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
+
                     
                     Spacer()
                 }
@@ -242,7 +246,13 @@ struct PushView: View {
             UserDefaults.standard.set(encoded, forKey: "savedDocuments")
         }
     }
-    
+    private func deleteDocument(_ entry: DocumentEntry) {
+        withAnimation {
+            savedDocuments.removeAll { $0.id == entry.id }
+            NotificationManager.instance.removeNotification(identifier: "monthly_document_check")
+        }
+    }
+
     private func loadDocuments() {
         if let savedData = UserDefaults.standard.data(forKey: "savedDocuments"),
            let decoded = try? JSONDecoder().decode([DocumentEntry].self, from: savedData) {
@@ -257,7 +267,6 @@ struct PushView: View {
         let content = UNMutableNotificationContent()
         content.title = "monthly_notification_title".appLocalized
         
-        // Lokalizujemy dopiero tutaj
         let docLines = savedDocuments.map { entry in
             "\(entry.documentKey.appLocalized) - \(dateFormatter.string(from: entry.date))"
         }.joined(separator: "\n")
@@ -269,8 +278,8 @@ struct PushView: View {
         content.sound = .default
         
         var dateComponents = DateComponents()
-        dateComponents.day = 20
-        dateComponents.hour = 11
+        dateComponents.day = 1
+        dateComponents.hour = 12
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         let request = UNNotificationRequest(identifier: "monthly_document_check",

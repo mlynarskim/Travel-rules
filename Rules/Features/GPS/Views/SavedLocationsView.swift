@@ -10,14 +10,27 @@ struct SavedLocationsView: View {
     @State private var selectedLocation: LocationData?
     @State private var showActionSheet = false
     @AppStorage("isDarkMode") var isDarkMode = false
-    @AppStorage("selectedTheme") private var selectedTheme: String = "mountain"
+    @AppStorage("selectedTheme") private var selectedTheme: String = "classic"
     @StateObject private var languageManager = LanguageManager.shared
+    
+    // MARK: - Background Image
+    private var backgroundImageView: some View {
+        let imageName: String
+        switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
+        case .classic:   imageName = isDarkMode ? "classic-bg-dark" : "theme-classic-preview"
+        case .mountain:  imageName = isDarkMode ? "mountain-bg-dark" : "theme-mountain-preview"
+        case .beach:     imageName = isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
+        case .desert:    imageName = isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
+        case .forest:    imageName = isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
+        }
+        return Image(imageName)
+            .resizable()
+            .scaledToFill()
+    }
     
     var body: some View {
         ZStack {
-            Image("\(selectedTheme)-bg\(isDarkMode ? "-dark" : "")")
-                .resizable()
-                .scaledToFill()
+            backgroundImageView
                 .ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
@@ -178,8 +191,3 @@ struct SavedLocationsViewPreviewContainer: View {
     }
 }
 
-struct SavedLocationsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SavedLocationsViewPreviewContainer()
-    }
-}

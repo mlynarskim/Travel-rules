@@ -36,12 +36,8 @@ class HttpServerFilter : public ImplementChannelFilter<HttpServerFilter> {
  public:
   static const grpc_channel_filter kFilter;
 
-  static absl::StatusOr<std::unique_ptr<HttpServerFilter>> Create(
+  static absl::StatusOr<HttpServerFilter> Create(
       const ChannelArgs& args, ChannelFilter::Args filter_args);
-
-  HttpServerFilter(bool surface_user_agent, bool allow_put_requests)
-      : surface_user_agent_(surface_user_agent),
-        allow_put_requests_(allow_put_requests) {}
 
   class Call {
    public:
@@ -50,12 +46,15 @@ class HttpServerFilter : public ImplementChannelFilter<HttpServerFilter> {
     void OnServerInitialMetadata(ServerMetadata& md);
     void OnServerTrailingMetadata(ServerMetadata& md);
     static const NoInterceptor OnClientToServerMessage;
-    static const NoInterceptor OnClientToServerHalfClose;
     static const NoInterceptor OnServerToClientMessage;
     static const NoInterceptor OnFinalize;
   };
 
  private:
+  HttpServerFilter(bool surface_user_agent, bool allow_put_requests)
+      : surface_user_agent_(surface_user_agent),
+        allow_put_requests_(allow_put_requests) {}
+
   bool surface_user_agent_;
   bool allow_put_requests_;
 };

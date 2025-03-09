@@ -22,8 +22,6 @@
 #include <memory>
 #include <vector>
 
-#include "absl/log/absl_check.h"
-
 #include <grpc/support/log.h>
 #include <grpcpp/impl/rpc_method.h>
 #include <grpcpp/support/interceptor.h>
@@ -141,7 +139,7 @@ class ClientRpcInfo {
   // Runs interceptor at pos \a pos.
   void RunInterceptor(
       experimental::InterceptorBatchMethods* interceptor_methods, size_t pos) {
-    ABSL_CHECK_LT(pos, interceptors_.size());
+    GPR_ASSERT(pos < interceptors_.size());
     interceptors_[pos]->Intercept(interceptor_methods);
   }
 

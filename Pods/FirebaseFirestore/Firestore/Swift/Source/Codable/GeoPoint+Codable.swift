@@ -63,4 +63,4 @@ extension CodableGeoPoint {
 }
 
 /** Extends GeoPoint to conform to Codable. */
-extension FirebaseFirestore.GeoPoint: FirebaseFirestore.CodableGeoPoint {}
+extension GeoPoint: CodableGeoPoint {}

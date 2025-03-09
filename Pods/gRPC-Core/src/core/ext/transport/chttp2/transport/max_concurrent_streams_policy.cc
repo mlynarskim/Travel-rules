@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/ext/transport/chttp2/transport/max_concurrent_streams_policy.h"
 
 #include <utility>
 
-#include "absl/log/check.h"
-
 #include <grpc/support/log.h>
-#include <grpc/support/port_platform.h>
 
 namespace grpc_core {
 
@@ -33,7 +32,7 @@ void Chttp2MaxConcurrentStreamsPolicy::FlushedSettings() {
 }
 
 void Chttp2MaxConcurrentStreamsPolicy::AckLastSend() {
-  CHECK(unacked_demerits_ >= sent_demerits_);
+  GPR_ASSERT(unacked_demerits_ >= sent_demerits_);
   unacked_demerits_ -= std::exchange(sent_demerits_, 0);
 }
 

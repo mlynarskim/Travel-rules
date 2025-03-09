@@ -16,16 +16,17 @@
 //
 //
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/lib/iomgr/lockfree_event.h"
 
-#include "absl/log/check.h"
-
 #include <grpc/support/log.h>
-#include <grpc/support/port_platform.h>
 
 #include "src/core/lib/debug/trace.h"
 #include "src/core/lib/gprpp/crash.h"
 #include "src/core/lib/iomgr/exec_ctx.h"
+
+extern grpc_core::DebugOnlyTraceFlag grpc_polling_trace;
 
 // 'state' holds the to call when the fd is readable or writable respectively.
 // It can contain one of the following values:
@@ -79,7 +80,7 @@ void LockfreeEvent::DestroyEvent() {
     if (curr & kShutdownBit) {
       internal::StatusFreeHeapPtr(curr & ~kShutdownBit);
     } else {
-      CHECK(curr == kClosureNotReady || curr == kClosureReady);
+      GPR_ASSERT(curr == kClosureNotReady || curr == kClosureReady);
     }
     // we CAS in a shutdown, no error value here. If this event is interacted
     // with post-deletion (see the note in the constructor) we want the bit
@@ -95,7 +96,7 @@ void LockfreeEvent::NotifyOn(grpc_closure* closure) {
     // sure that the shutdown error has been initialized properly before us
     // referencing it.
     gpr_atm curr = gpr_atm_acq_load(&state_);
-    if (GRPC_TRACE_FLAG_ENABLED(polling)) {
+    if (GRPC_TRACE_FLAG_ENABLED(grpc_polling_trace)) {
       gpr_log(GPR_DEBUG,
               "LockfreeEvent::NotifyOn: %p curr=%" PRIxPTR " closure=%p", this,
               curr, closure);
@@ -164,7 +165,7 @@ bool LockfreeEvent::SetShutdown(grpc_error_handle shutdown_error) {
 
   while (true) {
     gpr_atm curr = gpr_atm_no_barrier_load(&state_);
-    if (GRPC_TRACE_FLAG_ENABLED(polling)) {
+    if (GRPC_TRACE_FLAG_ENABLED(grpc_polling_trace)) {
       gpr_log(GPR_DEBUG,
               "LockfreeEvent::SetShutdown: %p curr=%" PRIxPTR " err=%s",
               &state_, curr, StatusToString(shutdown_error).c_str());
@@ -214,7 +215,7 @@ void LockfreeEvent::SetReady() {
   while (true) {
     gpr_atm curr = gpr_atm_no_barrier_load(&state_);
 
-    if (GRPC_TRACE_FLAG_ENABLED(polling)) {
+    if (GRPC_TRACE_FLAG_ENABLED(grpc_polling_trace)) {
       gpr_log(GPR_DEBUG, "LockfreeEvent::SetReady: %p curr=%" PRIxPTR, &state_,
               curr);
     }

@@ -1,97 +1,118 @@
 import SwiftUI
+import FirebaseFirestore
+import FirebaseFirestoreSwift
+import FirebaseAuth
 
 struct RegistrationView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var email = ""
-    @State private var password = ""
-    @State private var confirmPassword = ""
-    @State private var errorMessage: String? = nil
-    @State private var isLoading = false
-    @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
-    let authenticationService = AuthenticationService.shared
+    // Dane użytkownika – zmienne stanu
+    @State private var username: String = ""
+    @State private var email: String = ""
+    @State private var phone: String = ""       // opcjonalne
+    @State private var password: String = ""
+    @State private var confirmPassword: String = ""
+    
+    @State private var errorMessage: String = ""
+    @State private var isLoading: Bool = false
     
     var body: some View {
-        VStack {
-            Text("registration_title".appLocalized)
-                .font(.largeTitle)
-                .foregroundColor(currentTheme.primaryText)
-            
-            if let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(currentTheme.error)
-                    .multilineTextAlignment(.center)
-                    .padding()
-            }
-            
-            TextField("email_placeholder".appLocalized, text: $email)
-                .autocapitalization(.none)
-                .keyboardType(.emailAddress)
-                .padding()
-                .background(Color(UIColor.secondarySystemBackground))
-                .cornerRadius(8)
-            
-            SecureField("password_placeholder".appLocalized, text: $password)
-                .padding()
-                .background(Color(UIColor.secondarySystemBackground))
-                .cornerRadius(8)
-            
-            SecureField("confirm_password_placeholder".appLocalized, text: $confirmPassword)
-                .padding()
-                .background(Color(UIColor.secondarySystemBackground))
-                .cornerRadius(8)
-            
-            Button(action: registerUser) {
-                if isLoading {
-                    ProgressView()
-                } else {
-                    Text("register_button".appLocalized)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(currentTheme.primary)
-                        .foregroundColor(currentTheme.lightText)
-                        .cornerRadius(8)
+        NavigationView {
+            Form {
+                Section(header: Text("Dane osobowe")) {
+                    TextField("Nazwa użytkownika", text: $username)
+                        .autocapitalization(.none)
+                    TextField("Email", text: $email)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                    TextField("Telefon (opcjonalnie)", text: $phone)
+                        .keyboardType(.phonePad)
+                }
+                
+                Section(header: Text("Hasło")) {
+                    SecureField("Hasło", text: $password)
+                    SecureField("Potwierdź hasło", text: $confirmPassword)
+                }
+                
+                if !errorMessage.isEmpty {
+                    Section {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                Section {
+                    Button("Zarejestruj się") {
+                        registerUser()
+                    }
+                    .disabled(isLoading)
                 }
             }
-            .disabled(isLoading)
-            
-            Spacer()
-        }
-        .padding()
-        .background(Color(currentTheme.background))
-        //.edgesIgnoringSafeArea(.all)
-        .ignoresSafeArea()
-        .navigationTitle("registration_title".appLocalized)
-    }
-    
-    private var currentTheme: ThemeColors {
-        switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
-        case .classic: return ThemeColors.classicTheme
-        case .mountain: return ThemeColors.mountainTheme
-        case .beach: return ThemeColors.beachTheme
-        case .desert: return ThemeColors.desertTheme
-        case .forest: return ThemeColors.forestTheme
+            .navigationTitle("Rejestracja")
         }
     }
     
     private func registerUser() {
-        guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "error_missing_email_password".appLocalized
+        // Walidacja danych
+        guard !username.isEmpty else {
+            errorMessage = "Nazwa użytkownika jest wymagana."
             return
         }
-        
+        guard !email.isEmpty else {
+            errorMessage = "Email jest wymagany."
+            return
+        }
+        guard !password.isEmpty else {
+            errorMessage = "Hasło jest wymagane."
+            return
+        }
         guard password == confirmPassword else {
-            errorMessage = "error_passwords_mismatch".appLocalized
+            errorMessage = "Hasła nie są zgodne."
             return
         }
         
         isLoading = true
-        authenticationService.registerUser(email: email, password: password) { result in
+        errorMessage = ""
+        
+        // Rejestracja użytkownika przy użyciu Firebase Auth
+        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             isLoading = false
-            switch result {
-            case .success:
-                dismiss()
-            case .failure(let error):
-                errorMessage = "registration_error".appLocalized + ": \(error.localizedDescription)"
+            if let error = error {
+                errorMessage = "Błąd rejestracji: \(error.localizedDescription)"
+            } else if let uid = authResult?.user.uid {
+                // Tworzymy nowy profil użytkownika – tutaj możesz rozszerzyć model o pole phone
+                let newProfile = UserProfile(
+                    id: uid,
+                    name: username,
+                    avatarUrl: nil,            // Awatar pomijamy
+                    description: nil,          // Opis pomijamy
+                    lastActiveTime: Date(),
+                    helpProvidedCount: 0,
+                    activeDaysCount: 0,
+                    thanksReceivedCount: 0,
+                    helpOffered: [],
+                    status: .available,        // Domyślny status
+                    category: .social,         // Domyślna kategoria
+                    distance: 0.0,
+                    shareLevel: .approximate
+                )
+                
+                // Jeśli chcesz zapisać numer telefonu w profilu, rozważ dodanie pola phone do modelu UserProfile
+                // i ustawienie go tutaj, np. phone: phone.isEmpty ? nil : phone
+                
+                let db = Firestore.firestore()
+                do {
+                    try db.collection("users").document(newProfile.id).setData(from: newProfile, merge: true) { error in
+                        if let error = error {
+                            errorMessage = "Błąd zapisu profilu: \(error.localizedDescription)"
+                        } else {
+                            print("Profil użytkownika zapisany w Firestore")
+                            // Po udanej rejestracji możesz przejść do głównego widoku aplikacji lub ustawić stan zalogowania
+                            dismiss()
+                        }
+                    }
+                } catch {
+                    errorMessage = "Błąd podczas przygotowania danych: \(error.localizedDescription)"
+                }
             }
         }
     }

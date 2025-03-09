@@ -16,6 +16,8 @@
 //
 //
 
+#include <grpc/support/port_platform.h>
+
 #include "src/core/lib/event_engine/posix_engine/timer.h"
 
 #include <algorithm>
@@ -24,11 +26,10 @@
 #include <utility>
 
 #include <grpc/support/cpu.h>
-#include <grpc/support/port_platform.h>
 
 #include "src/core/lib/event_engine/posix_engine/timer_heap.h"
+#include "src/core/lib/gpr/useful.h"
 #include "src/core/lib/gprpp/time.h"
-#include "src/core/util/useful.h"
 
 namespace grpc_event_engine {
 namespace experimental {

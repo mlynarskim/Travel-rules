@@ -72,8 +72,7 @@ int FIPS_query_algorithm_status(const char *algorithm) {
 #if defined(BORINGSSL_FIPS_COUNTERS)
 
 size_t FIPS_read_counter(enum fips_counter_t counter) {
-  size_t index = (size_t)counter;
-  if (index > fips_counter_max) {
+  if (counter < 0 || counter > fips_counter_max) {
     abort();
   }
 
@@ -83,12 +82,11 @@ size_t FIPS_read_counter(enum fips_counter_t counter) {
     return 0;
   }
 
-  return array[index];
+  return array[counter];
 }
 
 void boringssl_fips_inc_counter(enum fips_counter_t counter) {
-  size_t index = (size_t)counter;
-  if (index > fips_counter_max) {
+  if (counter < 0 || counter > fips_counter_max) {
     abort();
   }
 
@@ -108,7 +106,7 @@ void boringssl_fips_inc_counter(enum fips_counter_t counter) {
     }
   }
 
-  array[index]++;
+  array[counter]++;
 }
 
 #else

@@ -28,11 +28,11 @@ struct AppThemeModifier: ViewModifier {
     var backgroundImage: String {
         let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
         switch theme {
-        case .classic: return colorScheme == .dark ? "imageDark" : "Image"
-        case .mountain: return colorScheme == .dark ? "mountain-bg-dark" : "mountain-bg"
-        case .beach: return colorScheme == .dark ? "beach-bg-dark" : "beach-bg"
-        case .desert: return colorScheme == .dark ? "desert-bg-dark" : "desert-bg"
-        case .forest: return colorScheme == .dark ? "forest-bg-dark" : "forest-bg"
+        case .classic: return colorScheme == .dark ? "classic-bg-dark" : "theme-classic-preview"
+        case .mountain: return colorScheme == .dark ? "mountain-bg-dark" : "theme-mountain-preview"
+        case .beach: return colorScheme == .dark ? "beach-bg-dark" : "theme-beach-preview"
+        case .desert: return colorScheme == .dark ? "desert-bg-dark" : "theme-desert-preview"
+        case .forest: return colorScheme == .dark ? "forest-bg-dark" : "theme-forest-preview"
         }
     }
     

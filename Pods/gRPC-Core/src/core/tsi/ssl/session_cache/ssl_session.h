@@ -19,6 +19,8 @@
 #ifndef GRPC_SRC_CORE_TSI_SSL_SESSION_CACHE_SSL_SESSION_H
 #define GRPC_SRC_CORE_TSI_SSL_SESSION_CACHE_SSL_SESSION_H
 
+#include <grpc/support/port_platform.h>
+
 #include <memory>
 
 #if COCOAPODS==1
@@ -28,7 +30,6 @@
 #endif
 
 #include <grpc/slice.h>
-#include <grpc/support/port_platform.h>
 
 #include "src/core/lib/gprpp/ref_counted.h"
 
