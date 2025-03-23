@@ -1,6 +1,6 @@
 import Foundation
-import FirebaseFirestore
-import FirebaseFirestoreSwift
+//import FirebaseFirestore
+//import FirebaseFirestoreSwift
 
 public struct AppUserProfile: Codable {
     public let id: String            // UID z Firebase

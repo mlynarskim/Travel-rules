@@ -5,6 +5,7 @@ import AVFoundation
 import CoreLocation
 import MapKit
 import GoogleMobileAds
+import Darwin
 
 
 struct ContentView: View {

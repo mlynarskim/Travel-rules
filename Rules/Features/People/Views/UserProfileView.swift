@@ -1,7 +1,7 @@
 import SwiftUI
 import CoreLocation
-import FirebaseFirestore
-import FirebaseFirestoreSwift
+//import FirebaseFirestore
+//import FirebaseFirestoreSwift
 
 // Przykładowy model profilu użytkownika – dostosuj wg potrzeb
 struct UserProfile: Identifiable, Codable {

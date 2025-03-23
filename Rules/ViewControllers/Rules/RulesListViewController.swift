@@ -3,6 +3,7 @@
 
 import Foundation
 import SwiftUI
+import Darwin
 
 struct RulesListView: View {
     

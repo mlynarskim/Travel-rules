@@ -1,6 +1,7 @@
 //  ActivityView.swift
 import SwiftUI
 import UIKit
+import Darwin
 
 struct ActivityView: UIViewControllerRepresentable {
     var activityItems: [Any]

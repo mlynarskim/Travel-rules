@@ -1,7 +1,7 @@
 import SwiftUI
-import FirebaseFirestore
-import FirebaseFirestoreSwift
-import FirebaseAuth
+//import FirebaseFirestore
+//import FirebaseFirestoreSwift
+//import FirebaseAuth
 
 struct RegistrationView: View {
     @Environment(\.dismiss) private var dismiss

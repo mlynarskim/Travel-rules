@@ -383,3 +383,5 @@
 "miedzynarodowe_prawo_jazdy" = "International Driving Permit";
 "ubezpieczenie_oc" = "Liability Insurance";
 
+"NSLocationWhenInUseUsageDescription" = "This app uses your location solely to record your current position in the GPS tab. Location data is not transmitted to any external servers.";
+

@@ -2,8 +2,9 @@ import Foundation
 import CoreLocation
 import MapKit
 import Combine
-import FirebaseFirestore
-import FirebaseFirestoreSwift
+    //import FirebaseFirestore
+//import FirebaseFirestoreSwift
+import Darwin
 
 public class PeopleLocationService: ObservableObject {
     @Published public var nearbyUsers: [NearbyUser] = []

@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import SwiftUI
+import Darwin
 
 struct SavedRulesView: View {
     @AppStorage("isDarkMode") private var isDarkMode = false

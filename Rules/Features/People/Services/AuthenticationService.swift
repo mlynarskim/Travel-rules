@@ -4,11 +4,11 @@ import Combine
 import AuthenticationServices
 import CryptoKit
 @_exported import GoogleMobileAds
-import FirebaseAuth
-import Firebase
-import GoogleSignIn
-import FirebaseFirestore
-import FirebaseFirestoreSwift
+//import FirebaseAuth
+//import Firebase
+//import GoogleSignIn
+//import FirebaseFirestore
+//import FirebaseFirestoreSwift
     
 
 enum AuthenticationMethod {

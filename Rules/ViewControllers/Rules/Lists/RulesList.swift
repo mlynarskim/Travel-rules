@@ -2,6 +2,7 @@
 // All rights reserved 
 
 import Foundation
+import Darwin
 
 // English Rules
 let RulesList = [
@@ -360,6 +361,7 @@ let RulesList = [
             "107. No empaques en el último minuto, prepara los artículos necesarios al menos dos días antes.",
             "108. Una botella de alcohol u otro regalo es una buena idea como agradecimiento por la ayuda." ]
 
+@MainActor
 func getLocalizedRules() -> [String] {
     switch LanguageManager.shared.currentLanguage {
     case .english, .system:

@@ -1,5 +1,6 @@
 import SwiftUI
 import Foundation
+import Darwin
 
 // Główny system kolorów i stylów
 struct ThemeManager {

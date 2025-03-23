@@ -2,6 +2,7 @@
 //widok dodawania wwlasnej zasady ✅
 import Foundation
 import SwiftUI
+import Darwin
 
 // MARK: - Model
 struct Rule: Identifiable, Codable, Hashable {

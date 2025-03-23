@@ -1,5 +1,6 @@
 import SwiftUI
 import UserNotifications
+import Darwin
 
 class AchievementManager: ObservableObject {
     @Published var achievements: [Achievement] = Achievement.achievements

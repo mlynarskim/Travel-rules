@@ -1,5 +1,6 @@
 import SwiftUI
 import GoogleMobileAds
+import Darwin
 
 struct AdBannerView: UIViewRepresentable {
     let adUnitID: String

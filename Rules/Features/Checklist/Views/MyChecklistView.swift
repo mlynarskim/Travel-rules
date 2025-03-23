@@ -1,4 +1,5 @@
 import SwiftUI
+import Darwin
 
 struct TravelItem: Identifiable, Codable {
     var id = UUID()

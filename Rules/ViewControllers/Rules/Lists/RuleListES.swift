@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 let rulesListES = [
 "1. Invierte en un buen colchón: dormir es muy importante para tu salud y bienestar.",

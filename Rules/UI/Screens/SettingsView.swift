@@ -189,10 +189,11 @@ struct SettingsView: View {
     }
     
     private func sendFeedback() {
-        if let url = URL(string: "mlynarski.mateusz@gmail.com") {
-            UIApplication.shared.open(url)
+        if let url = URL(string: "mailto:mlynarski.mateusz@gmail.com?subject=Feedback") {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
+
     
     private func resetApplication() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -317,9 +318,3 @@ extension UIViewController {
     }
 }
 
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView(showSettings: .constant(true))
-            .environment(\.colorScheme, .light)
-    }
-}

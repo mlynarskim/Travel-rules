@@ -1,4 +1,5 @@
 import SwiftUI
+import Darwin
 
 struct RuleItemView: View {
     let rule: Rule

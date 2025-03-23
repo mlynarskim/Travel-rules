@@ -1,4 +1,5 @@
 import SwiftUI
+import Darwin
 
 struct NearbyPeopleListView: View {
     @ObservedObject private var peopleService = PeopleLocationService.shared

@@ -382,3 +382,4 @@
 "miedzynarodowe_prawo_jazdy" = "Międzynarodowe prawo jazdy";
 "ubezpieczenie_oc" = "Ubezpieczenie OC";
 
+"NSLocationWhenInUseUsageDescription" = "Ta aplikacja wykorzystuje Twoją lokalizację wyłącznie do zapisywania aktualnej pozycji w zakładce GPS. Dane lokalizacyjne nie są przesyłane na żadne zewnętrzne serwery.";

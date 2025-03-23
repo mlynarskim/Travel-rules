@@ -375,3 +375,6 @@
 "prawo_jazdy" = "Licencia de conducir";
 "miedzynarodowe_prawo_jazdy" = "Permiso de conducir internacional";
 "ubezpieczenie_oc" = "Seguro de responsabilidad civil";
+
+"NSLocationWhenInUseUsageDescription" = "Esta aplicación utiliza tu ubicación únicamente para registrar tu posición actual en la pestaña de GPS. Los datos de ubicación no se transmiten a servidores externos.";
+

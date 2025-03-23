@@ -3,6 +3,7 @@ import Foundation
 import AVFoundation
 import CoreLocation
 import MapKit
+import Darwin
 
 struct MainView: View {
     let bannerID = "ca-app-pub-5307701268996147~2371937539"

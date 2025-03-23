@@ -1,4 +1,5 @@
 import SwiftUI
+import Darwin
 
 struct AchievementsView: View {
    @Environment(\.dismiss) private var dismiss

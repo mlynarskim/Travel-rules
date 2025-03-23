@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 class CountryInfoService: ObservableObject {
     @Published var countryInfo: CountryInfo?

@@ -1,9 +1,14 @@
-//LanguageManager.swift
 import SwiftUI
 import ObjectiveC
 import Foundation
 import AVFoundation
 import UIKit
+import Darwin
+
+// Prywatna struktura, która przechowuje klucze do asocjowanych obiektów.
+private struct AssociatedKeys {
+    static var bundleKey: Void?
+}
 
 enum AppLanguage: String, CaseIterable {
     case system = "system"
@@ -21,9 +26,9 @@ enum AppLanguage: String, CaseIterable {
     }
 }
 
-class LanguageManager: ObservableObject {
+@MainActor
+final class LanguageManager: ObservableObject {
     static let shared = LanguageManager()
-    static var bundleKey = 0
     
     @Published var currentLanguage: AppLanguage {
         didSet {
@@ -34,7 +39,7 @@ class LanguageManager: ObservableObject {
         }
     }
     
-    init() {
+    private init() {
         let savedLanguage = UserDefaults.standard.string(forKey: "AppLanguage") ?? "system"
         currentLanguage = AppLanguage(rawValue: savedLanguage) ?? .system
         updateLanguage(to: currentLanguage)
@@ -45,9 +50,10 @@ class LanguageManager: ObservableObject {
         UserDefaults.standard.set([language.rawValue], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
         
-        let languageCode = language == .system ?
-            Locale.current.languageCode ?? "en" :
-            language.rawValue
+        // Używamy nowego API do pobrania kodu języka systemowego,
+        // rozpakowując opcjonalną wartość lub używając domyślnego "en".
+        let systemLanguageCode = Locale.current.language.languageCode?.identifier ?? "en"
+        let languageCode = (language == .system) ? systemLanguageCode : language.rawValue
         
         guard let path = Bundle.main.path(forResource: languageCode, ofType: "lproj"),
               let bundle = Bundle(path: path) else {
@@ -57,7 +63,7 @@ class LanguageManager: ObservableObject {
         }
         
         print("✅ Successfully loaded bundle for language: \(languageCode)")
-        objc_setAssociatedObject(Bundle.main, &LanguageManager.bundleKey, bundle, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(Bundle.main, &AssociatedKeys.bundleKey, bundle, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
     
     func refreshUI() {
@@ -67,7 +73,7 @@ class LanguageManager: ObservableObject {
 
 extension Bundle {
     var localizedBundle: Bundle {
-        if let bundle = objc_getAssociatedObject(self, &LanguageManager.bundleKey) as? Bundle {
+        if let bundle = objc_getAssociatedObject(self, &AssociatedKeys.bundleKey) as? Bundle {
             return bundle
         }
         return self
