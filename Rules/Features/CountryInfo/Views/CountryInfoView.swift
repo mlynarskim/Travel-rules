@@ -8,7 +8,6 @@ struct CountryInfoView: View {
         ZStack {
             Image(isDarkMode ? "imageDark" : "Image")
                 .resizable()
-                //.edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
             List {
                 Section(header: Text("Emergency Numbers")

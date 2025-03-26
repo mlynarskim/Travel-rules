@@ -39,7 +39,8 @@ struct RuleItemView: View {
                     .padding(.trailing, 16) // Padding dla przycisku kosza
             }
         }
-        .frame(height: 40) // Stała wysokość komórki
+        //.frame(height: 40) // Stała wysokość komórki
+        .padding(.vertical, 8)
         .background(Color(themeColors.primary).opacity(0.9))
         .cornerRadius(15)
         .padding(.horizontal, 10) // Rozciągnięcie na pełną szerokość

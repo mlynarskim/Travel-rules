@@ -10,7 +10,7 @@
 "language" = "Language";
 "dark_mode" = "Dark Mode";
 "slow_down" = "Slow down";
-"take_time_think" = "Please take time to think about the rule.";
+"take_time_think" = "Please take time to think about the rule. :) ";
 "ok" = "OK";
 "saved_rules" = "Saved rules";
 "delete_rule" = "Delete Rule";
@@ -90,6 +90,8 @@
 "open_google_maps" = "Open in Google Maps";
 "open_apple_maps" = "Open in Apple Maps";
 "coordinates" = "Coordinates";
+"copy_location" = "Copy coordinates";
+
 "meters" = "m";
 "north" = "N";
 "south" = "S";
@@ -339,6 +341,9 @@
 "police" = "Police";
 "ambulance" = "Ambulance";
 "fire" = "Fire";
+"healthcare" = "Healthcare";
+"government_website" = "Government Website";
+
 
 // MyRulesView
 "add_custom_rule_button" = "Add Custom Rule";
@@ -346,7 +351,7 @@
 "delete_rule_message" = "Are you sure you want to delete this rule?";
 "delete_button" = "Delete";
 "cancel_button" = "Cancel";
-"rule_details_title" = "Rule Details";
+"rule_details" = "Rule Details";
 "ok_button" = "OK";
 
 "back_button" = "Back";

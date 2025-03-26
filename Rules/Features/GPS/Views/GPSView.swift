@@ -15,7 +15,10 @@ struct GPSView: View {
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
     @StateObject private var languageManager = LanguageManager.shared
     @State private var isCountryInfoExpanded = false
-    
+   
+    @AppStorage("totalLocationsSaved") private var totalLocationsSaved: Int = 0
+    private let achievementManager = AchievementManager.shared
+
     private var themeColors: ThemeColors {
         switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
         case .classic: return ThemeColors.classicTheme
@@ -388,6 +391,7 @@ struct LocationInputPanel: View {
             description = ""
             locationManager.saveLocations()
             HapticManager.shared.impact(style: .medium)
+            
         }
     }
     

@@ -1,3 +1,5 @@
+// AchievementManager.swift
+
 import SwiftUI
 import UserNotifications
 import Darwin
@@ -9,7 +11,8 @@ class AchievementManager: ObservableObject {
     
     @AppStorage("dailyStreak") private var dailyStreak: Int = 0
     @AppStorage("lastOpenDate") private var lastOpenDate: Double = Date().timeIntervalSince1970
-    
+    static let shared = AchievementManager()
+
     init() {
         self.achievements = Achievement.achievements
         loadAchievements()
@@ -29,32 +32,44 @@ class AchievementManager: ObservableObject {
         }
     }
     
+    // Sprawdzanie dziennego streaku
     private func checkDailyStreak() {
         let currentDate = Date()
         let lastDate = Date(timeIntervalSince1970: lastOpenDate)
         
+        // Jeśli dzień się zmienił
         if !Calendar.current.isDate(lastDate, inSameDayAs: currentDate) {
-            if Calendar.current.isDate(lastDate, equalTo: currentDate, toGranularity: .day) {
+            // Sprawdź czy to kolejny dzień z rzędu
+            let dayDifference = Calendar.current.dateComponents([.day], from: lastDate, to: currentDate).day ?? 0
+            if dayDifference == 1 {
                 dailyStreak += 1
-                checkStreakAchievements()
             } else {
                 dailyStreak = 1
             }
             lastOpenDate = currentDate.timeIntervalSince1970
+            checkStreakAchievements()
         }
     }
     
     private func checkStreakAchievements() {
+        // Porównujemy dailyStreak z wymaganiami
         if dailyStreak == 3 {
             unlockAchievement(id: "daily_streak_3")
-        } else if dailyStreak == 7 {
+        }
+        if dailyStreak == 7 {
             unlockAchievement(id: "daily_streak_7")
-        } else if dailyStreak == 30 {
+        }
+        if dailyStreak == 30 {
             unlockAchievement(id: "daily_streak_30")
         }
     }
     
-    func checkAchievements(rulesDrawn: Int, rulesSaved: Int, customRulesAdded: Int, rulesShared: Int) {
+    // Funkcja sprawdzająca osiągnięcia związane z rysowaniem, zapisywaniem, udostępnianiem i lokalizacją
+    func checkAchievements(rulesDrawn: Int,
+                           rulesSaved: Int,
+                           rulesShared: Int,
+                           locationsSaved: Int) {
+        // Rysowanie:
         if rulesDrawn >= 1 {
             unlockAchievement(id: "first_rule")
         }
@@ -65,28 +80,22 @@ class AchievementManager: ObservableObject {
             unlockAchievement(id: "twenty_rules")
         }
         
+        // Zapisywanie:
         if rulesSaved >= 1 {
             unlockAchievement(id: "save_first")
         }
         if rulesSaved >= 10 {
             unlockAchievement(id: "save_ten")
         }
-        if rulesSaved >= 25 {
-            unlockAchievement(id: "save_twenty_five")
-        }
-        if rulesSaved >= 50 {
-            unlockAchievement(id: "save_fifty")
+        
+        // Udostępnianie:
+        if rulesShared >= 1 {
+            unlockAchievement(id: "first_share")
         }
         
-        if customRulesAdded >= 1 {
-            unlockAchievement(id: "add_first_custom_rule")
-        }
-        if customRulesAdded >= 10 {
-            unlockAchievement(id: "add_ten_custom_rules")
-        }
-        
-        if rulesShared >= 10 {
-            unlockAchievement(id: "share_ten_rules")
+        // Pierwsza lokalizacja:
+        if locationsSaved >= 1 {
+            unlockAchievement(id: "first_location")
         }
     }
     
@@ -103,12 +112,13 @@ class AchievementManager: ObservableObject {
         // Haptic feedback
         HapticManager.shared.notification(type: .success)
         
-        // Show notification
+        // Lokalne powiadomienie
         let content = UNMutableNotificationContent()
         content.title = NSLocalizedString("achievement.unlocked.title", comment: "")
-        content.body = String(format: NSLocalizedString("achievement.unlocked.message",
-                                                        comment: ""),
-                              achievement.title)
+        // W treści podstawiamy tytuł osiągnięcia (przetłumaczony w pliku Localizable)
+        let localizedTitle = NSLocalizedString(achievement.titleKey, comment: "")
+        content.body = String(format: NSLocalizedString("achievement.unlocked.message", comment: ""),
+                              localizedTitle)
         content.sound = .default
         
         let request = UNNotificationRequest(identifier: UUID().uuidString,
@@ -117,13 +127,13 @@ class AchievementManager: ObservableObject {
         
         UNUserNotificationCenter.current().add(request)
         
-        // Show toast
+        // Wyświetlenie toasta
         currentAchievement = achievement
         withAnimation(.spring()) {
             showToast = true
         }
         
-        // Hide toast after 3 seconds
+        // Ukrycie toasta po 4 sekundach
         DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
             withAnimation(.spring()) {
                 self.showToast = false

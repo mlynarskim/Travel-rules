@@ -1,4 +1,5 @@
-//ConentView.swift
+// ContentView.swift
+
 import SwiftUI
 import Foundation
 import AVFoundation
@@ -7,14 +8,13 @@ import MapKit
 import GoogleMobileAds
 import Darwin
 
-
 struct ContentView: View {
     @State private var savedRules: [Int] = []
     @State private var showSettings = false
     @State private var showPushView = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
     @AppStorage("isDarkMode") var isDarkMode = false
-    
+
     var backgroundImage: String {
         let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
         switch theme {
@@ -34,20 +34,21 @@ struct ContentView: View {
                         .resizable()
                         .scaledToFill()
                         .ignoresSafeArea()
-                    
                 )
                 .navigationBarHidden(true)
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
-
 
 struct ScreenMetrics {
     static let screenWidth = UIScreen.main.bounds.width
     static let screenHeight = UIScreen.main.bounds.height
+    
     static func adaptiveWidth(_ percentage: CGFloat) -> CGFloat {
         return screenWidth * (percentage / 100)
     }
+    
     static func adaptiveHeight(_ percentage: CGFloat) -> CGFloat {
         return screenHeight * (percentage / 100)
     }
@@ -163,8 +164,8 @@ struct LoadingView: View {
     var body: some View {
         ZStack {
             Color.black.opacity(0.4)
-            // .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
+            
             ProgressView()
                 .scaleEffect(1.5)
                 .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
@@ -176,9 +177,9 @@ struct LoadingView: View {
 struct NextView: View {
     let bannerID = "ca-app-pub-5307701268996147~2371937539"
     let bannerAdUnitID = "ca-app-pub-5307701268996147/4702587401"
-
+    
     @State private var shouldShowAd = false
-    private let maxDailyRules = 20
+    private let maxDailyRules = 5
     @State private var randomRule: String = ""
     @State private var lastDrawnRule: String = ""
     @State private var savedRules: [Int] = []
@@ -200,9 +201,10 @@ struct NextView: View {
     @StateObject private var achievementManager = AchievementManager()
     @AppStorage("totalRulesDrawn") private var totalRulesDrawn: Int = 0
     @AppStorage("totalRulesSaved") private var totalRulesSaved: Int = 0
-    @AppStorage("totalCustomRulesAdded") private var totalCustomRulesAdded: Int = 0
+    // ZMIANA: usunięto customRulesAdded (nie jest używane w AchievementManager),
+    // a zamiast tego w checkAchievements przekazujemy locationsSaved:
+    // @AppStorage("totalCustomRulesAdded") private var totalCustomRulesAdded: Int = 0
     @AppStorage("totalRulesShared") private var totalRulesShared: Int = 0
-
     
     var body: some View {
         LocalizedView {
@@ -216,6 +218,7 @@ struct NextView: View {
                 
                 VStack {
                     TopMenuView(showSettings: $showSettings, showPushView: $showPushView)
+                    
                     VStack(spacing: ThemeManager.layout.spacing.medium) {
                         Text("the_rule_for_today".appLocalized)
                             .font(ThemeManager.typography.headline)
@@ -271,7 +274,6 @@ struct NextView: View {
                                     }
                                 }
                             }
-                            
                             
                             MainActionButton(title: "save".appLocalized, icon: "bookmark.fill") {
                                 withAnimation(.spring()) {
@@ -330,9 +332,8 @@ struct NextView: View {
         }
     }
     
-    
-    
     // MARK: - Private Methods
+    
     private func saveLastDrawnRule() {
         UserDefaults.standard.set(randomRule, forKey: "lastDrawnRule")
         lastDrawnRule = randomRule
@@ -396,13 +397,13 @@ struct NextView: View {
                 saveLastDrawnRule()
                 
                 totalRulesDrawn += 1
+                // ZMIANA: usunięto argument customRulesAdded i dodano locationsSaved: 0
                 achievementManager.checkAchievements(
                     rulesDrawn: totalRulesDrawn,
                     rulesSaved: totalRulesSaved,
-                    customRulesAdded: totalCustomRulesAdded,
-                    rulesShared: totalRulesShared
-                    //packingListsCreated: 0
-                );
+                    rulesShared: totalRulesShared,
+                    locationsSaved: 0
+                )
                 
                 if dailyRulesCount % 2 == 0 {
                     withAnimation {
@@ -417,6 +418,7 @@ struct NextView: View {
             }
         }
     }
+    
     func shareRule() {
         guard let image = generateImage() else {
             print("Failed to generate image")
@@ -432,6 +434,15 @@ struct NextView: View {
            let viewController = windowScene.windows.first?.rootViewController {
             viewController.present(activityViewController, animated: true)
         }
+        
+        // Po udostępnieniu zwiększamy licznik rulesShared
+        totalRulesShared += 1
+        achievementManager.checkAchievements(
+            rulesDrawn: totalRulesDrawn,
+            rulesSaved: totalRulesSaved,
+            rulesShared: totalRulesShared,
+            locationsSaved: 0 // ZMIANA: przekazujemy 0 zamiast customRulesAdded
+        )
     }
     
     func generateImage() -> UIImage? {
@@ -506,15 +517,15 @@ struct NextView: View {
                 getRandomRule()
                 
                 totalRulesSaved += 1
+                // ZMIANA: usunięto argument customRulesAdded i dodano locationsSaved: 0
                 achievementManager.checkAchievements(
                     rulesDrawn: totalRulesDrawn,
                     rulesSaved: totalRulesSaved,
-                    customRulesAdded: totalCustomRulesAdded,
-                    rulesShared: totalRulesShared
-                    //packingListsCreated: 0
-                );
-
-                saveAlertMessage = "rule_saved".appLocalized 
+                    rulesShared: totalRulesShared,
+                    locationsSaved: 0
+                )
+                
+                saveAlertMessage = "rule_saved".appLocalized
                 showSaveAlert = true
             } else {
                 saveAlertMessage = "rule_exists".appLocalized
@@ -553,22 +564,15 @@ struct NextView: View {
     }
 }
 
-//Navigation Components
+// Navigation Components
 struct BottomNavigationMenu: View {
     @Binding var savedRules: [Int]
     
     var body: some View {
         HStack {
-            //NavigationButton(destination: PeopleTabView(user: NearbyUser(
-              //  id: UUID(),
-               // name: "Użytkownik",
-              //  status: .available,
-             //   category: .social,
-             //   location: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-            //    distance: 0,
-           //     shareLevel: .approximate,
-             //   description: nil
-         //   )), icon: "person.2")
+            // Odkomentuj lub dostosuj według potrzeb:
+            // NavigationButton(destination: PeopleTabView(...), icon: "person.2")
+            
             NavigationButton(destination: MyChecklistView(), icon: "checkmark.circle")
             NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
             NavigationButton(destination: RulesListView(), icon: "list.star")
@@ -576,7 +580,6 @@ struct BottomNavigationMenu: View {
         .padding(.horizontal)
     }
 }
-
 
 struct NavigationButton<Destination: View>: View {
     let destination: Destination
@@ -626,4 +629,3 @@ struct ScaleButtonStyle: ButtonStyle {
             .animation(.spring(), value: configuration.isPressed)
     }
 }
-

@@ -10,7 +10,7 @@
 "language" = "Język";
 "dark_mode" = "Tryb ciemny";
 "slow_down" = "Zwolnij";
-"take_time_think" = "Proszę poświęć czas na przemyślenie zasady.";
+"take_time_think" = "Proszę poświęć czas na przemyślenie zasady. :)";
 "ok" = "OK";
 "saved_rules" = "Zapisane zasady";
 "delete_rule" = "Usuń zasadę";
@@ -88,6 +88,7 @@
 "open_google_maps" = "Otwórz w Google Maps";
 "open_apple_maps" = "Otwórz w Apple Maps";
 "coordinates" = "Współrzędne";
+"copy_location" = "Kopiuj współrzędne";
 "meters" = "m";
 "north" = "N";
 "south" = "S";
@@ -338,6 +339,9 @@
 "police" = "Policja";
 "ambulance" = "Pogotowie";
 "fire" = "Straż pożarna";
+"healthcare" = "Opieka zdrowotna";
+"government_website" = "Strona rządowa";
+
 
 // MyRulesView
 "add_custom_rule_button" = "Dodaj własną zasadę";
@@ -345,7 +349,7 @@
 "delete_rule_message" = "Czy na pewno chcesz usunąć tę zasadę?";
 "delete_button" = "Usuń";
 "cancel_button" = "Anuluj";
-"rule_details_title" = "Szczegóły zasady";
+"rule_details" = "Szczegóły zasady";
 "ok_button" = "OK";
 
 "back_button" = "Wróć";

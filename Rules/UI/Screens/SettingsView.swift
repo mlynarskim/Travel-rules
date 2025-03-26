@@ -43,7 +43,7 @@ struct SettingsView: View {
     }
     
     private var isSmallDevice: Bool {
-        UIScreen.main.bounds.height <= 667 // iPhone SE, 7, 8
+        UIScreen.main.bounds.height <= 667 // np. iPhone SE, 7, 8
     }
     
     var body: some View {
@@ -54,7 +54,7 @@ struct SettingsView: View {
                 
                 ScrollView {
                     VStack(spacing: isSmallDevice ? 10 : 16) {
-                        // Header
+                        // Nagłówek
                         HStack {
                             Spacer()
                             Text("settings".appLocalized)
@@ -169,16 +169,35 @@ struct SettingsView: View {
         }
     }
     
+    // MARK: - Funkcje
     private func shareApp() {
         let appLink = "https://apps.apple.com/pl/app/travel-rules/id6451070215?l=pl"
+        let shareText = "Check out Travel-Rules!"
         let activityController = UIActivityViewController(
-            activityItems: [appLink],
+            activityItems: [shareText, appLink],
             applicationActivities: nil
         )
         
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let topViewController = windowScene.windows.first?.rootViewController {
-            topViewController.present(activityController, animated: true)
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+               let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
+               let topController = keyWindow.rootViewController?.topmostViewController() {
+                
+                if let popover = activityController.popoverPresentationController {
+                    popover.sourceView = topController.view
+                    popover.sourceRect = CGRect(
+                        x: topController.view.bounds.midX,
+                        y: topController.view.bounds.midY,
+                        width: 0,
+                        height: 0
+                    )
+                    popover.permittedArrowDirections = []
+                }
+                
+                topController.present(activityController, animated: true, completion: nil)
+            } else {
+                print("Nie udało się znaleźć aktywnego widoku kontrolera.")
+            }
         }
     }
     
@@ -193,7 +212,6 @@ struct SettingsView: View {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
-
     
     private func resetApplication() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -305,16 +323,17 @@ struct SettingsButton: View {
 
 extension UIViewController {
     func topmostViewController() -> UIViewController {
-        if let presentedViewController = presentedViewController {
-            return presentedViewController.topmostViewController()
+        if let presentedVC = presentedViewController {
+            return presentedVC.topmostViewController()
         }
-        if let navigationController = self as? UINavigationController {
-            return navigationController.visibleViewController?.topmostViewController() ?? self
+        if let navVC = self as? UINavigationController,
+           let visibleVC = navVC.visibleViewController {
+            return visibleVC.topmostViewController()
         }
-        if let tabBarController = self as? UITabBarController {
-            return tabBarController.selectedViewController?.topmostViewController() ?? self
+        if let tabVC = self as? UITabBarController,
+           let selectedVC = tabVC.selectedViewController {
+            return selectedVC.topmostViewController()
         }
         return self
     }
 }
-

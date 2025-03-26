@@ -70,59 +70,60 @@ extension Achievement {
             isUnlocked: false,
             color: "AchievementPurple"
         ),
+        
+        // Dzienny streak (3)
         Achievement(
-            id: "save_twenty_five",
-            titleKey: "achievement.save_twenty_five.title",
-            descriptionKey: "achievement.save_twenty_five.description",
-            icon: "bookmark.circle",
-            requiredCount: 25,
-            isUnlocked: false,
-            color: "AchievementGreen"
-        ),
-        Achievement(
-            id: "save_fifty",
-            titleKey: "achievement.save_fifty.title",
-            descriptionKey: "achievement.save_fifty.description",
-            icon: "bookmark.square",
-            requiredCount: 50,
-            isUnlocked: false,
-            color: "AchievementGold"
-        ),
-        Achievement(
-            id: "add_first_custom_rule",
-            titleKey: "achievement.add_first_custom_rule.title",
-            descriptionKey: "achievement.add_first_custom_rule.description",
-            icon: "plus.circle.fill",
-            requiredCount: 1,
-            isUnlocked: false,
-            color: "AchievementBlue"
-        ),
-        Achievement(
-            id: "add_ten_custom_rules",
-            titleKey: "achievement.add_ten_custom_rules.title",
-            descriptionKey: "achievement.add_ten_custom_rules.description",
-            icon: "plus.circle",
-            requiredCount: 10,
-            isUnlocked: false,
-            color: "AchievementPurple"
-        ),
-        Achievement(
-            id: "create_packing_list",
-            titleKey: "achievement.create_packing_list.title",
-            descriptionKey: "achievement.create_packing_list.description",
-            icon: "list.bullet",
-            requiredCount: 1,
+            id: "daily_streak_3",
+            titleKey: "achievement.daily_streak_3.title",
+            descriptionKey: "achievement.daily_streak_3.description",
+            icon: "flame.fill",
+            requiredCount: 3,
             isUnlocked: false,
             color: "AchievementOrange"
         ),
+        
+        // Dzienny streak (7)
         Achievement(
-            id: "share_ten_rules",
-            titleKey: "achievement.share_ten_rules.title",
-            descriptionKey: "achievement.share_ten_rules.description",
+            id: "daily_streak_7",
+            titleKey: "achievement.daily_streak_7.title",
+            descriptionKey: "achievement.daily_streak_7.description",
+            icon: "flame.fill",
+            requiredCount: 7,
+            isUnlocked: false,
+            color: "AchievementRed"
+        ),
+        
+        // Dzienny streak (30)
+        Achievement(
+            id: "daily_streak_30",
+            titleKey: "achievement.daily_streak_30.title",
+            descriptionKey: "achievement.daily_streak_30.description",
+            icon: "flame.fill",
+            requiredCount: 30,
+            isUnlocked: false,
+            color: "AchievementGold"
+        ),
+        
+        // Pierwsze udostępnienie zasady
+        Achievement(
+            id: "first_share",
+            titleKey: "achievement.first_share.title",
+            descriptionKey: "achievement.first_share.description",
             icon: "square.and.arrow.up.fill",
-            requiredCount: 10,
+            requiredCount: 1,
             isUnlocked: false,
             color: "AchievementGreen"
+        ),
+        
+        // Pierwsza zapisana lokalizacja
+        Achievement(
+            id: "first_location",
+            titleKey: "achievement.first_location.title",
+            descriptionKey: "achievement.first_location.description",
+            icon: "mappin.circle.fill",
+            requiredCount: 1,
+            isUnlocked: false,
+            color: "AchievementBlue"
         )
     ]
 }

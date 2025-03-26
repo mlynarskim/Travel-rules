@@ -72,7 +72,7 @@
 
 // Localización
 "current_location" = "Ubicación actual:";
-"country_location" = "Actualmente se encuentra en";
+"country_location" = "Actualmente se encuentra en ";
 "latitude" = "Latitud";
 "longitude" = "Longitud";
 "altitude" = "Altitud";
@@ -86,6 +86,7 @@
 "open_google_maps" = "Abrir en Google Maps";
 "open_apple_maps" = "Abrir en Apple Maps";
 "coordinates" = "Coordenadas";
+"copy_location" = "Copiar coordenadas";
 "meters" = "m";
 "north" = "N";
 "south" = "S";
@@ -333,6 +334,8 @@
 "police" = "Policía";
 "ambulance" = "Ambulancia";
 "fire" = "Bomberos";
+"healthcare" = "Atención médica";
+"government_website" = "Sitio web del gobierno";
 
 // MyRulesView
 "add_custom_rule_button" = "Añadir regla personalizada";
@@ -340,7 +343,7 @@
 "delete_rule_message" = "¿Estás seguro de que quieres eliminar esta regla?";
 "delete_button" = "Eliminar";
 "cancel_button" = "Cancelar";
-"rule_details_title" = "Detalles de la regla";
+"rule_details" = "Detalles de la regla";
 "ok_button" = "Aceptar";
 
 "back_button" = "Volver";
