@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		071485002D48A7000063B774 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 071484FF2D48A7000063B774 /* GoogleService-Info.plist */; };
 		071485022D48A7250063B774 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 071485012D48A7250063B774 /* Podfile */; };
 		07211A042D29B04100B501B9 /* RulesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A032D29B03C00B501B9 /* RulesListViewController.swift */; };
 		07211A062D29B0C000B501B9 /* SavedRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */; };
@@ -1111,7 +1110,6 @@
 				07DD83752D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 in Resources */,
 				07DD83772D267182004C5C5F /* Lato-Black.ttf in Resources */,
 				07DD83782D267182004C5C5F /* Lato-LightItalic.ttf in Resources */,
-				071485002D48A7000063B774 /* GoogleService-Info.plist in Resources */,
 				07DD837A2D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 in Resources */,
 				07DD837C2D267182004C5C5F /* Lato-BoldItalic.ttf in Resources */,
 				07DD837D2D267182004C5C5F /* Preview Assets.xcassets in Resources */,
@@ -1433,7 +1431,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1525,7 +1523,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";

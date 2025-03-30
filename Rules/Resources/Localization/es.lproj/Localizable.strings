@@ -343,6 +343,7 @@
 "delete_rule_message" = "¿Estás seguro de que quieres eliminar esta regla?";
 "delete_button" = "Eliminar";
 "cancel_button" = "Cancelar";
+"rule_details_title" = "Detalles de la regla";
 "rule_details" = "Detalles de la regla";
 "ok_button" = "Aceptar";
 
@@ -381,3 +382,4 @@
 
 "NSLocationWhenInUseUsageDescription" = "Esta aplicación utiliza tu ubicación únicamente para registrar tu posición actual en la pestaña de GPS. Los datos de ubicación no se transmiten a servidores externos.";
 
+"bonus_rules_add" = "Obtener los 5 principios";

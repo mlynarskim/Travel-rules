@@ -5,21 +5,17 @@ import UserNotifications
 //import GoogleSignIn
 import BackgroundTasks
 
-class AppDelegate:UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         
         // ✅ Inicjalizacja Firebase
-       // FirebaseApp.configure()
-       // print("✅ Firebase skonfigurowany poprawnie")
+        // FirebaseApp.configure()
+        // print("✅ Firebase skonfigurowany poprawnie")
 
         // ✅ Inicjalizacja Google Mobile Ads
-            func application(_ application: UIApplication,
-                             didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-                MobileAds.shared.start(completionHandler: nil)
-                return true
-            }
-        
+        MobileAds.shared.start(completionHandler: nil)
+
         // ✅ Sprawdzenie, czy GADApplicationIdentifier jest w Info.plist
         if let appID = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String {
             print("✅ Google Ads initialized with App ID: \(appID)")
@@ -30,16 +26,19 @@ class AppDelegate:UIResponder, UIApplicationDelegate, UNUserNotificationCenterDe
         // ✅ Ustawienie delegata powiadomień
         UNUserNotificationCenter.current().delegate = self
 
+        // ✅ Wyczyść badge przy starcie
+        application.applicationIconBadgeNumber = 0
+
         // ✅ Rejestracja zadań w tle
         registerBackgroundTasks()
 
         return true
     }
-    
-    // ✅ Obsługa powrotu z Google Sign-In (dla iOS 13+)
-   // func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-     //   return GIDSignIn.sharedInstance.handle(url)
-  //  }
+
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        // ✅ Wyczyść badge po powrocie do aplikacji
+        application.applicationIconBadgeNumber = 0
+    }
 
     // ✅ Rejestracja zadań w tle (BGTaskScheduler)
     private func registerBackgroundTasks() {
@@ -96,6 +95,9 @@ struct RulesApp: App {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(isDarkModeEnabled ? .dark : .light)
+                .onAppear {
+                    UIApplication.shared.applicationIconBadgeNumber = 0
+                }
         }
     }
 }

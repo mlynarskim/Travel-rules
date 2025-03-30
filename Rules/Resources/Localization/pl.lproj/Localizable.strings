@@ -350,7 +350,9 @@
 "delete_button" = "Usuń";
 "cancel_button" = "Anuluj";
 "rule_details" = "Szczegóły zasady";
+"rule_details_title" = "Szczegóły zasady";
 "ok_button" = "OK";
+
 
 "back_button" = "Wróć";
 "travel.checklist.button" = "Lista Podróżna";
@@ -387,3 +389,5 @@
 "ubezpieczenie_oc" = "Ubezpieczenie OC";
 
 "NSLocationWhenInUseUsageDescription" = "Ta aplikacja wykorzystuje Twoją lokalizację wyłącznie do zapisywania aktualnej pozycji w zakładce GPS. Dane lokalizacyjne nie są przesyłane na żadne zewnętrzne serwery.";
+
+"bonus_rules_add" = "Chce wiecej zasad!";

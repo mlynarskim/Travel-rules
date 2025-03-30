@@ -1,4 +1,6 @@
+//
 // ContentView.swift
+//
 
 import SwiftUI
 import Foundation
@@ -6,7 +8,22 @@ import AVFoundation
 import CoreLocation
 import MapKit
 import GoogleMobileAds
-import Darwin
+
+// MARK: - Rewarded Ad Delegate
+class RewardedAdDelegate: NSObject, FullScreenContentDelegate {
+    var adDidDismiss: (() -> Void)?
+    var adDidFail: ((Error) -> Void)?
+    
+    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        print("✅ Rewarded ad został zamknięty")
+        adDidDismiss?()
+    }
+    
+    func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        print("❌ Błąd prezentacji rewarded ad: \(error.localizedDescription)")
+        adDidFail?(error)
+    }
+}
 
 struct ContentView: View {
     @State private var savedRules: [Int] = []
@@ -14,7 +31,7 @@ struct ContentView: View {
     @State private var showPushView = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
     @AppStorage("isDarkMode") var isDarkMode = false
-
+    
     var backgroundImage: String {
         let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
         switch theme {
@@ -71,7 +88,6 @@ struct TopMenuView: View {
                 MenuButton(icon: "trophy.fill") {
                     showAchievements = true
                 }
-                
                 MenuButton(icon: "bell") {
                     showPushView = true
                 }
@@ -165,7 +181,6 @@ struct LoadingView: View {
         ZStack {
             Color.black.opacity(0.4)
                 .ignoresSafeArea()
-            
             ProgressView()
                 .scaleEffect(1.5)
                 .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
@@ -177,6 +192,7 @@ struct LoadingView: View {
 struct NextView: View {
     let bannerID = "ca-app-pub-5307701268996147~2371937539"
     let bannerAdUnitID = "ca-app-pub-5307701268996147/4702587401"
+    let rewardedAdUnitID = "ca-app-pub-5307701268996147/7858242475"
     
     @State private var shouldShowAd = false
     private let maxDailyRules = 5
@@ -201,9 +217,19 @@ struct NextView: View {
     @StateObject private var achievementManager = AchievementManager()
     @AppStorage("totalRulesDrawn") private var totalRulesDrawn: Int = 0
     @AppStorage("totalRulesSaved") private var totalRulesSaved: Int = 0
-    // ZMIANA: usunięto customRulesAdded (nie jest używane w AchievementManager),
-    // a zamiast tego w checkAchievements przekazujemy locationsSaved:
-    // @AppStorage("totalCustomRulesAdded") private var totalCustomRulesAdded: Int = 0
+    
+    // Bonus – dodatkowe zasady po obejrzeniu rewarded ad
+    @State private var bonusUnlocked: Bool = false
+    // Obiekt rewarded ad
+    @State private var rewardedAd: RewardedAd?
+    // Przechowujemy delegata rewarded ad
+    @State private var rewardedAdDelegate = RewardedAdDelegate()
+    
+    // Obliczana liczba dozwolonych zasad dziennie
+    var allowedRules: Int {
+        return maxDailyRules + (bonusUnlocked ? 5 : 0)
+    }
+    
     @AppStorage("totalRulesShared") private var totalRulesShared: Int = 0
     
     var body: some View {
@@ -244,12 +270,6 @@ struct NextView: View {
                                     .foregroundColor(ThemeManager.colors.primaryText)
                                     .padding()
                                 
-                                if shouldShowAd {
-                                    AdBannerView(adUnitID: bannerAdUnitID)
-                                        .frame(height: 50)
-                                        .padding(.horizontal)
-                                }
-                                
                                 Spacer()
                                 
                                 ShareButton {
@@ -259,6 +279,16 @@ struct NextView: View {
                             }
                         }
                         .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(25))
+                        .overlay(
+                            Group {
+                                if shouldShowAd {
+                                    AdBannerView(adUnitID: bannerAdUnitID)
+                                        .frame(height: 50)
+                                        .padding(8)
+                                }
+                            },
+                            alignment: .bottomLeading
+                        )
                         .padding(.horizontal)
                         
                         HStack {
@@ -298,7 +328,10 @@ struct NextView: View {
                 Alert(
                     title: Text("daily_limit".appLocalized),
                     message: Text("come_back_tomorrow".appLocalized),
-                    dismissButton: .default(Text("ok".appLocalized))
+                    primaryButton: .default(Text("bonus_rules_add".appLocalized), action: {
+                        showRewardedAd()
+                    }),
+                    secondaryButton: .cancel(Text("OK"))
                 )
             }
             .alert("success".appLocalized, isPresented: $showSaveAlert) {
@@ -307,15 +340,16 @@ struct NextView: View {
                 Text(saveAlertMessage)
             }
             .onAppear {
+                resetDailyStateIfNeeded()
                 loadSavedRules()
                 loadUsedRulesIndices()
                 loadLastDrawnRule()
+                loadRewardedAd()
             }
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
                 loadLastDrawnRule()
             }
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("AppReset"))) { _ in
-                // Resetuj stan widoku
                 savedRules = []
                 usedRulesIndices = []
                 dailyRulesCount = 0
@@ -323,16 +357,54 @@ struct NextView: View {
                 totalRulesSaved = 0
                 randomRule = ""
                 lastDrawnRule = ""
-                
-                // Odśwież widok
                 loadSavedRules()
                 loadUsedRulesIndices()
                 loadLastDrawnRule()
             }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                resetDailyStateIfNeeded()
+            }
         }
     }
     
-    // MARK: - Private Methods
+    // MARK: - Rewarded Ad Logic
+    
+    func loadRewardedAd() {
+        let request = Request()
+        RewardedAd.load(with: rewardedAdUnitID, request: request) { ad, error in
+            if let error = error {
+                print("❌ Nie udało się załadować rewarded ad: \(error.localizedDescription)")
+                return
+            }
+            self.rewardedAd = ad
+            // Ustaw delegata – korzystamy z RewardedAdDelegate
+            rewardedAdDelegate.adDidDismiss = {
+                self.loadRewardedAd()
+            }
+            rewardedAdDelegate.adDidFail = { error in
+                print("❌ Rewarded ad failed: \(error.localizedDescription)")
+            }
+            self.rewardedAd?.fullScreenContentDelegate = rewardedAdDelegate
+            print("✅ Rewarded ad załadowana")
+        }
+    }
+    
+    func showRewardedAd() {
+        if let rewardedAd = rewardedAd,
+           let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootViewController = windowScene.windows.first?.rootViewController {
+            rewardedAd.present(from: rootViewController) {
+                // Callback – użytkownik obejrzał reklamę do końca, odblokowujemy dodatkowe 5 zasad
+                print("✅ Użytkownik obejrzał reklamę do końca – odblokowujemy dodatkowe 5 zasad!")
+                self.bonusUnlocked = true
+            }
+        } else {
+            print("Rewarded ad nie jest dostępna, ładuję ponownie...")
+            loadRewardedAd()
+        }
+    }
+    
+    // MARK: - Pozostałe metody
     
     private func saveLastDrawnRule() {
         UserDefaults.standard.set(randomRule, forKey: "lastDrawnRule")
@@ -348,12 +420,10 @@ struct NextView: View {
             let allIndices = Set(0..<currentRules.count)
             let usedIndicesSet = Set(usedRulesIndices)
             let availableIndices = allIndices.subtracting(usedIndicesSet)
-            
             if availableIndices.isEmpty {
                 randomRule = "all_rules_used".appLocalized
                 return
             }
-            
             if let randomIndex = availableIndices.randomElement() {
                 randomRule = currentRules[randomIndex]
                 lastDrawnRule = randomRule
@@ -362,14 +432,22 @@ struct NextView: View {
         }
     }
     
-    func getRandomRule() {
+    private func getRandomRule() {
         let currentDate = Date()
         let calendar = Calendar.current
+        let currentComponents = calendar.dateComponents([.year, .month, .day], from: currentDate)
+        let storedDate = Date(timeIntervalSince1970: lastRulesDate)
+        let storedComponents = calendar.dateComponents([.year, .month, .day], from: storedDate)
         
-        if !calendar.isDate(Date(timeIntervalSince1970: lastRulesDate), inSameDayAs: currentDate) {
+        if currentComponents.year != storedComponents.year ||
+            currentComponents.month != storedComponents.month ||
+            currentComponents.day != storedComponents.day {
             dailyRulesCount = 0
             lastRulesDate = currentDate.timeIntervalSince1970
         }
+        print("Current date: \(currentComponents)")
+        print("Stored date: \(storedComponents)")
+        print("Daily rules count reset: \(dailyRulesCount)")
         
         let currentRules = getLocalizedRules()
         let allIndices = Set(0..<currentRules.count)
@@ -382,7 +460,8 @@ struct NextView: View {
             return
         }
         
-        if dailyRulesCount >= maxDailyRules {
+        // Używamy allowedRules, które uwzględnia bonus
+        if dailyRulesCount >= allowedRules {
             showAlert = true
             randomRule = lastDrawnRule
             return
@@ -397,7 +476,6 @@ struct NextView: View {
                 saveLastDrawnRule()
                 
                 totalRulesDrawn += 1
-                // ZMIANA: usunięto argument customRulesAdded i dodano locationsSaved: 0
                 achievementManager.checkAchievements(
                     rulesDrawn: totalRulesDrawn,
                     rulesSaved: totalRulesSaved,
@@ -405,17 +483,38 @@ struct NextView: View {
                     locationsSaved: 0
                 )
                 
-                if dailyRulesCount % 2 == 0 {
+                // Wyświetlamy reklamę banerową na określony czas
+                withAnimation {
+                    shouldShowAd = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
                     withAnimation {
-                        shouldShowAd = true
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                        withAnimation {
-                            shouldShowAd = false
-                        }
+                        shouldShowAd = false
                     }
                 }
             }
+        }
+    }
+
+    
+    private func resetDailyStateIfNeeded() {
+        let currentDate = Date()
+        let calendar = Calendar.current
+        let currentComponents = calendar.dateComponents([.year, .month, .day], from: currentDate)
+        let storedDate = Date(timeIntervalSince1970: lastRulesDate)
+        let storedComponents = calendar.dateComponents([.year, .month, .day], from: storedDate)
+        if currentComponents.year != storedComponents.year ||
+            currentComponents.month != storedComponents.month ||
+            currentComponents.day != storedComponents.day {
+            print("Reset stanu dnia: \(currentComponents)")
+            dailyRulesCount = 0
+            usedRulesIndices = []
+            lastRulesDate = currentDate.timeIntervalSince1970
+            bonusUnlocked = false
+            saveUsedRulesIndices()
+            UserDefaults.standard.removeObject(forKey: "lastDrawnRule")
+        } else {
+            print("Brak zmiany dnia: \(currentComponents)")
         }
     }
     
@@ -424,65 +523,54 @@ struct NextView: View {
             print("Failed to generate image")
             return
         }
-        
         let activityViewController = UIActivityViewController(
             activityItems: [image],
             applicationActivities: nil
         )
-        
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let viewController = windowScene.windows.first?.rootViewController {
             viewController.present(activityViewController, animated: true)
         }
-        
-        // Po udostępnieniu zwiększamy licznik rulesShared
         totalRulesShared += 1
         achievementManager.checkAchievements(
             rulesDrawn: totalRulesDrawn,
             rulesSaved: totalRulesSaved,
             rulesShared: totalRulesShared,
-            locationsSaved: 0 // ZMIANA: przekazujemy 0 zamiast customRulesAdded
+            locationsSaved: 0
         )
     }
     
     func generateImage() -> UIImage? {
         let maxWidth: CGFloat = 300
         let maxHeight: CGFloat = 200
-        
         let textAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 20),
             .foregroundColor: UIColor.black
         ]
         let attributedText = NSAttributedString(string: randomRule, attributes: textAttributes)
-        
         let textRect = attributedText.boundingRect(
             with: CGSize(width: maxWidth, height: .greatestFiniteMagnitude),
             options: .usesLineFragmentOrigin,
             context: nil
         )
-        
         let imageSize = CGSize(
             width: max(textRect.width + 40, maxWidth),
             height: max(textRect.height + 40, maxHeight)
         )
-        
         let image = UIGraphicsImageRenderer(size: imageSize).image { context in
             UIColor(ThemeManager.colors.secondary).setFill()
             context.fill(CGRect(origin: .zero, size: imageSize))
-            
             attributedText.draw(in: CGRect(
                 x: 20,
                 y: 20,
                 width: imageSize.width - 40,
                 height: imageSize.height - 40
             ))
-            
             let watermarkText = "travel_rules".appLocalized
             let watermarkAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: 12),
                 .foregroundColor: UIColor(ThemeManager.colors.primary)
             ]
-            
             let watermarkSize = watermarkText.size(withAttributes: watermarkAttributes)
             let watermarkRect = CGRect(
                 x: imageSize.width - watermarkSize.width - 10,
@@ -490,7 +578,6 @@ struct NextView: View {
                 width: watermarkSize.width,
                 height: watermarkSize.height
             )
-            
             watermarkText.draw(in: watermarkRect, withAttributes: watermarkAttributes)
         }
         return image
@@ -515,16 +602,13 @@ struct NextView: View {
                 savedRules.append(index)
                 saveRules()
                 getRandomRule()
-                
                 totalRulesSaved += 1
-                // ZMIANA: usunięto argument customRulesAdded i dodano locationsSaved: 0
                 achievementManager.checkAchievements(
                     rulesDrawn: totalRulesDrawn,
                     rulesSaved: totalRulesSaved,
                     rulesShared: totalRulesShared,
                     locationsSaved: 0
                 )
-                
                 saveAlertMessage = "rule_saved".appLocalized
                 showSaveAlert = true
             } else {
@@ -564,15 +648,17 @@ struct NextView: View {
     }
 }
 
-// Navigation Components
+extension NextView {
+    // Nie rozszerzamy NextView o GADFullScreenContentDelegate – korzystamy z RewardedAdDelegate, który przypisujemy rewardedAd.fullScreenContentDelegate.
+}
+
+// MARK: - Navigation Components
+
 struct BottomNavigationMenu: View {
     @Binding var savedRules: [Int]
     
     var body: some View {
         HStack {
-            // Odkomentuj lub dostosuj według potrzeb:
-            // NavigationButton(destination: PeopleTabView(...), icon: "person.2")
-            
             NavigationButton(destination: MyChecklistView(), icon: "checkmark.circle")
             NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
             NavigationButton(destination: RulesListView(), icon: "list.star")
