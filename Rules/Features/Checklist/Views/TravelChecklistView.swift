@@ -286,22 +286,3 @@ struct ChecklistItem: View {
     }
 }
 
-
-// MARK: - Preview
-struct TravelChecklist_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            TravelChecklist()
-                .previewDevice(PreviewDevice(rawValue: "iPhone SE (2nd generation)"))
-                .previewDisplayName("iPhone SE")
-            
-            TravelChecklist()
-                .previewDevice(PreviewDevice(rawValue: "iPhone 13"))
-                .previewDisplayName("iPhone 13")
-            
-            TravelChecklist()
-                .previewDevice(PreviewDevice(rawValue: "iPhone 13 Pro Max"))
-                .previewDisplayName("iPhone 13 Pro Max")
-        }
-    }
-}

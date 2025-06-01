@@ -190,10 +190,14 @@ struct LoadingView: View {
 }
 
 struct NextView: View {
-    let bannerID = "ca-app-pub-5307701268996147~2371937539"
-    let bannerAdUnitID = "ca-app-pub-5307701268996147/4702587401"
-    let rewardedAdUnitID = "ca-app-pub-5307701268996147/7858242475"
-    
+     let bannerID = "ca-app-pub-5307701268996147~2371937539"
+   let bannerAdUnitID = "ca-app-pub-5307701268996147/4702587401"
+   // let rewardedAdUnitID = "ca-app-pub-5307701268996147/7858242475"
+   
+    //testowea
+  //  let bannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
+    let rewardedAdUnitID = "ca-app-pub-3940256099942544/1712485313"
+
     @State private var shouldShowAd = false
     private let maxDailyRules = 5
     @State private var randomRule: String = ""
@@ -218,16 +222,13 @@ struct NextView: View {
     @AppStorage("totalRulesDrawn") private var totalRulesDrawn: Int = 0
     @AppStorage("totalRulesSaved") private var totalRulesSaved: Int = 0
     
-    // Bonus – dodatkowe zasady po obejrzeniu rewarded ad
-    @State private var bonusUnlocked: Bool = false
-    // Obiekt rewarded ad
+    @AppStorage("rewardedPacks") private var rewardedPacks: Int = 0
+    
     @State private var rewardedAd: RewardedAd?
-    // Przechowujemy delegata rewarded ad
     @State private var rewardedAdDelegate = RewardedAdDelegate()
     
-    // Obliczana liczba dozwolonych zasad dziennie
     var allowedRules: Int {
-        return maxDailyRules + (bonusUnlocked ? 5 : 0)
+        return maxDailyRules + (rewardedPacks * 5)
     }
     
     @AppStorage("totalRulesShared") private var totalRulesShared: Int = 0
@@ -275,17 +276,17 @@ struct NextView: View {
                                 ShareButton {
                                     shareRule()
                                 }
-                                .padding(.bottom, 10)
+                                .padding(.top, 10)
+                                .padding(.bottom, 50)
                             }
                         }
                         .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(25))
                         .overlay(
                             Group {
-                                if shouldShowAd {
                                     AdBannerView(adUnitID: bannerAdUnitID)
                                         .frame(height: 50)
                                         .padding(8)
-                                }
+                                
                             },
                             alignment: .bottomLeading
                         )
@@ -294,7 +295,7 @@ struct NextView: View {
                         HStack {
                             MainActionButton(title: "draw".appLocalized, icon: "dice.fill") {
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                                    if dailyRulesCount >= maxDailyRules {
+                                    if dailyRulesCount >= allowedRules {
                                         HapticManager.shared.notification(type: .warning)
                                         showAlert = true
                                         randomRule = lastDrawnRule
@@ -394,15 +395,19 @@ struct NextView: View {
            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootViewController = windowScene.windows.first?.rootViewController {
             rewardedAd.present(from: rootViewController) {
-                // Callback – użytkownik obejrzał reklamę do końca, odblokowujemy dodatkowe 5 zasad
-                print("✅ Użytkownik obejrzał reklamę do końca – odblokowujemy dodatkowe 5 zasad!")
-                self.bonusUnlocked = true
+                // Użytkownik obejrzał reklamę do końca
+                print("✅ Użytkownik obejrzał reklamę do końca – dodajemy +5 zasad")
+                rewardedPacks += 1
+                print("🎁 rewardedPacks zwiększony do \(rewardedPacks)")
+
+                loadRewardedAd()
             }
         } else {
-            print("Rewarded ad nie jest dostępna, ładuję ponownie...")
+            print("❌ Rewarded ad nie jest dostępna – ładuję ponownie...")
             loadRewardedAd()
         }
     }
+
     
     // MARK: - Pozostałe metody
     
@@ -510,7 +515,7 @@ struct NextView: View {
             dailyRulesCount = 0
             usedRulesIndices = []
             lastRulesDate = currentDate.timeIntervalSince1970
-            bonusUnlocked = false
+           // bonusUnlocked = false
             saveUsedRulesIndices()
             UserDefaults.standard.removeObject(forKey: "lastDrawnRule")
         } else {
