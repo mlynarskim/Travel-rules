@@ -3,20 +3,16 @@ import UIKit
 import UserNotifications
 import Swift
 
-
-
-
 class NotificationManager {
     static let instance = NotificationManager()
     
     func requestAuthorization(completion: @escaping (Bool) -> Void) {
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) { granted, error in
-            if let error = error {
-                print("Error: \(error)")
+        UNUserNotificationCenter.current()
+            .requestAuthorization(options: options) { granted, error in
+                if let error = error { print("Error: \(error)") }
+                completion(granted)
             }
-            completion(granted)
-        }
     }
     
     func checkNotificationStatus(completion: @escaping (Bool) -> Void) {
@@ -34,7 +30,7 @@ class NotificationManager {
         }
     }
     
-    // Dzienna powiadomienie o 9
+    // Dzienne powiadomienie o 11
     func scheduleNotification() {
         let content = UNMutableNotificationContent()
         content.title = "Daily Reminder"
@@ -44,14 +40,12 @@ class NotificationManager {
         var dateComponents = DateComponents()
         dateComponents.hour = 11
         
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-        let request = UNNotificationRequest(identifier: "daily_rule_notification", content: content, trigger: trigger)
-        
+        let trigger  = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        let request  = UNNotificationRequest(identifier: "daily_rule_notification", content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(request)
     }
     
-    // Ustaw powiadomienie co miesiąc, ale w tym kodzie
-    // nie używamy go bezpośrednio, tylko w scheduleDocumentNotifications() w PushView
+    // Miesięczne przypomnienie 19-ego o 11
     func scheduleMonthlyDocumentCheckNotification() {
         let content = UNMutableNotificationContent()
         content.title = "Monthly Reminder"
@@ -62,19 +56,29 @@ class NotificationManager {
         dateComponents.day = 19
         dateComponents.hour = 11
         
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-        let request = UNNotificationRequest(identifier: "monthly_document_check", content: content, trigger: trigger)
-        
+        let trigger  = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        let request  = UNNotificationRequest(identifier: "monthly_document_check", content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(request)
     }
     
     func removeNotification(identifier: String) {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+        UNUserNotificationCenter.current()
+            .removePendingNotificationRequests(withIdentifiers: [identifier])
     }
     
+    // ⚙️ Nowa, bezpieczna metoda czyszczenia badge
     func resetBadgeCount() {
-        DispatchQueue.main.async {
-            UIApplication.shared.applicationIconBadgeNumber = 0
+        if #available(iOS 17, *) {
+            UNUserNotificationCenter.current()
+                .setBadgeCount(0) { error in
+                    if let error = error {
+                        print("Badge reset error: \(error.localizedDescription)")
+                    }
+                }
+        } else {
+            DispatchQueue.main.async {
+                UIApplication.shared.applicationIconBadgeNumber = 0 // iOS 16
+            }
         }
     }
 }

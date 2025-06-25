@@ -5,9 +5,29 @@ import UserNotifications
 //import GoogleSignIn
 import BackgroundTasks
 
+// MARK: - Wspólna funkcja czyszcząca badge (iOS 16 / 17+)
+extension UIApplication {
+    static func clearBadge() {
+        if #available(iOS 17, *) {
+            UNUserNotificationCenter.current()
+                .setBadgeCount(0) { error in
+                    if let error = error {
+                        print("❌ Nie udało się wyczyścić badge: \(error.localizedDescription)")
+                    }
+                }
+        } else {
+            // 🗑️ deprecated w iOS 17, ale potrzebne dla iOS 16
+            UIApplication.shared.applicationIconBadgeNumber = 0
+        }
+    }
+}
+
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
         
         // ✅ Inicjalizacja Firebase
         // FirebaseApp.configure()
@@ -16,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // ✅ Inicjalizacja Google Mobile Ads
         MobileAds.shared.start(completionHandler: nil)
 
-        // ✅ Sprawdzenie, czy GADApplicationIdentifier jest w Info.plist
+        // ✅ Sprawdzenie App ID Google Ads
         if let appID = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String {
             print("✅ Google Ads initialized with App ID: \(appID)")
         } else {
@@ -27,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         UNUserNotificationCenter.current().delegate = self
 
         // ✅ Wyczyść badge przy starcie
-        application.applicationIconBadgeNumber = 0
+        UIApplication.clearBadge() // zastępuje applicationIconBadgeNumber
 
         // ✅ Rejestracja zadań w tle
         registerBackgroundTasks()
@@ -37,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // ✅ Wyczyść badge po powrocie do aplikacji
-        application.applicationIconBadgeNumber = 0
+        UIApplication.clearBadge() // zastępuje applicationIconBadgeNumber
     }
 
     // ✅ Rejestracja zadań w tle (BGTaskScheduler)
@@ -68,7 +88,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     // ✅ Obsługa powiadomień push
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
         completionHandler([.banner, .sound])
     }
 }
@@ -81,13 +105,14 @@ struct RulesApp: App {
     init() {
         // ✅ Prośba o zgodę na powiadomienia
         DispatchQueue.main.async {
-            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-                if let error = error {
-                    print("❌ Nie udało się uzyskać zgody na powiadomienia: \(error.localizedDescription)")
-                } else {
-                    print("✅ Zgoda na powiadomienia: \(granted)")
+            UNUserNotificationCenter.current()
+                .requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    if let error = error {
+                        print("❌ Nie udało się uzyskać zgody na powiadomienia: \(error.localizedDescription)")
+                    } else {
+                        print("✅ Zgoda na powiadomienia: \(granted)")
+                    }
                 }
-            }
         }
     }
     
@@ -96,7 +121,7 @@ struct RulesApp: App {
             ContentView()
                 .preferredColorScheme(isDarkModeEnabled ? .dark : .light)
                 .onAppear {
-                    UIApplication.shared.applicationIconBadgeNumber = 0
+                    UIApplication.clearBadge()
                 }
         }
     }

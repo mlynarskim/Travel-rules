@@ -192,11 +192,13 @@ struct LoadingView: View {
 struct NextView: View {
      let bannerID = "ca-app-pub-5307701268996147~2371937539"
    let bannerAdUnitID = "ca-app-pub-5307701268996147/4702587401"
-   // let rewardedAdUnitID = "ca-app-pub-5307701268996147/7858242475"
+   // let rewardedAdUnitID = "ca-app-pub-5307701268996147/7858242475" //reklama pełnoekranowa z nagrodą
+    let rewardedAdUnitID = "ca-app-pub-5307701268996147/8131308249"
+
    
     //testowea
   //  let bannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
-    let rewardedAdUnitID = "ca-app-pub-3940256099942544/1712485313"
+    // let rewardedAdUnitID = "ca-app-pub-3940256099942544/1712485313"
 
     @State private var shouldShowAd = false
     private let maxDailyRules = 5
@@ -265,11 +267,12 @@ struct NextView: View {
                                 .shadow(color: ThemeManager.colors.cardShadow, radius: 8)
                             
                             VStack {
-                                Text(randomRule)
-                                    .font(ThemeManager.typography.body)
-                                    .multilineTextAlignment(.center)
-                                    .foregroundColor(ThemeManager.colors.primaryText)
-                                    .padding()
+                                
+                                    Text(randomRule)
+                                        .font(ThemeManager.typography.body)
+                                        .multilineTextAlignment(.center)
+                                        .foregroundColor(ThemeManager.colors.primaryText)
+                                        .padding()
                                 
                                 Spacer()
                                 
@@ -280,7 +283,7 @@ struct NextView: View {
                                 .padding(.bottom, 50)
                             }
                         }
-                        .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(25))
+                        .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(30))
                         .overlay(
                             Group {
                                     AdBannerView(adUnitID: bannerAdUnitID)
@@ -378,7 +381,6 @@ struct NextView: View {
                 return
             }
             self.rewardedAd = ad
-            // Ustaw delegata – korzystamy z RewardedAdDelegate
             rewardedAdDelegate.adDidDismiss = {
                 self.loadRewardedAd()
             }
@@ -395,7 +397,6 @@ struct NextView: View {
            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootViewController = windowScene.windows.first?.rootViewController {
             rewardedAd.present(from: rootViewController) {
-                // Użytkownik obejrzał reklamę do końca
                 print("✅ Użytkownik obejrzał reklamę do końca – dodajemy +5 zasad")
                 rewardedPacks += 1
                 print("🎁 rewardedPacks zwiększony do \(rewardedPacks)")
@@ -488,7 +489,6 @@ struct NextView: View {
                     locationsSaved: 0
                 )
                 
-                // Wyświetlamy reklamę banerową na określony czas
                 withAnimation {
                     shouldShowAd = true
                 }

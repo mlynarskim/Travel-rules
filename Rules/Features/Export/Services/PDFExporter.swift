@@ -42,7 +42,6 @@ class PDFExporter {
                 dateFormatter.timeStyle = .none
                 let headerText = "\(dateFormatter.string(from: data.date)) | \(data.category)"
                 
-                // App icon
                 if let logo = UIImage(named: "AppIcon") {
                     let logoSize = CGSize(width: 40, height: 40)
                     let logoRect = CGRect(x: configuration.margins.left,
@@ -52,12 +51,10 @@ class PDFExporter {
                     logo.draw(in: logoRect)
                 }
                 
-                // Header text
                 let headerPoint = CGPoint(x: configuration.margins.left + 50,
                                           y: configuration.margins.top + 15)
                 headerText.draw(at: headerPoint, withAttributes: configuration.styles.header)
                 
-                // Page number
                 let pageText = String(format: NSLocalizedString("pdf.page", comment: ""), page)
                 let pageTextSize = pageText.size(withAttributes: configuration.styles.pageNumber)
                 let pagePoint = CGPoint(
@@ -71,7 +68,6 @@ class PDFExporter {
             
             addNewPage()
             
-            // Title
             let titleRect = CGRect(
                 x: configuration.margins.left,
                 y: yPosition,
@@ -82,7 +78,6 @@ class PDFExporter {
             
             yPosition += 40
             
-            // Treść – jeżeli lista jest pusta, wyświetl komunikat
             if data.items.isEmpty {
                 let noItemsText = NSLocalizedString("No items to export.", comment: "")
                 let noItemsRect = CGRect(
@@ -106,24 +101,20 @@ class PDFExporter {
                     yPosition += 25
                 } else {
                     for item in data.items {
-                        // Ustal wysokość dla pojedynczego wpisu
                         let itemHeight: CGFloat = 30
                         
-                        // Rysowanie kółka (checkbox) obok wpisu
                         let circleDiameter: CGFloat = 12
                         let circleX = configuration.margins.left
-                        let circleY = yPosition + (itemHeight - circleDiameter) / 2  // wyśrodkowanie kółka w pionie
+                        let circleY = yPosition + (itemHeight - circleDiameter) / 2
                         let circleRect = CGRect(x: circleX, y: circleY, width: circleDiameter, height: circleDiameter)
                         
                         let circlePath = UIBezierPath(ovalIn: circleRect)
-                        UIColor.black.setStroke()  // lub możesz użyć innego koloru
+                        UIColor.black.setStroke()
                         circlePath.lineWidth = 1.5
                         circlePath.stroke()
                         
-                        // Rysowanie tekstu wpisu – zaczynamy od pozycji po kółku z odstępem
                         let textX = configuration.margins.left + circleDiameter + 10
                         
-                        // Zwiększamy czcionkę wpisu o kilka punktów
                         var itemAttributes = configuration.styles.body
                         if let currentFont = itemAttributes[.font] as? UIFont {
                             let biggerFont = UIFont.systemFont(ofSize: currentFont.pointSize + 2)
@@ -138,8 +129,8 @@ class PDFExporter {
                         )
                         (item as NSString).draw(in: itemRect, withAttributes: itemAttributes)
                         
-                        // Sprawdzenie, czy mamy wystarczająco miejsca na stronie, w przeciwnym wypadku dodajemy nową stronę
-                        yPosition += itemHeight + 5  // 5 punktów odstępu między wpisami
+                      
+                        yPosition += itemHeight + 5 
                         if yPosition > configuration.pageSize.height - configuration.margins.bottom - 30 {
                             addNewPage()
                         }

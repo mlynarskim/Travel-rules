@@ -1,4 +1,4 @@
-//ExportButtonView.swift
+// ExportButtonView.swift
 import SwiftUI
 import UIKit
 import Darwin
@@ -7,9 +7,12 @@ struct ExportButtonView: View {
     let items: [String]
     let title: String
     let category: String
+    let fileName: String
     
     @State private var showingError = false
     @State private var showShareSheet = false
+    @State private var fileURLToShare: URL?
+    
     private let exporter = PDFExporter()
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
 
@@ -25,9 +28,7 @@ struct ExportButtonView: View {
     private var isSmallDevice: Bool {
         UIScreen.main.bounds.height <= 667
     }
-    
-    @State private var pdfDataToShare: Data?
-    
+
     var body: some View {
         Button(action: exportToPDF) {
             HStack {
@@ -48,8 +49,8 @@ struct ExportButtonView: View {
             Text(LocalizedStringKey("export.error.message"))
         }
         .sheet(isPresented: $showShareSheet) {
-            if let data = pdfDataToShare {
-                ActivityView(activityItems: [data])
+            if let url = fileURLToShare {
+                ActivityView(activityItems: [url])
             } else {
                 Text("No PDF data available")
             }
@@ -57,7 +58,6 @@ struct ExportButtonView: View {
     }
     
     private func exportToPDF() {
-        // Dodaj niewielkie opóźnienie, aby dane z listy mogły się zaktualizować
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             let exportData = PDFExporter.ExportData(
                 title: title,
@@ -70,8 +70,16 @@ struct ExportButtonView: View {
                 showingError = true
                 return
             }
-            pdfDataToShare = data
-            showShareSheet = true
+            // Zapisz PDF do pliku tymczasowego z zachowaniem nazwy
+            let tmpURL = FileManager.default.temporaryDirectory
+                .appendingPathComponent(fileName)
+            do {
+                try data.write(to: tmpURL)
+                fileURLToShare = tmpURL
+                showShareSheet = true
+            } catch {
+                showingError = true
+            }
         }
     }
 }

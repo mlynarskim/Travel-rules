@@ -1,18 +1,33 @@
 import SwiftUI
 import Darwin
+import UIKit
 
-struct TravelItem: Identifiable, Codable {
-    var id = UUID()
-    var name: String
-    var isCompleted = false
-    
-    init(name: String) {
-        self.name = name
+// MARK: - Kompatybilne onChange
+extension View {
+    @ViewBuilder
+    func onChangeCompat<V: Equatable>(_ value: V, action: @escaping () -> Void) -> some View {
+        if #available(iOS 17, *) {
+            self.onChange(of: value) { _, _ in action() }
+        } else {
+            self.onChange(of: value) { _ in action() }
+        }
     }
 }
 
+// MARK: - Model
+struct TravelItem: Identifiable, Codable, Equatable {    
+    var id: UUID = UUID()
+    var name: String
+    var isCompleted: Bool = false
+    
+    init(id: UUID = UUID(), name: String, isCompleted: Bool = false) {
+        self.id = id
+        self.name = name
+        self.isCompleted = isCompleted
+    }
+}
 
-
+// MARK: - Widok główny
 struct MyChecklistView: View {
     @State private var travelItems: [TravelItem] = []
     @State private var newItemName: String = ""
@@ -21,6 +36,7 @@ struct MyChecklistView: View {
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
     @AppStorage("isDarkMode") private var isDarkMode = false
     @StateObject private var keyboard = KeyboardResponder()
+    @Environment(\.scenePhase) private var scenePhase
     
     private var themeColors: ThemeColors {
         switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
@@ -44,7 +60,6 @@ struct MyChecklistView: View {
         }
         return Image(imageName)
             .resizable()
-           // .scaledToFill()
             .ignoresSafeArea()
     }
 
@@ -56,7 +71,6 @@ struct MyChecklistView: View {
         NavigationView {
             ZStack {
                 backgroundImageView
-                    .ignoresSafeArea()
                 
                 VStack(spacing: 16) {
                     Spacer()
@@ -64,7 +78,6 @@ struct MyChecklistView: View {
                     
                     SegmentedPicker(selectedTab: $selectedTab, themeColors: themeColors)
                         .padding(.horizontal)
-                        //.padding(.top, 80)
 
                     if selectedTab == 0 {
                         ChecklistContentView(
@@ -79,8 +92,6 @@ struct MyChecklistView: View {
                     
                     Spacer()
                 }
-                //.frame(maxWidth: .infinity)
-               // .padding(.horizontal)
             }
             .navigationBarItems(trailing:
                 Button(action: {
@@ -93,13 +104,25 @@ struct MyChecklistView: View {
                 }
             )
             .sheet(isPresented: $showExportSheet) {
-                ExportView(items: travelItems.map { $0.name }, themeColors: themeColors)
+                ExportView(
+                    items: travelItems.map { $0.name },
+                    themeColors: themeColors
+                )
             }
+
+
             .onAppear(perform: loadItems)
             .onDisappear(perform: saveItems)
+            .onChangeCompat(travelItems) {
+                saveItems()
+            }
+            .onChangeCompat(scenePhase) {
+                if scenePhase == .background { saveItems() }
+            }
         }
     }
 
+    // MARK: - Persistence
     private func loadItems() {
         if let data = UserDefaults.standard.data(forKey: "travelItems"),
            let decoded = try? JSONDecoder().decode([TravelItem].self, from: data) {
@@ -114,7 +137,7 @@ struct MyChecklistView: View {
     }
 }
 
-
+// MARK: - ChecklistItemRow
 struct ChecklistItemRow: View {
     @Binding var item: TravelItem
     let themeColors: ThemeColors
@@ -124,9 +147,7 @@ struct ChecklistItemRow: View {
     var body: some View {
         HStack {
             Button(action: {
-                withAnimation {
-                    item.isCompleted.toggle()
-                }
+                withAnimation { item.isCompleted.toggle() }
                 HapticManager.shared.impact(style: .light)
             }) {
                 Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
@@ -141,6 +162,7 @@ struct ChecklistItemRow: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
                 .strikethrough(item.isCompleted, color: themeColors.lightText)
+            
             Spacer()
             
             Button(action: deleteAction) {
@@ -148,16 +170,16 @@ struct ChecklistItemRow: View {
                     .foregroundColor(themeColors.error)
                     .font(.system(size: isSmallDevice ? 14 : 16))
             }
-            .padding(.trailing, 8) // Poprawienie odstępu ikony trash od prawej krawędzi komórki
+            .padding(.trailing, 8)
         }
-        .frame(height: isSmallDevice ? 32 : 36) // Zmniejszenie wysokości komórki o 2-4 punkty
+        .frame(height: isSmallDevice ? 32 : 36)
         .background(themeColors.primary)
         .cornerRadius(12)
         .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
     }
 }
 
-
+// MARK: - ChecklistContentView
 struct ChecklistContentView: View {
     @Binding var travelItems: [TravelItem]
     @Binding var newItemName: String
@@ -180,9 +202,7 @@ struct ChecklistContentView: View {
                             item: $item,
                             themeColors: themeColors,
                             isSmallDevice: isSmallDevice,
-                            deleteAction: {
-                                deleteItem(item)
-                            }
+                            deleteAction: { deleteItem(item) }
                         )
                     }
                 }
@@ -209,6 +229,7 @@ struct ChecklistContentView: View {
     }
 }
 
+// MARK: - AddItemView i AddButtonStyle
 struct AddItemView: View {
     @Binding var newItemName: String
     let themeColors: ThemeColors
@@ -247,7 +268,7 @@ struct AddButtonStyle: ButtonStyle {
     }
 }
 
-
+// MARK: - SegmentedPicker
 struct SegmentedPicker: View {
     @Binding var selectedTab: Int
     let themeColors: ThemeColors
@@ -267,37 +288,34 @@ struct SegmentedPicker: View {
     }
 }
 
+// MARK: - ExportView
 struct ExportView: View {
-    let items: [String]
+    let items: [String]                // lista z Twojej zakładki “Moja lista”
     let themeColors: ThemeColors
-    @Environment(\ .dismiss) private var dismiss
-    
+    @Environment(\.dismiss) private var dismiss
+
     @State private var showShareSheet = false
     @State private var shareItems: [Any] = []
     @State private var showingError = false
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                Text("".appLocalized)
-                    .font(.title)
-                    .foregroundColor(themeColors.primaryText)
-                    .padding()
-                
-                // Przycisk eksportu My Checklist
+                // 1) Dynamiczny eksport “Moja lista”
                 ExportButtonView(
                     items: items,
                     title: "myTravelList".appLocalized,
-                    category: "userChecklist".appLocalized
+                    category: "userChecklist".appLocalized,
+                    fileName: "My Travel Checklist.pdf"
                 )
-                .padding()
-                
-                // Nowy przycisk eksportu gotowego pliku PDF Travel Checklist
-                Button(action: exportStaticTravelChecklist) {
+                .padding(.horizontal)
+
+                // 2) Statyczny PDF - English
+                Button(action: { exportBundle(named: "Travel Rules Checklist English") }) {
                     HStack {
                         Image(systemName: "doc.richtext")
                             .font(.system(size: 18))
-                        Text(LocalizedStringKey("travel.checklist.button"))
+                        Text("Travel Rules Checklist English")
                     }
                     .padding()
                     .background(themeColors.accent)
@@ -305,20 +323,49 @@ struct ExportView: View {
                     .cornerRadius(10)
                     .shadow(color: themeColors.cardShadow, radius: 5)
                 }
-                .padding()
-                
+                .padding(.horizontal)
+
+                // 3) Statyczny PDF - Polish
+                Button(action: { exportBundle(named: "Travel Rules Checklist Polish") }) {
+                    HStack {
+                        Image(systemName: "doc.richtext")
+                            .font(.system(size: 18))
+                        Text("Travel Rules Checklist Polish")
+                    }
+                    .padding()
+                    .background(themeColors.accent)
+                    .foregroundColor(themeColors.lightText)
+                    .cornerRadius(10)
+                    .shadow(color: themeColors.cardShadow, radius: 5)
+                }
+                .padding(.horizontal)
+
+                // 4) Statyczny PDF - Spanish
+                Button(action: { exportBundle(named: "Travel Rules Checklist Spanish") }) {
+                    HStack {
+                        Image(systemName: "doc.richtext")
+                            .font(.system(size: 18))
+                        Text("Travel Rules Checklist Spanish")
+                    }
+                    .padding()
+                    .background(themeColors.accent)
+                    .foregroundColor(themeColors.lightText)
+                    .cornerRadius(10)
+                    .shadow(color: themeColors.cardShadow, radius: 5)
+                }
+                .padding(.horizontal)
+
                 Spacer()
             }
             .background(Color(themeColors.background).ignoresSafeArea())
             .navigationTitle("export_pdf".appLocalized)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("exit".appLocalized) {
-                        dismiss()
-                    }
-                    .foregroundColor(themeColors.primaryText)
+                    Button("exit".appLocalized) { dismiss() }
+                        .foregroundColor(themeColors.primaryText)
                 }
             }
+            // wspólny sheet i alert dla statycznych przycisków
             .sheet(isPresented: $showShareSheet) {
                 ActivityView(activityItems: shareItems)
             }
@@ -329,13 +376,15 @@ struct ExportView: View {
             }
         }
     }
-    
-    private func exportStaticTravelChecklist() {
-        guard let fileURL = Bundle.main.url(forResource: "Travel checklist", withExtension: "pdf") else {
+
+    private func exportBundle(named resource: String) {
+        guard let fileURL = Bundle.main.url(
+                forResource: resource,
+                withExtension: "pdf")
+        else {
             showingError = true
             return
         }
-        
         shareItems = [fileURL]
         showShareSheet = true
     }

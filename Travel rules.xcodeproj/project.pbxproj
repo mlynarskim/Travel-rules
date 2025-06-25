@@ -22,7 +22,9 @@
 		075B0D1C2D57ED0000F47C1D /* RuleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */; };
 		076C07192D60A12100C12DB1 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076C07182D60A11A00C12DB1 /* ActivityView.swift */; };
 		076C071B2D60A36200C12DB1 /* MyChecklistExportButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076C071A2D60A36000C12DB1 /* MyChecklistExportButtonView.swift */; };
-		076C071F2D60A9FA00C12DB1 /* Travel checklist.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 076C071E2D60A9FA00C12DB1 /* Travel checklist.pdf */; };
+		076EAA862E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 076EAA832E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf */; };
+		076EAA872E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 076EAA852E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf */; };
+		076EAA882E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 076EAA842E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf */; };
 		07DAA6492D82B34200138AAF /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 07DAA6482D82B34200138AAF /* GoogleMobileAds */; };
 		07DD83652D267182004C5C5F /* Travel rules.xcworkspace in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83622D267182004C5C5F /* Travel rules.xcworkspace */; };
 		07DD83662D267182004C5C5F /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83272D267182004C5C5F /* Lato-Regular.ttf */; };
@@ -427,7 +429,9 @@
 		075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleRow.swift; sourceTree = "<group>"; };
 		076C07182D60A11A00C12DB1 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		076C071A2D60A36000C12DB1 /* MyChecklistExportButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyChecklistExportButtonView.swift; sourceTree = "<group>"; };
-		076C071E2D60A9FA00C12DB1 /* Travel checklist.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Travel checklist.pdf"; sourceTree = "<group>"; };
+		076EAA832E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Travel Rules Checklist English.pdf"; sourceTree = "<group>"; };
+		076EAA842E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Travel Rules Checklist Polish.pdf"; sourceTree = "<group>"; };
+		076EAA852E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Travel Rules Checklist Spanish.pdf"; sourceTree = "<group>"; };
 		079DEF4E2D4AA8A800582CD7 /* FirebaseAuth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FirebaseAuth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		07DD82EB2D267182004C5C5F /* Podfile.lock */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
 		07DD82ED2D267182004C5C5F /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
@@ -629,7 +633,9 @@
 		076C071D2D60A9EF00C12DB1 /* PDF */ = {
 			isa = PBXGroup;
 			children = (
-				076C071E2D60A9FA00C12DB1 /* Travel checklist.pdf */,
+				076EAA832E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf */,
+				076EAA842E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf */,
+				076EAA852E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf */,
 			);
 			path = PDF;
 			sourceTree = "<group>";
@@ -1100,13 +1106,15 @@
 				07DD83652D267182004C5C5F /* Travel rules.xcworkspace in Resources */,
 				07DD83662D267182004C5C5F /* Lato-Regular.ttf in Resources */,
 				07DD83682D267182004C5C5F /* Localizable.strings in Resources */,
-				076C071F2D60A9FA00C12DB1 /* Travel checklist.pdf in Resources */,
 				07DD836D2D267182004C5C5F /* Lato-Light.ttf in Resources */,
 				07DD836E2D267182004C5C5F /* Podfile.lock in Resources */,
 				07DD836F2D267182004C5C5F /* Lato-Thin.ttf in Resources */,
 				07DD83712D267182004C5C5F /* Lato-Bold.ttf in Resources */,
 				07DD83732D267182004C5C5F /* Assets.xcassets in Resources */,
 				07DD83742D267182004C5C5F /* OFL.txt in Resources */,
+				076EAA862E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf in Resources */,
+				076EAA872E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf in Resources */,
+				076EAA882E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf in Resources */,
 				07DD83752D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 in Resources */,
 				07DD83772D267182004C5C5F /* Lato-Black.ttf in Resources */,
 				07DD83782D267182004C5C5F /* Lato-LightItalic.ttf in Resources */,
@@ -1155,9 +1163,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Rules/Pods-Rules-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Rules/Pods-Rules-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1431,7 +1443,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1523,7 +1535,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
