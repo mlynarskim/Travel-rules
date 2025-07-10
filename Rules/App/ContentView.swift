@@ -139,14 +139,10 @@ struct ShareButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "square.and.arrow.up")
-                .font(.system(size: 24))
+                .font(.system(size: 22))
                 .foregroundColor(ThemeManager.colors.primary)
-                .padding(12)
-                .background(
-                    Circle()
-                        .fill(Color.white)
-                        .shadow(color: ThemeManager.colors.cardShadow, radius: 3)
-                )
+                .padding(14)
+                
         }
         .offset(x: ScreenMetrics.adaptiveWidth(32), y: -8)
     }
@@ -248,18 +244,34 @@ struct NextView: View {
                 VStack {
                     TopMenuView(showSettings: $showSettings, showPushView: $showPushView)
                     
+                    // Modified section of NextView body
                     VStack(spacing: ThemeManager.layout.spacing.medium) {
-                        Text("the_rule_for_today".appLocalized)
-                            .font(ThemeManager.typography.headline)
-                            .foregroundColor(ThemeManager.colors.lightText)
-                            .frame(maxWidth: .infinity)
-                            .padding(ThemeManager.layout.spacing.medium)
-                            .background(
-                                RoundedRectangle(cornerRadius: ThemeManager.layout.cornerRadius.medium)
-                                    .fill(ThemeManager.colors.primary)
-                                    .shadow(color: ThemeManager.colors.cardShadow, radius: 5)
-                            )
-                            .padding(.horizontal)
+                        // Modified header with centered text and share button
+                        ZStack {
+                            // Centered text
+                            Text("the_rule_for_today".appLocalized)
+                                .font(ThemeManager.typography.headline)
+                                .foregroundColor(ThemeManager.colors.lightText)
+                            
+                            // Share button aligned to trailing edge
+                            HStack {
+                                Spacer()
+                                Button(action: {
+                                    shareRule()
+                                }) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 20, weight: .semibold))
+                                        .foregroundColor(ThemeManager.colors.lightText)
+                                }
+                            }
+                        }
+                        .padding(ThemeManager.layout.spacing.medium)
+                        .background(
+                            RoundedRectangle(cornerRadius: ThemeManager.layout.cornerRadius.medium)
+                                .fill(ThemeManager.colors.primary)
+                                .shadow(color: ThemeManager.colors.cardShadow, radius: 5)
+                        )
+                        .padding(.horizontal)
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: ThemeManager.layout.cornerRadius.medium)
@@ -267,34 +279,29 @@ struct NextView: View {
                                 .shadow(color: ThemeManager.colors.cardShadow, radius: 8)
                             
                             VStack {
-                                
-                                    Text(randomRule)
-                                        .font(ThemeManager.typography.body)
-                                        .multilineTextAlignment(.center)
-                                        .foregroundColor(ThemeManager.colors.primaryText)
-                                        .padding()
+                                Text(randomRule)
+                                    .font(ThemeManager.typography.body)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(ThemeManager.colors.primaryText)
+                                    .padding()
                                 
                                 Spacer()
                                 
-                                ShareButton {
-                                    shareRule()
-                                }
-                                .padding(.top, 10)
-                                .padding(.bottom, 50)
+                                // Remove the old ShareButton from here
                             }
                         }
-                        .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(35))
+                        .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(33))
                         .overlay(
                             Group {
-                                    AdBannerView(adUnitID: bannerAdUnitID)
-                                        .frame(height: 50)
-                                        .padding(8)
-                                
+                                AdBannerView(adUnitID: bannerAdUnitID)
+                                    .frame(height: 50)
+                                    .padding(8)
                             },
                             alignment: .bottomLeading
                         )
                         .padding(.horizontal)
                         
+                        // Rest of your buttons remain the same
                         HStack {
                             MainActionButton(title: "draw".appLocalized, icon: "dice.fill") {
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
@@ -319,7 +326,6 @@ struct NextView: View {
                         }
                         .padding(.horizontal)
                     }
-                    
                     Spacer()
                     BottomNavigationMenu(savedRules: $savedRules)
                 }
