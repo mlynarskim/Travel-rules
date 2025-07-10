@@ -283,7 +283,7 @@ struct NextView: View {
                                 .padding(.bottom, 50)
                             }
                         }
-                        .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(30))
+                        .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(35))
                         .overlay(
                             Group {
                                     AdBannerView(adUnitID: bannerAdUnitID)

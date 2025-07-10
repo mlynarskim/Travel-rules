@@ -1443,7 +1443,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 1.6;
+				MARKETING_VERSION = 1.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1535,7 +1535,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 1.6;
+				MARKETING_VERSION = 1.7;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
