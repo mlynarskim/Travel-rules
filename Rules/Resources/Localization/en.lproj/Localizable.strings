@@ -393,3 +393,32 @@
 "NSLocationWhenInUseUsageDescription" = "This app uses your location solely to record your current position in the GPS tab. Location data is not transmitted to any external servers.";
 
 "bonus_rules_add" = "Watch the ad - Get 5 rules";
+
+// Category section (SettingsView)
+"category.settings.title" = "Categories";
+"category.settings.choose" = "Category";
+"category.all.title" = "All";
+
+// Category names
+"category.technical" = "Technical";
+"category.vanlife" = "Vanlife & Travel";
+"category.ecology" = "Ecology & Nature";
+"category.hygiene" = "Hygiene & Health";
+"category.food" = "Food & Kitchen";
+"category.mindset" = "Mindset & Relationships";
+"category.safety" = "Safety";
+"category.location" = "Places & Location";
+"category.organization" = "Organization & Order";
+"category.gear" = "Gear & Lifehacks";
+
+// Paywall / Premium
+"premium_active" = "Premium active";
+"premium_locked" = "Premium locked";
+"premium_title" = "Unlock Premium";
+"premium_subtitle" = "Access all categories, remove ads, and export a PDF packing checklist.";
+"premium_price" = "Price:";
+"premium_buy" = "Buy Premium";
+"premium_restore" = "Restore";
+"premium_owned" = "Owned";
+"product_unavailable" = "Product unavailable";
+"close" = "Close";

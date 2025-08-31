@@ -2,14 +2,15 @@ import SwiftUI
 import Foundation
 import AVFoundation
 import UIKit
+import StoreKit  // ⬅️ [PAYWALL] StoreKit 2
 
+// MARK: - Background music (bez zmian)
 var audioPlayer: AVAudioPlayer?
 
 func playBackgroundMusic() {
-    guard let musicURL = Bundle.main.url(forResource: "lofi-ambient-pianoline-116134", withExtension: "mp3") else {
+    guard let musicURL = Bundle.main.url(forResource: "ambient-wave-48-tribute-17243", withExtension: "mp3") else {
         return
     }
-    
     do {
         audioPlayer = try AVAudioPlayer(contentsOf: musicURL)
         audioPlayer?.numberOfLoops = -1
@@ -24,6 +25,114 @@ func stopBackgroundMusic() {
     audioPlayer?.currentTime = 0
 }
 
+// MARK: - [PAYWALL] StoreKit 2 Manager (subskrypcje: monthly/yearly)
+@MainActor
+final class PurchaseManager: ObservableObject {
+    private let premiumProductID = "com.mlynarski.travelrules.premium.monthly"
+    private let premiumYearlyProductID = "com.mlynarski.travelrules.premium.yearly"
+    
+    @Published var premiumProduct: Product?            // domyślnie monthly
+    @Published var premiumMonthlyProduct: Product?
+    @Published var premiumYearlyProduct: Product?
+    
+    @Published var isPurchasing = false
+    @Published var lastError: String?
+    
+    private var transactionListenerTask: Task<Void, Never>?
+    deinit { transactionListenerTask?.cancel() }
+    
+    func loadProducts() async {
+        do {
+            let ids = [premiumProductID, premiumYearlyProductID]
+            let products = try await Product.products(for: ids)
+            for p in products {
+                if p.id == premiumProductID { premiumMonthlyProduct = p }
+                if p.id == premiumYearlyProductID { premiumYearlyProduct = p }
+            }
+            premiumProduct = premiumMonthlyProduct ?? premiumYearlyProduct
+            if premiumMonthlyProduct == nil && premiumYearlyProduct == nil {
+                lastError = "product_unavailable".appLocalized
+            }
+            print("📦 Products loaded:",
+                  premiumMonthlyProduct?.id ?? "nil",
+                  premiumYearlyProduct?.id ?? "nil")
+        } catch {
+            lastError = error.localizedDescription
+            print("❌ [StoreKit] products error: \(error.localizedDescription)")
+        }
+    }
+    
+    func updatePurchased(hasPremiumBinding: Binding<Bool>) async {
+        var hasPremium = false
+        for await result in Transaction.currentEntitlements {
+            if case .verified(let transaction) = result,
+               (transaction.productID == premiumProductID || transaction.productID == premiumYearlyProductID) {
+                hasPremium = true
+                break
+            }
+        }
+        hasPremiumBinding.wrappedValue = hasPremium
+        print("🔐 Premium status updated ->", hasPremium)
+    }
+    
+    func purchase(product: Product?, hasPremiumBinding: Binding<Bool>) async {
+        guard let product else {
+            lastError = "product_unavailable".appLocalized
+            return
+        }
+        isPurchasing = true
+        defer { isPurchasing = false }
+        do {
+            let result = try await product.purchase()
+            switch result {
+            case .success(let verification):
+                switch verification {
+                case .unverified(_, let err):
+                    lastError = err.localizedDescription
+                case .verified(let transaction):
+                    await transaction.finish()
+                    await updatePurchased(hasPremiumBinding: hasPremiumBinding)
+                }
+            case .userCancelled, .pending:
+                break
+            @unknown default:
+                break
+            }
+        } catch {
+            lastError = error.localizedDescription
+            print("❌ [StoreKit] purchase error: \(error.localizedDescription)")
+        }
+    }
+    
+    func purchase(hasPremiumBinding: Binding<Bool>) async {
+        await purchase(product: premiumProduct, hasPremiumBinding: hasPremiumBinding)
+    }
+    
+    func restore(hasPremiumBinding: Binding<Bool>) async {
+        do {
+            try await AppStore.sync()
+            await updatePurchased(hasPremiumBinding: hasPremiumBinding)
+        } catch {
+            lastError = error.localizedDescription
+            print("❌ [StoreKit] restore error: \(error.localizedDescription)")
+        }
+    }
+    
+    func listenForTransactions(hasPremiumBinding: Binding<Bool>) {
+        transactionListenerTask?.cancel()
+        transactionListenerTask = Task.detached(priority: .background) { [weak self] in
+            for await result in Transaction.updates {
+                guard let self else { continue }
+                // ✅ [POPRAWKA] wyciągamy Transaction z VerificationResult, a potem transaction.finish()
+                guard case .verified(let transaction) = result else { continue } // ← zamiast update.finish()
+                await self.updatePurchased(hasPremiumBinding: hasPremiumBinding)
+                await transaction.finish() // ← poprawny obiekt do finish()
+            }
+        }
+    }
+}
+
+// MARK: - SettingsView
 struct SettingsView: View {
     @Binding var showSettings: Bool
     @AppStorage("isDarkMode") var isDarkMode = false
@@ -31,6 +140,18 @@ struct SettingsView: View {
     @State private var showThemeSelector = false
     @StateObject private var languageManager = LanguageManager.shared
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
+    
+    // [KATEGORIE + PAYWALL]
+    @AppStorage("selectedCategoryKey") private var selectedCategoryKey: String = "all"
+    @AppStorage("hasPremium") private var hasPremium: Bool = false
+    @StateObject private var purchaseManager = PurchaseManager()
+    @State private var showPaywallSheet = false
+    
+    // tymczasowy wybór do cofnięcia po paywallu
+    @State private var tempSelectedCategoryKey: String = "all"
+    
+    // wybór planu
+    @State private var selectedPlanIsYearly: Bool = false
     
     private var themeColors: ThemeColors {
         switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
@@ -42,80 +163,63 @@ struct SettingsView: View {
         }
     }
     
-    private var isSmallDevice: Bool {
-        UIScreen.main.bounds.height <= 667 // np. iPhone SE, 7, 8
-    }
+    private var isSmallDevice: Bool { UIScreen.main.bounds.height <= 667 } // iPhone 7/8/SE
     
     var body: some View {
         NavigationView {
             ZStack {
-                themeColors.secondary
-                    .ignoresSafeArea()
+                themeColors.secondary.ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: isSmallDevice ? 10 : 16) {
-                        // Nagłówek
-                        HStack {
-                            Spacer()
-                            Text("settings".appLocalized)
-                                .font(.system(size: isSmallDevice ? 24 : 28, weight: .bold))
-                                .foregroundColor(themeColors.primaryText)
-                                .padding(.vertical, isSmallDevice ? 8 : 12)
-                            Spacer()
-                            Button(action: {
-                                showSettings = false
-                            }) {
-                                Image(systemName: "xmark.circle")
-                                    .font(.system(size: isSmallDevice ? 20 : 24))
-                                    .foregroundColor(themeColors.primaryText)
-                                    .padding()
-                            }
+                        HeaderBar(themeColors: themeColors, isSmallDevice: isSmallDevice) {
+                            showSettings = false
                         }
                         
                         VStack(spacing: isSmallDevice ? 16 : 20) {
-                            SettingsCard {
-                                Toggle("dark_mode".appLocalized, isOn: $isDarkMode)
-                                    .foregroundColor(themeColors.primaryText)
-                                
-                                Toggle("music".appLocalized, isOn: $isMusicEnabled)
-                                    .foregroundColor(themeColors.primaryText)
-                                    .onChange(of: isMusicEnabled) { _, newValue in
-                                        if newValue {
-                                            playBackgroundMusic()
-                                        } else {
-                                            stopBackgroundMusic()
-                                        }
-                                    }
-                            }
+                            AppearanceCard(
+                                themeColors: themeColors,
+                                isDarkMode: $isDarkMode,
+                                isMusicEnabled: $isMusicEnabled
+                            )
                             
-                            SettingsCard {
-                                Button(action: { showThemeSelector = true }) {
-                                    HStack {
-                                        Text("themes".appLocalized)
-                                            .foregroundColor(themeColors.primaryText)
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundColor(themeColors.secondaryText)
+                            ThemeLangCard(
+                                themeColors: themeColors,
+                                showThemeSelector: $showThemeSelector,
+                                languageManager: languageManager
+                            )
+                            
+                            CategoryCard(
+                                themeColors: themeColors,
+                                hasPremium: hasPremium,
+                                tempSelectedCategoryKey: $tempSelectedCategoryKey,
+                                selectedCategoryKey: $selectedCategoryKey,
+                                showPaywall: { showPaywallSheet = true },
+                                isSmallDevice: isSmallDevice
+                            )
+                            
+                            PremiumCard(
+                                themeColors: themeColors,
+                                isSmallDevice: isSmallDevice,
+                                hasPremium: hasPremium,
+                                selectedPlanIsYearly: $selectedPlanIsYearly,
+                                monthlyProduct: purchaseManager.premiumMonthlyProduct,
+                                yearlyProduct: purchaseManager.premiumYearlyProduct,
+                                defaultProduct: purchaseManager.premiumProduct,
+                                isPurchasing: purchaseManager.isPurchasing,
+                                buyTapped: {
+                                    Task {
+                                        let product = selectedPlanIsYearly
+                                        ? (purchaseManager.premiumYearlyProduct ?? purchaseManager.premiumProduct)
+                                        : (purchaseManager.premiumMonthlyProduct ?? purchaseManager.premiumProduct)
+                                        await purchaseManager.purchase(product: product, hasPremiumBinding: $hasPremium)
                                     }
-                                }
-                                
-                                Divider().background(themeColors.secondaryText)
-                                
-                                HStack {
-                                    Text("language".appLocalized)
-                                        .foregroundColor(themeColors.primaryText)
-                                    Spacer()
-                                    Picker("", selection: $languageManager.currentLanguage) {
-                                        ForEach(AppLanguage.allCases, id: \.self) { language in
-                                            Text(language.displayName).tag(language)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .onChange(of: languageManager.currentLanguage) { _, _ in
-                                        NotificationCenter.default.post(name: NSNotification.Name("LanguageChanged"), object: nil)
-                                    }
-                                }
-                            }
+                                },
+                                restoreTapped: {
+                                    Task { await purchaseManager.restore(hasPremiumBinding: $hasPremium) }
+                                },
+                                lastError: purchaseManager.lastError
+                            )
                             
                             Button(action: { resetApplication() }) {
                                 Text("reset_all_settings".appLocalized)
@@ -129,47 +233,65 @@ struct SettingsView: View {
                             }
                             .padding(.horizontal)
                             
-                            SettingsCard {
-                                SettingsButton(
-                                    icon: "square.and.arrow.up",
-                                    title: "share_app".appLocalized,
-                                    action: "share".appLocalized,
-                                    iconColor: themeColors.primary,
-                                    themeColors: themeColors
-                                ) { shareApp() }
-                                
-                                Divider().background(themeColors.secondaryText)
-                                
-                                SettingsButton(
-                                    icon: "star.fill",
-                                    title: "rate_app".appLocalized,
-                                    action: "rate".appLocalized,
-                                    iconColor: .yellow,
-                                    themeColors: themeColors
-                                ) { rateApp() }
-                                
-                                Divider().background(themeColors.secondaryText)
-                                
-                                SettingsButton(
-                                    icon: "envelope.fill",
-                                    title: "send_feedback".appLocalized,
-                                    action: "send".appLocalized,
-                                    iconColor: .red,
-                                    themeColors: themeColors
-                                ) { sendFeedback() }
-                            }
+                            ActionsCard(themeColors: themeColors, shareApp: shareApp, rateApp: rateApp, sendFeedback: sendFeedback)
                         }
                         .padding(.horizontal, isSmallDevice ? 12 : 16)
                     }
                 }
+                
+                if purchaseManager.isPurchasing {
+                    ZStack {
+                        Color.black.opacity(0.3).ignoresSafeArea()
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(1.3)
+                    }
+                    .transition(.opacity)
+                }
             }
         }
-        .sheet(isPresented: $showThemeSelector) {
-            ThemeSelectionView()
+        .sheet(isPresented: $showThemeSelector) { ThemeSelectionView() }
+        .task {
+            tempSelectedCategoryKey = selectedCategoryKey
+            await purchaseManager.loadProducts()
+            await purchaseManager.updatePurchased(hasPremiumBinding: $hasPremium)
+            purchaseManager.listenForTransactions(hasPremiumBinding: $hasPremium)
+        }
+        .sheet(isPresented: $showPaywallSheet) {
+            PaywallSheet(
+                themeColors: themeColors,
+                product: selectedPlanIsYearly ? (purchaseManager.premiumYearlyProduct ?? purchaseManager.premiumProduct)
+                                              : (purchaseManager.premiumMonthlyProduct ?? purchaseManager.premiumProduct),
+                isPurchasing: purchaseManager.isPurchasing,
+                buyAction: {
+                    Task {
+                        let product = selectedPlanIsYearly
+                        ? (purchaseManager.premiumYearlyProduct ?? purchaseManager.premiumProduct)
+                        : (purchaseManager.premiumMonthlyProduct ?? purchaseManager.premiumProduct)
+                        await purchaseManager.purchase(product: product, hasPremiumBinding: $hasPremium)
+                        showPaywallSheet = false
+                    }
+                },
+                restoreAction: {
+                    Task {
+                        await purchaseManager.restore(hasPremiumBinding: $hasPremium)
+                        showPaywallSheet = false
+                    }
+                }
+            )
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            Task { await purchaseManager.updatePurchased(hasPremiumBinding: $hasPremium) }
         }
     }
     
-    // MARK: - Funkcje
+    // MARK: - Helpers
+    private func currentCategoryTitle(for key: String) -> String {
+        if key == "all" { return "category.all.title".appLocalized }
+        if let cat = RuleCategory.allCases.first(where: { $0.rawValue == key }) { return cat.localizedTitle }
+        return "category.all.title".appLocalized
+    }
+    
     private func shareApp() {
         let appLink = "https://apps.apple.com/pl/app/travel-rules/id6451070215?l=pl"
         let shareText = "Check out Travel-Rules!"
@@ -177,7 +299,6 @@ struct SettingsView: View {
             activityItems: [shareText, appLink],
             applicationActivities: nil
         )
-        
         DispatchQueue.main.async {
             if let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
                let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }),
@@ -185,15 +306,9 @@ struct SettingsView: View {
                 
                 if let popover = activityController.popoverPresentationController {
                     popover.sourceView = topController.view
-                    popover.sourceRect = CGRect(
-                        x: topController.view.bounds.midX,
-                        y: topController.view.bounds.midY,
-                        width: 0,
-                        height: 0
-                    )
+                    popover.sourceRect = CGRect(x: topController.view.bounds.midX, y: topController.view.bounds.midY, width: 0, height: 0)
                     popover.permittedArrowDirections = []
                 }
-                
                 topController.present(activityController, animated: true, completion: nil)
             } else {
                 print("Nie udało się znaleźć aktywnego widoku kontrolera.")
@@ -215,9 +330,7 @@ struct SettingsView: View {
     
     private func resetApplication() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootViewController = windowScene.windows.first?.rootViewController?.topmostViewController() else {
-            return
-        }
+              let rootViewController = windowScene.windows.first?.rootViewController?.topmostViewController() else { return }
         
         let confirmReset = UIAlertController(
             title: "reset_title".appLocalized,
@@ -238,6 +351,10 @@ struct SettingsView: View {
                 UserDefaults.standard.removeObject(forKey: "totalRulesDrawn")
                 UserDefaults.standard.removeObject(forKey: "totalRulesSaved")
                 
+                // [PAYWALL/KATEGORIE] Reset
+                UserDefaults.standard.set("all", forKey: "selectedCategoryKey")
+                UserDefaults.standard.set(false, forKey: "hasPremium")
+                
                 UserDefaults.standard.set(false, forKey: "isDarkMode")
                 UserDefaults.standard.set(ThemeStyle.classic.rawValue, forKey: "selectedTheme")
                 UserDefaults.standard.set(true, forKey: "isMusicEnabled")
@@ -248,41 +365,266 @@ struct SettingsView: View {
                 self.showSettings = false
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    NotificationCenter.default.post(
-                        name: NSNotification.Name("AppReset"),
-                        object: nil
-                    )
-                    
+                    NotificationCenter.default.post(name: NSNotification.Name("AppReset"), object: nil)
                     let restartAlert = UIAlertController(
                         title: "reset_complete".appLocalized,
                         message: "please_restart_app".appLocalized,
                         preferredStyle: .alert
                     )
-                    
-                    restartAlert.addAction(UIAlertAction(
-                        title: "ok".appLocalized,
-                        style: .default,
-                        handler: nil
-                    ))
-                    
+                    restartAlert.addAction(UIAlertAction(title: "ok".appLocalized, style: .default, handler: nil))
                     rootViewController.present(restartAlert, animated: true)
                 }
             }))
         
-        confirmReset.addAction(UIAlertAction(
-            title: "cancel".appLocalized,
-            style: .cancel,
-            handler: nil
-        ))
-        
+        confirmReset.addAction(UIAlertAction(title: "cancel".appLocalized, style: .cancel, handler: nil))
         rootViewController.present(confirmReset, animated: true)
     }
 }
 
+// MARK: - Pod-widoki (bez zmian merytorycznych)
+
+private struct HeaderBar: View {
+    let themeColors: ThemeColors
+    let isSmallDevice: Bool
+    let onClose: () -> Void
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            Text("settings".appLocalized)
+                .font(.system(size: isSmallDevice ? 24 : 28, weight: .bold))
+                .foregroundColor(themeColors.primaryText)
+                .padding(.vertical, isSmallDevice ? 8 : 12)
+            Spacer()
+            Button(action: onClose) {
+                Image(systemName: "xmark.circle")
+                    .font(.system(size: isSmallDevice ? 20 : 24))
+                    .foregroundColor(themeColors.primaryText)
+                    .padding()
+            }
+        }
+    }
+}
+
+private struct AppearanceCard: View {
+    let themeColors: ThemeColors
+    @Binding var isDarkMode: Bool
+    @Binding var isMusicEnabled: Bool
+    
+    var body: some View {
+        SettingsCard(themeColors: themeColors) {
+            Toggle("dark_mode".appLocalized, isOn: $isDarkMode)
+                .foregroundColor(themeColors.primaryText)
+            Toggle("music".appLocalized, isOn: $isMusicEnabled)
+                .foregroundColor(themeColors.primaryText)
+                .onChange(of: isMusicEnabled) { _, newValue in
+                    newValue ? playBackgroundMusic() : stopBackgroundMusic()
+                }
+        }
+    }
+}
+
+private struct ThemeLangCard: View {
+    let themeColors: ThemeColors
+    @Binding var showThemeSelector: Bool
+    let languageManager: LanguageManager
+    
+    var body: some View {
+        SettingsCard(themeColors: themeColors) {
+            Button(action: { showThemeSelector = true }) {
+                HStack {
+                    Text("themes".appLocalized).foregroundColor(themeColors.primaryText)
+                    Spacer()
+                    Image(systemName: "chevron.right").foregroundColor(themeColors.secondaryText)
+                }
+            }
+            Divider().background(themeColors.secondaryText)
+            HStack {
+                Text("language".appLocalized).foregroundColor(themeColors.primaryText)
+                Spacer()
+                Picker("", selection: Binding(
+                    get: { languageManager.currentLanguage },
+                    set: { language in
+                        languageManager.currentLanguage = language
+                        NotificationCenter.default.post(name: NSNotification.Name("LanguageChanged"), object: nil)
+                    })
+                ) {
+                    ForEach(AppLanguage.allCases, id: \.self) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+            }
+        }
+    }
+}
+
+private struct CategoryCard: View {
+    let themeColors: ThemeColors
+    let hasPremium: Bool
+    @Binding var tempSelectedCategoryKey: String
+    @Binding var selectedCategoryKey: String
+    let showPaywall: () -> Void
+    let isSmallDevice: Bool
+    
+    var body: some View {
+        SettingsCard(themeColors: themeColors) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("category.settings.title".appLocalized)
+                        .font(.system(size: isSmallDevice ? 18 : 20, weight: .semibold))
+                        .foregroundColor(themeColors.primaryText)
+                    Spacer()
+                    Text(hasPremium ? "premium_active".appLocalized : "premium_locked".appLocalized)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(hasPremium ? .green : .orange)
+                }
+                
+                HStack {
+                    Text("category.settings.choose".appLocalized)
+                        .foregroundColor(themeColors.primaryText)
+                    Spacer()
+                    
+                    let label = Text(currentCategoryTitle(for: tempSelectedCategoryKey))
+                        .foregroundColor(themeColors.primary)
+                    
+                    Picker(selection: $tempSelectedCategoryKey) {
+                        Text("category.all.title".appLocalized).tag("all")
+                        ForEach(RuleCategory.allCases) { cat in
+                            Text(cat.localizedTitle).tag(cat.rawValue)
+                        }
+                    } label: { label }
+                    .pickerStyle(MenuPickerStyle())
+                    .onChange(of: tempSelectedCategoryKey) { _, newKey in
+                        if newKey != "all" && !hasPremium {
+                            tempSelectedCategoryKey = selectedCategoryKey
+                            showPaywall()
+                        } else {
+                            selectedCategoryKey = newKey
+                            NotificationCenter.default.post(name: NSNotification.Name("CategoryChanged"), object: nil)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func currentCategoryTitle(for key: String) -> String {
+        if key == "all" { return "category.all.title".appLocalized }
+        if let cat = RuleCategory.allCases.first(where: { $0.rawValue == key }) { return cat.localizedTitle }
+        return "category.all.title".appLocalized
+    }
+}
+
+private struct PremiumCard: View {
+    let themeColors: ThemeColors
+    let isSmallDevice: Bool
+    let hasPremium: Bool
+    @Binding var selectedPlanIsYearly: Bool
+    let monthlyProduct: Product?
+    let yearlyProduct: Product?
+    let defaultProduct: Product?
+    let isPurchasing: Bool
+    let buyTapped: () -> Void
+    let restoreTapped: () -> Void
+    let lastError: String?
+    
+    var body: some View {
+        SettingsCard(themeColors: themeColors) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(themeColors.primary)
+                    .padding(.top, 2)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("premium_title".appLocalized)
+                        .font(.system(size: isSmallDevice ? 18 : 20, weight: .bold))
+                        .foregroundColor(themeColors.primaryText)
+                    Text("premium_subtitle".appLocalized)
+                        .font(.system(size: 14))
+                        .foregroundColor(themeColors.secondaryText)
+                }
+                Spacer()
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                if let mp = monthlyProduct?.displayPrice {
+                    Text("• " + "monthly".appLocalized + ": \(mp)")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(themeColors.primaryText)
+                }
+                if let yp = yearlyProduct?.displayPrice {
+                    Text("• " + "yearly".appLocalized + ": \(yp)")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(themeColors.primaryText)
+                }
+                if monthlyProduct == nil && yearlyProduct == nil, let price = defaultProduct?.displayPrice {
+                    Text("premium_price".appLocalized + " \(price)")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(themeColors.primaryText)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            HStack(spacing: 12) {
+                PlanPill(
+                    title: "monthly".appLocalized,
+                    subtitle: monthlyProduct?.displayPrice ?? "—",
+                    selected: !selectedPlanIsYearly,
+                    themeColors: themeColors
+                ) { selectedPlanIsYearly = false }
+                
+                PlanPill(
+                    title: "yearly".appLocalized,
+                    subtitle: yearlyProduct?.displayPrice ?? "—",
+                    selected: selectedPlanIsYearly,
+                    themeColors: themeColors
+                ) { selectedPlanIsYearly = true }
+            }
+            
+            HStack {
+                Button(action: buyTapped) {
+                    Text(hasPremium ? "premium_owned".appLocalized : "premium_buy".appLocalized)
+                        .font(.system(size: isSmallDevice ? 16 : 18, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: isSmallDevice ? 44 : 50)
+                        .background(themeColors.primary)
+                        .cornerRadius(12)
+                }
+                .disabled(hasPremium || isPurchasing)
+                
+                Button(action: restoreTapped) {
+                    Text("premium_restore".appLocalized)
+                        .font(.system(size: isSmallDevice ? 14 : 16, weight: .bold))
+                        .foregroundColor(themeColors.primary)
+                        .frame(height: isSmallDevice ? 44 : 50)
+                        .padding(.horizontal, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(themeColors.primary, lineWidth: 2)
+                        )
+                }
+                .disabled(isPurchasing)
+            }
+            
+            if let error = lastError {
+                Text(error)
+                    .font(.system(size: 12))
+                    .foregroundColor(.red)
+            }
+        }
+    }
+}
+
+// MARK: - Reusable cards / rows
+
 struct SettingsCard<Content: View>: View {
     let content: Content
+    let themeColors: ThemeColors
     
-    init(@ViewBuilder content: () -> Content) {
+    init(themeColors: ThemeColors, @ViewBuilder content: () -> Content) {
+        self.themeColors = themeColors
         self.content = content()
     }
     
@@ -291,9 +633,9 @@ struct SettingsCard<Content: View>: View {
             content
         }
         .padding()
-        .background(Color.white.opacity(0.95))
+        .background(themeColors.cardBackground)
         .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4)
+        .shadow(color: themeColors.cardShadow, radius: 4)
     }
 }
 
@@ -321,6 +663,179 @@ struct SettingsButton: View {
     }
 }
 
+// ⛔️ NIEUŻYWANE (zostawione)
+struct CategoryRow: View {
+    let title: String
+    let isSelected: Bool
+    let locked: Bool
+    let themeColors: ThemeColors
+    let onTap: () -> Void
+    
+    var body: some View {
+        HStack {
+            Text(title)
+                .foregroundColor(locked ? themeColors.secondaryText : themeColors.primaryText)
+            Spacer()
+            if isSelected {
+                Image(systemName: "checkmark")
+                    .foregroundColor(themeColors.primary)
+            }
+            if locked {
+                Image(systemName: "lock.fill")
+                    .foregroundColor(.secondary)
+                    .opacity(0.7)
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture { onTap() }
+    }
+}
+
+struct PlanPill: View {
+    let title: String
+    let subtitle: String
+    let selected: Bool
+    let themeColors: ThemeColors
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 2) {
+                Text(title).font(.system(size: 12, weight: .semibold))
+                Text(subtitle).font(.system(size: 11))
+            }
+            .foregroundColor(selected ? .white : themeColors.primaryText)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(selected ? themeColors.primary : themeColors.cardBackground)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(selected ? themeColors.primary : themeColors.secondaryText.opacity(0.4), lineWidth: 1)
+            )
+        }
+    }
+}
+
+private struct ActionsCard: View {
+    let themeColors: ThemeColors
+    let shareApp: () -> Void
+    let rateApp: () -> Void
+    let sendFeedback: () -> Void
+    
+    var body: some View {
+        SettingsCard(themeColors: themeColors) {
+            SettingsButton(
+                icon: "square.and.arrow.up",
+                title: "share_app".appLocalized,
+                action: "share".appLocalized,
+                iconColor: themeColors.primary,
+                themeColors: themeColors
+            ) { shareApp() }
+            
+            Divider().background(themeColors.secondaryText)
+            
+            SettingsButton(
+                icon: "star.fill",
+                title: "rate_app".appLocalized,
+                action: "rate".appLocalized,
+                iconColor: .yellow,
+                themeColors: themeColors
+            ) { rateApp() }
+            
+            Divider().background(themeColors.secondaryText)
+            
+            SettingsButton(
+                icon: "envelope.fill",
+                title: "send_feedback".appLocalized,
+                action: "send".appLocalized,
+                iconColor: .red,
+                themeColors: themeColors
+            ) { sendFeedback() }
+        }
+    }
+}
+
+// MARK: - Paywall Sheet
+struct PaywallSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let themeColors: ThemeColors
+    let product: Product?
+    let isPurchasing: Bool
+    let buyAction: () -> Void
+    let restoreAction: () -> Void
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                themeColors.secondary.ignoresSafeArea()
+                VStack(spacing: 16) {
+                    Spacer(minLength: 8)
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 40, weight: .bold))
+                        .foregroundColor(themeColors.primary)
+                    Text("premium_title".appLocalized)
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(themeColors.primaryText)
+                    Text("premium_subtitle".appLocalized)
+                        .font(.system(size: 15))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(themeColors.primaryText.opacity(0.8))
+                        .padding(.horizontal)
+                    
+                    if let price = product?.displayPrice {
+                        Text("premium_price".appLocalized + " \(price)")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(themeColors.primaryText)
+                            .padding(.top, 6)
+                    }
+                    
+                    VStack(spacing: 12) {
+                        Button(action: buyAction) {
+                            Text("premium_buy".appLocalized)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(themeColors.primary)
+                                .cornerRadius(12)
+                        }
+                        .disabled(isPurchasing)
+                        
+                        Button(action: restoreAction) {
+                            Text("premium_restore".appLocalized)
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(themeColors.primary)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(themeColors.primary, lineWidth: 2)
+                                )
+                        }
+                        .disabled(isPurchasing)
+                    }
+                    .padding(.horizontal)
+                    
+                    Spacer()
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("close".appLocalized) {
+                        dismiss()
+                    }
+                    .foregroundColor(themeColors.primary)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Helpers
 extension UIViewController {
     func topmostViewController() -> UIViewController {
         if let presentedVC = presentedViewController {

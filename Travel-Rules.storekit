@@ -1,0 +1,165 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "7871D18E",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6451070215",
+    "_developerTeamID" : "3Y79SF4PL3",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 778331844.10030901,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21769708",
+      "localizations" : [
+
+      ],
+      "name" : "Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "1.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6751771896",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Unlock full access to vanlife rules.",
+              "displayName" : "Travel Rules Premium",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Odblokuj pełny dostęp do zasad vanlife.",
+              "displayName" : "Travel Rules Premium",
+              "locale" : "pl"
+            },
+            {
+              "description" : "El acceso completo a las reglas de vanlife.",
+              "displayName" : "Travel Rules Premium",
+              "locale" : "ar"
+            }
+          ],
+          "productID" : "com.mlynarski.travelrules.premium.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Auto-Renewable monthly",
+          "subscriptionGroupID" : "21769708",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6751771904",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "El acceso completo a las reglas de vanlife.",
+              "displayName" : "Travel Rules Premium",
+              "locale" : "ar"
+            },
+            {
+              "description" : "Odblokuj pełny dostęp do zasad vanlife.",
+              "displayName" : "Travel Rules Premium",
+              "locale" : "pl"
+            },
+            {
+              "description" : "Unlock full access to vanlife rules.",
+              "displayName" : "Travel Rules Premium",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.mlynarski.travelrules.premium.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Auto-Renewable yearly",
+          "subscriptionGroupID" : "21769708",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

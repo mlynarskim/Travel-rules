@@ -8,6 +8,7 @@ import AVFoundation
 import CoreLocation
 import MapKit
 import GoogleMobileAds
+import UIKit // dla UIImage w generateImage()
 
 // MARK: - Rewarded Ad Delegate
 class RewardedAdDelegate: NSObject, FullScreenContentDelegate {
@@ -142,7 +143,6 @@ struct ShareButton: View {
                 .font(.system(size: 22))
                 .foregroundColor(ThemeManager.colors.primary)
                 .padding(14)
-                
         }
         .offset(x: ScreenMetrics.adaptiveWidth(32), y: -8)
     }
@@ -186,16 +186,10 @@ struct LoadingView: View {
 }
 
 struct NextView: View {
-     let bannerID = "ca-app-pub-5307701268996147~2371937539"
-   let bannerAdUnitID = "ca-app-pub-5307701268996147/4702587401"
-   // let rewardedAdUnitID = "ca-app-pub-5307701268996147/7858242475" //reklama pełnoekranowa z nagrodą
+    let bannerID = "ca-app-pub-5307701268996147~2371937539"
+    let bannerAdUnitID = "ca-app-pub-5307701268996147/4702587401"
     let rewardedAdUnitID = "ca-app-pub-5307701268996147/8131308249"
-
-   
-    //testowea
-  //  let bannerAdUnitID = "ca-app-pub-3940256099942544/2934735716"
-    // let rewardedAdUnitID = "ca-app-pub-3940256099942544/1712485313"
-
+    
     @State private var shouldShowAd = false
     private let maxDailyRules = 5
     @State private var randomRule: String = ""
@@ -206,8 +200,14 @@ struct NextView: View {
     @State private var showRulesList = false
     @AppStorage("isDarkMode") var isDarkMode = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
+    
+    // 🟡 PREMIUM
+    @AppStorage("hasPremium") private var hasPremium: Bool = false
+    
+    // 🕒 przechowywanie daty oraz limitu dziennego
     @AppStorage("lastRulesDate") private var lastRulesDate: Double = Date().timeIntervalSince1970
     @AppStorage("dailyRulesCount") private var dailyRulesCount: Int = 0
+    
     @State private var usedRulesIndices: [Int] = []
     var rulesList: [String] { return getLocalizedRules() }
     @State private var showAlert = false
@@ -219,17 +219,24 @@ struct NextView: View {
     @StateObject private var achievementManager = AchievementManager()
     @AppStorage("totalRulesDrawn") private var totalRulesDrawn: Int = 0
     @AppStorage("totalRulesSaved") private var totalRulesSaved: Int = 0
-    
     @AppStorage("rewardedPacks") private var rewardedPacks: Int = 0
-    
     @State private var rewardedAd: RewardedAd?
     @State private var rewardedAdDelegate = RewardedAdDelegate()
-    
-    var allowedRules: Int {
-        return maxDailyRules + (rewardedPacks * 5)
-    }
-    
     @AppStorage("totalRulesShared") private var totalRulesShared: Int = 0
+
+    // [KATEGORIE]
+    @AppStorage("selectedCategoryKey") private var selectedCategoryKey: String = "all"
+    // ⚠️ [ZMIANA] usunięto użycie @AppStorage("appLanguage") na rzecz LanguageManager (spójność z SettingsView)
+    // @AppStorage("appLanguage") private var appLanguageCode: String = Locale.current.language.languageCode?.identifier ?? "pl" // ← nieużywane (pozostawiono komentarz)
+    @State private var categorizedAllRules: [VanlifeRule] = []
+    
+    // klucz per kategoria
+    private var usedIndicesStorageKey: String { "usedRulesIndices_\(selectedCategoryKey)" }
+    
+    // Limit dzienny: Premium = bez limitu (Int.max)
+    var allowedRules: Int {
+        return hasPremium ? Int.max : (maxDailyRules + (rewardedPacks * 5))
+    }
     
     var body: some View {
         LocalizedView {
@@ -244,21 +251,16 @@ struct NextView: View {
                 VStack {
                     TopMenuView(showSettings: $showSettings, showPushView: $showPushView)
                     
-                    // Modified section of NextView body
                     VStack(spacing: ThemeManager.layout.spacing.medium) {
-                        // Modified header with centered text and share button
+                        // Header + share
                         ZStack {
-                            // Centered text
                             Text("the_rule_for_today".appLocalized)
                                 .font(ThemeManager.typography.headline)
                                 .foregroundColor(ThemeManager.colors.lightText)
                             
-                            // Share button aligned to trailing edge
                             HStack {
                                 Spacer()
-                                Button(action: {
-                                    shareRule()
-                                }) {
+                                Button(action: { shareRule() }) {
                                     Image(systemName: "square.and.arrow.up")
                                         .font(.system(size: 20, weight: .semibold))
                                         .foregroundColor(ThemeManager.colors.lightText)
@@ -275,7 +277,7 @@ struct NextView: View {
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: ThemeManager.layout.cornerRadius.medium)
-                                .fill(Color.white)
+                                .fill(ThemeManager.colors.cardBackground) // 🔁 [ZMIANA] było: Color.white – dostosowanie do motywu
                                 .shadow(color: ThemeManager.colors.cardShadow, radius: 8)
                             
                             VStack {
@@ -286,26 +288,29 @@ struct NextView: View {
                                     .padding()
                                 
                                 Spacer()
-                                
-                                // Remove the old ShareButton from here
                             }
                         }
                         .frame(width: ScreenMetrics.adaptiveWidth(85), height: ScreenMetrics.adaptiveHeight(33))
                         .overlay(
                             Group {
-                                AdBannerView(adUnitID: bannerAdUnitID)
-                                    .frame(height: 50)
-                                    .padding(8)
+                                // 🟡 PREMIUM: ukryj reklamę, jeśli użytkownik ma Premium
+                                if !hasPremium {
+                                    AdBannerView(adUnitID: bannerAdUnitID)
+                                        .frame(height: 50)
+                                        .padding(8)
+                                }
                             },
                             alignment: .bottomLeading
                         )
                         .padding(.horizontal)
                         
-                        // Rest of your buttons remain the same
                         HStack {
                             MainActionButton(title: "draw".appLocalized, icon: "dice.fill") {
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                                    if dailyRulesCount >= allowedRules {
+                                    resetDailyStateIfNeeded()
+                                    
+                                    // 🟡 PREMIUM: brak alertu i limitu
+                                    if !hasPremium && dailyRulesCount >= allowedRules {
                                         HapticManager.shared.notification(type: .warning)
                                         showAlert = true
                                         randomRule = lastDrawnRule
@@ -334,6 +339,7 @@ struct NextView: View {
                     LoadingView()
                 }
             }
+            // 🟡 PREMIUM: alert „więcej zasad” nigdy się nie pokaże, bo showAlert ustawiamy tylko bez Premium
             .alert(isPresented: $showAlert) {
                 Alert(
                     title: Text("daily_limit".appLocalized),
@@ -350,13 +356,19 @@ struct NextView: View {
                 Text(saveAlertMessage)
             }
             .onAppear {
+                rebuildCategorizedRules()
                 resetDailyStateIfNeeded()
                 loadSavedRules()
                 loadUsedRulesIndices()
                 loadLastDrawnRule()
-                loadRewardedAd()
+                
+                // 🟡 PREMIUM: nie ładuj rewarded ad, jeśli Premium
+                if !hasPremium {
+                    loadRewardedAd()
+                }
             }
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
+                rebuildCategorizedRules()
                 loadLastDrawnRule()
             }
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("AppReset"))) { _ in
@@ -374,12 +386,27 @@ struct NextView: View {
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                 resetDailyStateIfNeeded()
             }
+            .onChange(of: selectedCategoryKey) { _ in
+                loadUsedRulesIndices()
+                loadLastDrawnRule()
+            }
+            // 🟡 PREMIUM: jeśli status premium się zmieni „w locie”, schowaj reklamy i odblokuj limit natychmiast
+            .onChange(of: hasPremium) { newValue in
+                if newValue {
+                    showAlert = false
+                    rewardedPacks = 0
+                } else {
+                    loadRewardedAd()
+                }
+            }
         }
     }
     
     // MARK: - Rewarded Ad Logic
-    
     func loadRewardedAd() {
+        // 🟡 PREMIUM: nic nie rób, jeśli Premium
+        guard !hasPremium else { return }
+        
         let request = Request()
         RewardedAd.load(with: rewardedAdUnitID, request: request) { ad, error in
             if let error = error {
@@ -399,6 +426,9 @@ struct NextView: View {
     }
     
     func showRewardedAd() {
+        // 🟡 PREMIUM: nie pokazujemy rewarded ad
+        guard !hasPremium else { return }
+        
         if let rewardedAd = rewardedAd,
            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootViewController = windowScene.windows.first?.rootViewController {
@@ -406,7 +436,6 @@ struct NextView: View {
                 print("✅ Użytkownik obejrzał reklamę do końca – dodajemy +5 zasad")
                 rewardedPacks += 1
                 print("🎁 rewardedPacks zwiększony do \(rewardedPacks)")
-
                 loadRewardedAd()
             }
         } else {
@@ -415,9 +444,41 @@ struct NextView: View {
         }
     }
 
+    // MARK: - [KATEGORIE] Budowa i filtr listy
+    private func getLocalizedRules() -> [String] {
+        // 🔁 [ZMIANA] spójność z SettingsView – korzystamy z LanguageManager
+        let code: String
+        switch languageManager.currentLanguage {
+        case .polish: code = "pl"
+        case .spanish: code = "es"
+        default: code = "en"
+        }
+        switch code {
+        case "pl": return RulesListPL
+        case "es": return RulesListES
+        default:   return RulesList
+        }
+    }
     
-    // MARK: - Pozostałe metody
+    private func rebuildCategorizedRules() {
+        let base = getLocalizedRules()
+        // Upewnij się, że masz metodę build(from:) w VanlifeRulesFactory
+        categorizedAllRules = VanlifeRulesFactory.build(from: base)
+    }
     
+    private var eligibleCategorized: [VanlifeRule] {
+        guard selectedCategoryKey != "all",
+              let cat = RuleCategory(rawValue: selectedCategoryKey) else {
+            return categorizedAllRules
+        }
+        return categorizedAllRules.filter { $0.category == cat }
+    }
+    
+    private var eligibleTexts: [String] {
+        eligibleCategorized.map { $0.text }
+    }
+    
+    // MARK: - Losowanie / zapis
     private func saveLastDrawnRule() {
         UserDefaults.standard.set(randomRule, forKey: "lastDrawnRule")
         lastDrawnRule = randomRule
@@ -428,7 +489,7 @@ struct NextView: View {
             randomRule = lastRule
             lastDrawnRule = lastRule
         } else {
-            let currentRules = getLocalizedRules()
+            let currentRules = eligibleTexts
             let allIndices = Set(0..<currentRules.count)
             let usedIndicesSet = Set(usedRulesIndices)
             let availableIndices = allIndices.subtracting(usedIndicesSet)
@@ -445,23 +506,9 @@ struct NextView: View {
     }
     
     private func getRandomRule() {
-        let currentDate = Date()
-        let calendar = Calendar.current
-        let currentComponents = calendar.dateComponents([.year, .month, .day], from: currentDate)
-        let storedDate = Date(timeIntervalSince1970: lastRulesDate)
-        let storedComponents = calendar.dateComponents([.year, .month, .day], from: storedDate)
+        resetDailyStateIfNeeded()
         
-        if currentComponents.year != storedComponents.year ||
-            currentComponents.month != storedComponents.month ||
-            currentComponents.day != storedComponents.day {
-            dailyRulesCount = 0
-            lastRulesDate = currentDate.timeIntervalSince1970
-        }
-        print("Current date: \(currentComponents)")
-        print("Stored date: \(storedComponents)")
-        print("Daily rules count reset: \(dailyRulesCount)")
-        
-        let currentRules = getLocalizedRules()
+        let currentRules = eligibleTexts
         let allIndices = Set(0..<currentRules.count)
         let usedIndicesSet = Set(usedRulesIndices)
         let availableIndices = allIndices.subtracting(usedIndicesSet)
@@ -472,8 +519,8 @@ struct NextView: View {
             return
         }
         
-        // Używamy allowedRules, które uwzględnia bonus
-        if dailyRulesCount >= allowedRules {
+        // 🟡 PREMIUM: pomijamy limit
+        if !hasPremium && dailyRulesCount >= allowedRules {
             showAlert = true
             randomRule = lastDrawnRule
             return
@@ -484,7 +531,12 @@ struct NextView: View {
             if !usedRulesIndices.contains(randomIndex) {
                 usedRulesIndices.append(randomIndex)
                 saveUsedRulesIndices()
-                dailyRulesCount += 1
+                
+                // premium nie zwiększa licznika, free – tak
+                if !hasPremium {
+                    dailyRulesCount += 1
+                }
+                
                 saveLastDrawnRule()
                 
                 totalRulesDrawn += 1
@@ -495,37 +547,39 @@ struct NextView: View {
                     locationsSaved: 0
                 )
                 
-                withAnimation {
-                    shouldShowAd = true
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
-                    withAnimation {
-                        shouldShowAd = false
+                // 🟡 PREMIUM: nie pokazuj timera/animacji dla reklam
+                if !hasPremium {
+                    withAnimation { shouldShowAd = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
+                        withAnimation { shouldShowAd = false }
                     }
                 }
             }
         }
     }
 
-    
+    /// Reset stanu dnia o północy
     private func resetDailyStateIfNeeded() {
-        let currentDate = Date()
-        let calendar = Calendar.current
-        let currentComponents = calendar.dateComponents([.year, .month, .day], from: currentDate)
-        let storedDate = Date(timeIntervalSince1970: lastRulesDate)
-        let storedComponents = calendar.dateComponents([.year, .month, .day], from: storedDate)
-        if currentComponents.year != storedComponents.year ||
-            currentComponents.month != storedComponents.month ||
-            currentComponents.day != storedComponents.day {
-            print("Reset stanu dnia: \(currentComponents)")
+        let tz = TimeZone.current
+        var cal = Calendar.current
+        cal.timeZone = tz
+        
+        let now = Date()
+        let stored = Date(timeIntervalSince1970: lastRulesDate)
+        let startNow = cal.startOfDay(for: now)
+        let startStored = cal.startOfDay(for: stored)
+        
+        if startNow > startStored {
+            print("🔁 Reset stanu dnia. Nowy dzień od: \(startNow)")
             dailyRulesCount = 0
             usedRulesIndices = []
-            lastRulesDate = currentDate.timeIntervalSince1970
-           // bonusUnlocked = false
+            lastRulesDate = now.timeIntervalSince1970
             saveUsedRulesIndices()
             UserDefaults.standard.removeObject(forKey: "lastDrawnRule")
+            rewardedPacks = 0 // 🔁 [ZMIANA] reset bonusów reklamowych co 24h
         } else {
-            print("Brak zmiany dnia: \(currentComponents)")
+            let comps = cal.dateComponents([.year, .month, .day], from: now)
+            print("ℹ️ Brak zmiany dnia: \(comps)")
         }
     }
     
@@ -594,15 +648,32 @@ struct NextView: View {
         return image
     }
     
+    // MARK: - Zapis / odczyt
+    private func stripLeadingNumber(_ text: String) -> String {
+        if let dotIdx = text.firstIndex(of: ".") {
+            let afterDot = text.index(after: dotIdx)
+            return text[afterDot...].trimmingCharacters(in: .whitespaces)
+        }
+        return text
+    }
+    
     private func findRuleIndex(_ rule: String) -> Int? {
-        if let index = RulesList.firstIndex(of: rule) {
-            return index
+        if let idx = RulesList.firstIndex(of: rule) { return idx }
+        if let idx = RulesListPL.firstIndex(of: rule) { return idx }
+        if let idx = RulesListES.firstIndex(of: rule) { return idx }
+
+        func indexByStrippedMatch(in list: [String]) -> Int? {
+            for (i, raw) in list.enumerated() {
+                if stripLeadingNumber(raw) == rule { return i }
+            }
+            return nil
         }
-        if let index = RulesListPL.firstIndex(of: rule) {
-            return index
-        }
-        if let index = RulesListES.firstIndex(of: rule) {
-            return index
+        if let i = indexByStrippedMatch(in: RulesList) { return i }
+        if let i = indexByStrippedMatch(in: RulesListPL) { return i }
+        if let i = indexByStrippedMatch(in: RulesListES) { return i }
+
+        if let item = categorizedAllRules.first(where: { $0.text == rule }) {
+            return max(0, item.id - 1)
         }
         return nil
     }
@@ -626,20 +697,31 @@ struct NextView: View {
                 saveAlertMessage = "rule_exists".appLocalized
                 showSaveAlert = true
             }
+        } else {
+            saveAlertMessage = "rule_exists".appLocalized
+            showSaveAlert = true
         }
     }
     
     private func saveUsedRulesIndices() {
         if let encoded = try? JSONEncoder().encode(usedRulesIndices) {
-            UserDefaults.standard.set(encoded, forKey: "usedRulesIndices")
+            UserDefaults.standard.set(encoded, forKey: usedIndicesStorageKey)
         }
     }
     
     private func loadUsedRulesIndices() {
+        if let data = UserDefaults.standard.data(forKey: usedIndicesStorageKey),
+           let decoded = try? JSONDecoder().decode([Int].self, from: data) {
+            usedRulesIndices = decoded
+            return
+        }
         if let data = UserDefaults.standard.data(forKey: "usedRulesIndices"),
            let decoded = try? JSONDecoder().decode([Int].self, from: data) {
             usedRulesIndices = decoded
+            saveUsedRulesIndices()
+            return
         }
+        usedRulesIndices = []
     }
     
     private func saveRules() {
@@ -660,7 +742,7 @@ struct NextView: View {
 }
 
 extension NextView {
-    // Nie rozszerzamy NextView o GADFullScreenContentDelegate – korzystamy z RewardedAdDelegate, który przypisujemy rewardedAd.fullScreenContentDelegate.
+    // brak
 }
 
 // MARK: - Navigation Components

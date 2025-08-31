@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		071485022D48A7250063B774 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 071485012D48A7250063B774 /* Podfile */; };
+		071CDDA72E431FF40099D930 /* VanlifeRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071CDDA62E431FF00099D930 /* VanlifeRule.swift */; };
 		07211A042D29B04100B501B9 /* RulesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A032D29B03C00B501B9 /* RulesListViewController.swift */; };
 		07211A062D29B0C000B501B9 /* SavedRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A052D29B0BE00B501B9 /* SavedRulesViewController.swift */; };
 		07211A082D29B0FE00B501B9 /* MyRulesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A072D29B0FA00B501B9 /* MyRulesViewController.swift */; };
@@ -411,6 +412,7 @@
 		070E0F272D5DEA4500B59A53 /* nanopb.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = nanopb.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		071484FF2D48A7000063B774 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		071485012D48A7250063B774 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		071CDDA62E431FF00099D930 /* VanlifeRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VanlifeRule.swift; sourceTree = "<group>"; };
 		0720CA4D2D705C870077DB2B /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		0720CA5F2D705D270077DB2B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		07211A032D29B03C00B501B9 /* RulesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesListViewController.swift; sourceTree = "<group>"; };
@@ -623,6 +625,7 @@
 		076C07172D5F2F3300C12DB1 /* Lists */ = {
 			isa = PBXGroup;
 			children = (
+				071CDDA62E431FF00099D930 /* VanlifeRule.swift */,
 				07DD83122D267182004C5C5F /* RuleListES.swift */,
 				07DD83132D267182004C5C5F /* RulesList.swift */,
 				07DD83142D267182004C5C5F /* RulesListPL.swift */,
@@ -1190,6 +1193,7 @@
 				07DD838C2D267182004C5C5F /* AchievementManager.swift in Sources */,
 				07DD838D2D267182004C5C5F /* BannerView.swift in Sources */,
 				07DD838F2D267182004C5C5F /* StartScreen.swift in Sources */,
+				071CDDA72E431FF40099D930 /* VanlifeRule.swift in Sources */,
 				07DD83902D267182004C5C5F /* LanguageManager.swift in Sources */,
 				07DD83912D267182004C5C5F /* MyChecklistView.swift in Sources */,
 				073E034A2D26893C002BD119 /* ExportButtonView.swift in Sources */,
@@ -1443,7 +1447,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 1.7;
+				MARKETING_VERSION = 2.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1535,7 +1539,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 1.7;
+				MARKETING_VERSION = 2.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";

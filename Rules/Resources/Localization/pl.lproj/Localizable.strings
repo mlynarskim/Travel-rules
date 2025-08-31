@@ -391,3 +391,33 @@
 "NSLocationWhenInUseUsageDescription" = "Ta aplikacja wykorzystuje Twoją lokalizację wyłącznie do zapisywania aktualnej pozycji w zakładce GPS. Dane lokalizacyjne nie są przesyłane na żadne zewnętrzne serwery.";
 
 "bonus_rules_add" = "Chce wiecej zasad!";
+
+// Sekcja kategorii (SettingsView)
+"category.settings.title" = "Kategorie";
+"category.settings.choose" = "Kategoria";
+"category.all.title" = "Wszystkie";
+
+// Nazwy kategorii
+"category.technical" = "Techniczne";
+"category.vanlife" = "Vanlife i podróż";
+"category.ecology" = "Ekologia i natura";
+"category.hygiene" = "Higiena i zdrowie";
+"category.food" = "Jedzenie i kuchnia";
+"category.mindset" = "Mindset i relacje";
+"category.safety" = "Bezpieczeństwo";
+"category.location" = "Miejsca i lokalizacja";
+"category.organization" = "Organizacja i porządek";
+"category.gear" = "Sprzęt i lifehacki";
+
+// Paywall / Premium
+"premium_active" = "Premium aktywne";
+"premium_locked" = "Premium zablokowane";
+"premium_title" = "Odblokuj Premium";
+"premium_subtitle" = "Dostęp do wszystkich kategorii, bez reklam oraz eksport listy pakowania do PDF.";
+"premium_price" = "Cena:";
+"premium_buy" = "Kup Premium";
+"premium_restore" = "Przywróć";
+"premium_owned" = "Posiadane";
+"product_unavailable" = "Produkt niedostępny";
+"close" = "Zamknij";
+

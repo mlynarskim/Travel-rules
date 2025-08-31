@@ -383,3 +383,32 @@
 "NSLocationWhenInUseUsageDescription" = "Esta aplicación utiliza tu ubicación únicamente para registrar tu posición actual en la pestaña de GPS. Los datos de ubicación no se transmiten a servidores externos.";
 
 "bonus_rules_add" = "Obtener los 5 principios";
+
+// Sección de categorías (SettingsView)
+"category.settings.title" = "Categorías";
+"category.settings.choose" = "Categoría";
+"category.all.title" = "Todas";
+
+// Nombres de categorías
+"category.technical" = "Técnico";
+"category.vanlife" = "Vanlife y viaje";
+"category.ecology" = "Ecología y naturaleza";
+"category.hygiene" = "Higiene y salud";
+"category.food" = "Comida y cocina";
+"category.mindset" = "Mentalidad y relaciones";
+"category.safety" = "Seguridad";
+"category.location" = "Lugares y ubicación";
+"category.organization" = "Organización y orden";
+"category.gear" = "Equipo y trucos";
+
+// Paywall / Premium
+"premium_active" = "Premium activo";
+"premium_locked" = "Premium bloqueado";
+"premium_title" = "Desbloquear Premium";
+"premium_subtitle" = "Accede a todas las categorías, sin anuncios y exporta la lista de equipaje en PDF.";
+"premium_price" = "Precio:";
+"premium_buy" = "Comprar Premium";
+"premium_restore" = "Restaurar";
+"premium_owned" = "Comprado";
+"product_unavailable" = "Producto no disponible";
+"close" = "Cerrar";
