@@ -1,142 +1,181 @@
 // AchievementManager.swift
-
 import SwiftUI
 import UserNotifications
+import UIKit
 import Darwin
 
-class AchievementManager: ObservableObject {
+final class AchievementManager: ObservableObject {
+    // Publiczny singleton (jeśli używasz w wielu miejscach)
+    static let shared = AchievementManager()
+
+    // Model
     @Published var achievements: [Achievement] = Achievement.achievements
     @Published var showToast = false
     @Published var currentAchievement: Achievement?
-    
-    @AppStorage("dailyStreak") private var dailyStreak: Int = 0
-    @AppStorage("lastOpenDate") private var lastOpenDate: Double = Date().timeIntervalSince1970
-    static let shared = AchievementManager()
 
+    // Streak
+    @AppStorage("dailyStreak") private var dailyStreak: Int = 0
+    @AppStorage("lastOpenDate") private var lastOpenDate: Double = 0
+
+    // „Pierwsza lokalizacja” – flaga, żeby nie odblokować ponownie
+    @AppStorage("firstLocationUnlocked") private var firstLocationUnlocked: Bool = false
+
+    // Prywatna zmienna do przechowywania ostatniej wartości rulesDrawn
+    private var lastRulesDrawn: Int = 0
+
+    // MARK: - Init
     init() {
-        self.achievements = Achievement.achievements
         loadAchievements()
-        checkDailyStreak()
+        bootstrapStreakIfNeeded()      // ← start od dnia 1
+        checkDailyStreak()              // ← sprawdź ewentualny przeskok dnia
+
+        // Sprawdzaj streak także po powrocie z tła
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.checkDailyStreak()
+        }
     }
-    
+
+    // MARK: - Persistence
     private func loadAchievements() {
         if let data = UserDefaults.standard.data(forKey: "achievements"),
            let decoded = try? JSONDecoder().decode([Achievement].self, from: data) {
             achievements = decoded
+        } else {
+            // Jeśli pod kluczem "achievements" nie ma Data lub dekodowanie się nie powiodło,
+            // zresetuj do wartości domyślnych i zapisz w poprawnym formacie.
+            achievements = Achievement.achievements
+            saveAchievements()
         }
     }
-    
+
     private func saveAchievements() {
         if let encoded = try? JSONEncoder().encode(achievements) {
             UserDefaults.standard.set(encoded, forKey: "achievements")
         }
     }
-    
-    // Sprawdzanie dziennego streaku
+
+    // MARK: - Streak bootstrap
+    private func bootstrapStreakIfNeeded() {
+        // Jeśli pierwszy raz uruchamiamy (brak daty) lub streak == 0 -> zacznij od 1 dziś
+        if lastOpenDate == 0 || dailyStreak == 0 {
+            dailyStreak = 1
+            lastOpenDate = Date().timeIntervalSince1970
+        }
+    }
+
+// MARK: - Daily streak
     private func checkDailyStreak() {
-        let currentDate = Date()
+        let now = Date()
         let lastDate = Date(timeIntervalSince1970: lastOpenDate)
-        
-        // Jeśli dzień się zmienił
-        if !Calendar.current.isDate(lastDate, inSameDayAs: currentDate) {
-            // Sprawdź czy to kolejny dzień z rzędu
-            let dayDifference = Calendar.current.dateComponents([.day], from: lastDate, to: currentDate).day ?? 0
-            if dayDifference == 1 {
-                dailyStreak += 1
-            } else {
-                dailyStreak = 1
-            }
-            lastOpenDate = currentDate.timeIntervalSince1970
-            checkStreakAchievements()
+
+        // Jeśli ten sam dzień – wyjście (streak już naliczony)
+        if Calendar.current.isDate(lastDate, inSameDayAs: now) {
+            return
         }
+
+        // Zmiana dnia – sprawdź różnicę
+        let dayDiff = Calendar.current.dateComponents([.day], from: lastDate, to: now).day ?? 0
+        if dayDiff == 1 {
+            dailyStreak += 1
+        } else {
+            // przerwa > 1 dnia – zacznij od 1
+            dailyStreak = 1
+        }
+        lastOpenDate = now.timeIntervalSince1970
+
+        checkStreakAchievements()
     }
-    
+
     private func checkStreakAchievements() {
-        // Porównujemy dailyStreak z wymaganiami
-        if dailyStreak == 3 {
-            unlockAchievement(id: "daily_streak_3")
-        }
-        if dailyStreak == 7 {
-            unlockAchievement(id: "daily_streak_7")
-        }
-        if dailyStreak == 30 {
-            unlockAchievement(id: "daily_streak_30")
-        }
+        if dailyStreak == 3  { unlockAchievement(id: "daily_streak_3") }
+        if dailyStreak == 7  { unlockAchievement(id: "daily_streak_7") }
+        if dailyStreak == 30 { unlockAchievement(id: "daily_streak_30") }
     }
-    
-    // Funkcja sprawdzająca osiągnięcia związane z rysowaniem, zapisywaniem, udostępnianiem i lokalizacją
+
+    // MARK: - Public API do ręcznego sprawdzania
     func checkAchievements(rulesDrawn: Int,
                            rulesSaved: Int,
                            rulesShared: Int,
-                           locationsSaved: Int) {
-        // Rysowanie:
-        if rulesDrawn >= 1 {
-            unlockAchievement(id: "first_rule")
-        }
-        if rulesDrawn >= 5 {
-            unlockAchievement(id: "five_rules")
-        }
-        if rulesDrawn >= 20 {
-            unlockAchievement(id: "twenty_rules")
-        }
-        
-        // Zapisywanie:
-        if rulesSaved >= 1 {
-            unlockAchievement(id: "save_first")
-        }
-        if rulesSaved >= 10 {
-            unlockAchievement(id: "save_ten")
-        }
-        
-        // Udostępnianie:
-        if rulesShared >= 1 {
-            unlockAchievement(id: "first_share")
-        }
-        
-        // Pierwsza lokalizacja:
-        if locationsSaved >= 1 {
-            unlockAchievement(id: "first_location")
-        }
+                           locationsSaved: Int)
+    {
+        // Aktualizacja ostatniej wartości rulesDrawn
+        lastRulesDrawn = rulesDrawn
+
+        // Losowania
+        if rulesDrawn == 1  { unlockAchievement(id: "first_rule") }
+        if rulesDrawn == 5  { unlockAchievement(id: "five_rules") }
+        if rulesDrawn == 20 { unlockAchievement(id: "twenty_rules") }
+
+        // Zapisy
+        if rulesSaved >= 1  { unlockAchievement(id: "save_first") }
+        if rulesSaved >= 10 { unlockAchievement(id: "save_ten") }
+
+        // Lokalizacje
+        if locationsSaved >= 1 { unlockAchievement(id: "first_location") }
+
+        // Udostępnienia – odblokuj dokładnie przy pierwszym share
+    }
+
+    /// Wygodny helper – zawołaj po zapisaniu **pierwszej** lokalizacji.
+    func recordLocationAdded() {
+        guard !firstLocationUnlocked else { return }
+        firstLocationUnlocked = true
+        unlockAchievement(id: "first_location")
+    }
+
+    /// Alternatywa jeśli masz licznik miejsc.
+    func recordLocationsCount(_ count: Int) {
+        if count >= 1 { recordLocationAdded() }
     }
     
+    /// Zawołaj w momencie naciśnięcia przycisku "Udostępnij" (share) na głównym ekranie
+    func recordShareAction() {
+        unlockAchievement(id: "first_share")
+    }
+
+    // MARK: - Odblokowanie
     func unlockAchievement(id: String) {
-        if let index = achievements.firstIndex(where: { $0.id == id }),
-           !achievements[index].isUnlocked {
-            achievements[index].isUnlocked = true
-            showAchievementUnlocked(achievements[index])
-            saveAchievements()
-        }
+        guard let index = achievements.firstIndex(where: { $0.id == id }),
+              !achievements[index].isUnlocked
+        else { return }
+
+        achievements[index].isUnlocked = true
+        saveAchievements()
+        showAchievementUnlocked(achievements[index])
     }
-    
+
     private func showAchievementUnlocked(_ achievement: Achievement) {
-        // Haptic feedback
+        // Haptic
         HapticManager.shared.notification(type: .success)
-        
-        // Lokalne powiadomienie
+
+        // Lokalne powiadomienie (poproś o zgodę, jeśli brak)
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            if settings.authorizationStatus == .notDetermined {
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in }
+            }
+        }
+
         let content = UNMutableNotificationContent()
         content.title = NSLocalizedString("achievement.unlocked.title", comment: "")
-        // W treści podstawiamy tytuł osiągnięcia (przetłumaczony w pliku Localizable)
         let localizedTitle = NSLocalizedString(achievement.titleKey, comment: "")
-        content.body = String(format: NSLocalizedString("achievement.unlocked.message", comment: ""),
-                              localizedTitle)
+        content.body = String(format: NSLocalizedString("achievement.unlocked.message", comment: ""), localizedTitle)
         content.sound = .default
-        
+
         let request = UNNotificationRequest(identifier: UUID().uuidString,
                                             content: content,
                                             trigger: nil)
-        
         UNUserNotificationCenter.current().add(request)
-        
-        // Wyświetlenie toasta
-        currentAchievement = achievement
-        withAnimation(.spring()) {
-            showToast = true
-        }
-        
-        // Ukrycie toasta po 4 sekundach
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-            withAnimation(.spring()) {
-                self.showToast = false
+
+        // Toast
+        DispatchQueue.main.async {
+            self.currentAchievement = achievement
+            withAnimation(.spring()) { self.showToast = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                withAnimation(.spring()) { self.showToast = false }
             }
         }
     }

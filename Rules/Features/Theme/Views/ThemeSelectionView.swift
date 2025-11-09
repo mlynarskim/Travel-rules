@@ -16,7 +16,28 @@ struct ThemeSelectionView: View {
                     .padding()
                 
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(ThemeStyle.allCases, id: \.self) { theme in
+                    ForEach([ThemeStyle.classic, .mountain, .beach, .desert, .forest], id: \.self) { theme in
+                        ThemePreviewCard(
+                            theme: theme,
+                            isSelected: theme.rawValue == selectedTheme,
+                            isPremium: isPremium
+                        ) {
+                            if !theme.isPremium || isPremium {
+                                selectedTheme = theme.rawValue
+                            }
+                        }
+                    }
+                }
+                .padding()
+                
+                Divider()
+                
+                Text("themes_section_seasonal".appLocalized)
+                    .font(.title2)
+                    .padding(.top)
+                
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach([ThemeStyle.autumn, .winter, .spring, .summer], id: \.self) { theme in
                         ThemePreviewCard(
                             theme: theme,
                             isSelected: theme.rawValue == selectedTheme,
@@ -78,6 +99,7 @@ struct ThemePreviewCard: View {
             .shadow(radius: 5)
         }
         .disabled(theme.isPremium && !isPremium)
+        .buttonStyle(.plain)
     }
     
     private func getThemeName() -> String {
@@ -87,6 +109,10 @@ struct ThemePreviewCard: View {
         case .beach: return "theme_beach".appLocalized
         case .desert: return "theme_desert".appLocalized
         case .forest: return "theme_forest".appLocalized
+        case .autumn: return "theme_autumn".appLocalized
+        case .winter: return "theme_winter".appLocalized
+        case .spring: return "theme_spring".appLocalized
+        case .summer: return "theme_summer".appLocalized
         }
     }
     
@@ -97,6 +123,10 @@ struct ThemePreviewCard: View {
         case .beach: return "theme-beach-preview"
         case .desert: return "theme-desert-preview"
         case .forest: return "theme-forest-preview"
+        case .autumn: return "theme-autumn-preview"
+        case .winter: return "theme-winter-preview"
+        case .spring: return "theme-spring-preview"
+        case .summer: return "theme-summer-preview"
         }
     }
 }

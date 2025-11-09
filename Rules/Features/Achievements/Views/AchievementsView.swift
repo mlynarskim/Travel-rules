@@ -14,6 +14,10 @@ struct AchievementsView: View {
        case .beach: return ThemeColors.beachTheme
        case .desert: return ThemeColors.desertTheme
        case .forest: return ThemeColors.forestTheme
+       case .autumn: return ThemeColors.autumnTheme
+       case .winter: return ThemeColors.winterTheme
+       case .summer: return ThemeColors.summerTheme
+       case .spring: return ThemeColors.springTheme
        }
    }
    
@@ -67,6 +71,7 @@ struct AchievementsView: View {
                        Image(systemName: "xmark.circle.fill")
                            .foregroundColor(Color(.systemGray3))
                    }
+                   .buttonStyle(.plain)
                }
            }
        }

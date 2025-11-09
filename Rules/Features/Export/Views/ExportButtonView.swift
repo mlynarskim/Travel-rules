@@ -23,6 +23,11 @@ struct ExportButtonView: View {
         case .beach:    return ThemeColors.beachTheme
         case .desert:   return ThemeColors.desertTheme
         case .forest:   return ThemeColors.forestTheme
+        case .autumn:   return ThemeColors.autumnTheme
+        case .winter: return ThemeColors.winterTheme
+        case .summer: return ThemeColors.summerTheme
+        case .spring: return ThemeColors.springTheme
+
         }
     }
     private var isSmallDevice: Bool {
@@ -42,9 +47,11 @@ struct ExportButtonView: View {
             .cornerRadius(10)
             .shadow(color: themeColors.cardShadow, radius: 5)
         }
+        .buttonStyle(.plain)
         .alert(Text(LocalizedStringKey("export.error.title")),
                isPresented: $showingError) {
             Button("OK", role: .cancel) { }
+            .buttonStyle(.plain)
         } message: {
             Text(LocalizedStringKey("export.error.message"))
         }

@@ -308,6 +308,8 @@
 "theme_beach" = "Beach";
 "theme_desert" = "Desert";
 "theme_forest" = "Forest";
+"theme_autumn" = "Autumn";
+
 "theme_classic_description" = "Standard application theme";
 "theme_mountain_description" = "Inspired by mountain hikes";
 "theme_beach_description" = "Vacation beach vibes";
@@ -422,3 +424,29 @@
 "premium_owned" = "Owned";
 "product_unavailable" = "Product unavailable";
 "close" = "Close";
+
+"monthly" = "Monthly";
+"yearly"  = "Yearly";
+
+"premium" = "Premium";
+"premium_required_title" = "Premium required";
+"premium_required_message" = "This PDF is available with Premium. Go to Settings → Premium to unlock.";
+"premium_manage" = "Manage subscription";
+"premium_renew_off" = "Auto-renew off";
+"version" = "Version";
+"legal.title" = "Legal";
+"privacy_policy" = "Privacy Policy";
+"terms_of_use" = "Terms of Use";
+"redeem_code" = "Redeem code";
+"redeem_title" = "Redeem Code";
+"redeem_in_app" = "Redeem in App";
+"redeem_in_store" = "Redeem in App Store";
+"accessibility_reduce_effects" = "Reduce effects";
+"accessibility_reduce_transparency" = "Reduce transparency";
+"daily_rule_notification_title" = "Today's rule!";
+
+"themes_section_standard" = "Standard";
+"themes_section_seasonal" = "Seasonal";
+"theme_winter" = "Winter";
+"theme_spring" = "Spring";
+"theme_summer" = "Summer";

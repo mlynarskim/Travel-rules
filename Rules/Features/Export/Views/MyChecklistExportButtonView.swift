@@ -26,8 +26,10 @@ struct TravelChecklistExportButtonView: View {
             .foregroundColor(.white)
             .cornerRadius(10)
         }
+        .buttonStyle(.plain)
         .alert("Export error", isPresented: $showingError) {
             Button("OK", role: .cancel) { }
+            .buttonStyle(.plain)
         }
         .sheet(isPresented: $showShareSheet) {
             if let data = pdfDataToShare {

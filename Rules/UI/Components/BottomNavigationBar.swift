@@ -28,6 +28,7 @@ struct BottomNavigationBar: View {
                                 .font(.system(size: 40))
                         )
                 }
+                .buttonStyle(.plain)
                 //NavigationLink(destination: PeopleTabView(user: NearbyUser(
                 //id: UUID(),
                 // name: "Użytkownik",
@@ -38,29 +39,19 @@ struct BottomNavigationBar: View {
                 //   shareLevel: .approximate,
                 //   description: nil
                 //))) {
-                RoundedRectangle(cornerRadius: 15)
-                    .padding(.all, 5)
-                    .foregroundColor(Color(hex: "#DDAA4F"))
-                    .frame(width: 80, height: 80)
-                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
-                    .overlay(
-                        Image(systemName: "checkmark.circle")
-                            .foregroundColor(.black)
-                            .font(.system(size: 40))
-                    )
-            }
-            
-            NavigationLink(destination: MyChecklistView()) {
-                RoundedRectangle(cornerRadius: 15)
-                    .padding(.all, 5)
-                    .foregroundColor(Color(hex: "#DDAA4F"))
-                    .frame(width: 80, height: 80)
-                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
-                    .overlay(
-                        Image(systemName: "checkmark.circle")
-                            .foregroundColor(.black)
-                            .font(.system(size: 40))
-                    )
+                NavigationLink(destination: MyChecklistView()) {
+                    RoundedRectangle(cornerRadius: 15)
+                        .padding(.all, 5)
+                        .foregroundColor(Color(hex: "#DDAA4F"))
+                        .frame(width: 80, height: 80)
+                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                        .overlay(
+                            Image(systemName: "checkmark.circle")
+                                .foregroundColor(.black)
+                                .font(.system(size: 40))
+                        )
+                }
+                .buttonStyle(.plain)
             }
             
             NavigationLink(destination: GPSView()) {
@@ -75,6 +66,7 @@ struct BottomNavigationBar: View {
                             .font(.system(size: 40))
                     )
             }
+            .buttonStyle(.plain)
             
             NavigationLink(destination: SavedRuleList(savedRules: $savedRules)) {
                 RoundedRectangle(cornerRadius: 15)
@@ -88,6 +80,7 @@ struct BottomNavigationBar: View {
                             .font(.system(size: 40))
                     )
             }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal)
     }
@@ -100,4 +93,3 @@ struct BottomNavigationBar: View {
         }
     }
 }
-

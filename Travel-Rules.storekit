@@ -14,13 +14,27 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "6752486256",
+      "localizations" : [
+        {
+          "description" : "Premium Version unlocks additional features",
+          "displayName" : "Travel Rules",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.mlynarski.travelrules.premium.iap",
+      "referenceName" : "In-App Purchase",
+      "type" : "NonConsumable"
+    }
   ],
   "settings" : {
     "_applicationInternalID" : "6451070215",
     "_developerTeamID" : "3Y79SF4PL3",
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 778331844.10030901,
+    "_lastSynchronizedDate" : 779464861.18470895,
     "_locale" : "en_US",
     "_storefront" : "USA",
     "_storeKitErrors" : [
@@ -87,7 +101,7 @@
 
           ],
           "displayPrice" : "1.99",
-          "familyShareable" : false,
+          "familyShareable" : true,
           "groupNumber" : 1,
           "internalID" : "6751771896",
           "introductoryOffer" : null,
@@ -105,7 +119,7 @@
             {
               "description" : "El acceso completo a las reglas de vanlife.",
               "displayName" : "Travel Rules Premium",
-              "locale" : "ar"
+              "locale" : "es_ES"
             }
           ],
           "productID" : "com.mlynarski.travelrules.premium.monthly",
@@ -125,16 +139,11 @@
 
           ],
           "displayPrice" : "19.99",
-          "familyShareable" : false,
+          "familyShareable" : true,
           "groupNumber" : 2,
           "internalID" : "6751771904",
           "introductoryOffer" : null,
           "localizations" : [
-            {
-              "description" : "El acceso completo a las reglas de vanlife.",
-              "displayName" : "Travel Rules Premium",
-              "locale" : "ar"
-            },
             {
               "description" : "Odblokuj pełny dostęp do zasad vanlife.",
               "displayName" : "Travel Rules Premium",
@@ -144,6 +153,11 @@
               "description" : "Unlock full access to vanlife rules.",
               "displayName" : "Travel Rules Premium",
               "locale" : "en_US"
+            },
+            {
+              "description" : "El acceso completo a las reglas de vanlife.",
+              "displayName" : "Travel Rules Premium",
+              "locale" : "es_ES"
             }
           ],
           "productID" : "com.mlynarski.travelrules.premium.yearly",

@@ -53,6 +53,11 @@ struct PushView: View {
         case .beach: return ThemeColors.beachTheme
         case .desert: return ThemeColors.desertTheme
         case .forest: return ThemeColors.forestTheme
+        case .autumn: return ThemeColors.autumnTheme
+        case .spring: return ThemeColors.springTheme
+        case .winter: return ThemeColors.winterTheme
+        case .summer: return ThemeColors.summerTheme
+
         }
     }
     
@@ -78,6 +83,7 @@ struct PushView: View {
                                 .foregroundColor(themeColors.primaryText)
                                 .padding()
                         }
+                        .buttonStyle(.plain)
                     }
                     
                     // Główna sekcja: opisy + przełączniki + dodawanie dokumentów
@@ -97,7 +103,7 @@ struct PushView: View {
                                             DispatchQueue.main.async {
                                                 self.isNotificationEnabled = granted
                                                 if granted {
-                                                    NotificationManager.instance.scheduleNotification()
+                                                    scheduleDailyRandomRuleNotification() // replaced old call to scheduleNotification()
                                                 }
                                             }
                                         }
@@ -176,6 +182,7 @@ struct PushView: View {
                             .background(themeColors.primary)
                             .foregroundColor(themeColors.secondary)
                             .cornerRadius(10)
+                            .buttonStyle(.plain)
                         }
                         .padding(.top, 20)
                     }
@@ -199,6 +206,7 @@ struct PushView: View {
                                         .padding(8)
                                 }
                                 .buttonStyle(BorderlessButtonStyle())
+                                .buttonStyle(.plain)
                             }
                             .padding(8)
                             .background(themeColors.cardBackground)
@@ -291,5 +299,78 @@ struct PushView: View {
                 print("monthly_notification_error".appLocalized, error)
             }
         }
+    }
+    
+    // New helper to schedule daily random rule notification at 10:25
+    private func scheduleDailyRandomRuleNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "daily_rule_notification_title".appLocalized
+        
+        content.body = pickRandomLocalizedRule()
+        
+        content.sound = .default
+        
+        var dateComponents = DateComponents()
+        dateComponents.hour = 14
+        dateComponents.minute = 00
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+
+        let request = UNNotificationRequest(identifier: "daily_rule_notification",
+                                            content: content,
+                                            trigger: trigger)
+
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["daily_rule_notification"])
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("daily_rule_notification_error".appLocalized, error)
+            }
+        }
+        // Diagnostic dump of pending notification requests
+        UNUserNotificationCenter.current().getPendingNotificationRequests { reqs in
+            let ids = reqs.map { $0.identifier }
+            print("[DEBUG] Pending notifications count: \(reqs.count) | ids: \(ids)")
+        }
+    }
+    
+    // Helper to pick a random localized rule from in-memory arrays instead of bundled JSON
+    private func pickRandomLocalizedRule() -> String {
+        let code = currentLanguageCode()
+        switch code {
+        case "pl":
+            if !RulesListPL.isEmpty {
+                return RulesListPL.randomElement() ?? String(localized: "random_rule_fallback")
+            }
+        case "es":
+            if !RulesListES.isEmpty {
+                return RulesListES.randomElement() ?? String(localized: "random_rule_fallback")
+            }
+        case "en":
+            if !RulesList.isEmpty {
+                return RulesList.randomElement() ?? String(localized: "random_rule_fallback")
+            }
+        default:
+            break
+        }
+        // Robust fallback chain
+        if !RulesList.isEmpty {
+            return RulesList.randomElement() ?? String(localized: "random_rule_fallback")
+        }
+        if !RulesListPL.isEmpty {
+            return RulesListPL.randomElement() ?? String(localized: "random_rule_fallback")
+        }
+        if !RulesListES.isEmpty {
+            return RulesListES.randomElement() ?? String(localized: "random_rule_fallback")
+        }
+        return String(localized: "random_rule_fallback")
+    }
+    
+    // Helper to get current language code, normalized to primary subtag (e.g., "en-US" -> "en")
+    private func currentLanguageCode() -> String {
+        if let selectedCode = UserDefaults.standard.string(forKey: "selectedLanguageCode") {
+            return selectedCode.components(separatedBy: CharacterSet(charactersIn: "-_")).first ?? selectedCode // normalize
+        }
+        let sysCode = Locale.current.language.languageCode?.identifier ?? "pl"
+        return sysCode.components(separatedBy: CharacterSet(charactersIn: "-_")).first ?? sysCode // normalize
     }
 }

@@ -23,6 +23,11 @@ struct MainView: View {
         case .beach: return ThemeColors.beachTheme
         case .desert: return ThemeColors.desertTheme
         case .forest: return ThemeColors.forestTheme
+        case .autumn: return ThemeColors.autumnTheme
+        case .winter: return ThemeColors.winterTheme
+        case .summer: return ThemeColors.summerTheme
+        case .spring: return ThemeColors.springTheme
+
         }
     }
     
@@ -148,13 +153,11 @@ struct BackgroundImage: View {
                     image.resizable()
                         .aspectRatio(contentMode: .fill)
                         .ignoresSafeArea()
-                    //.edgesIgnoringSafeArea(.all)
                     
                 default:
                     Image(getBackgroundImageName())
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                    //.edgesIgnoringSafeArea(.all)
                         .ignoresSafeArea()
                 }
             }
@@ -162,7 +165,6 @@ struct BackgroundImage: View {
             Image(getBackgroundImageName())
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-            // .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
         }
     }
@@ -175,6 +177,10 @@ struct BackgroundImage: View {
         case .beach: return isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
         case .desert: return isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
         case .forest: return isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
+        case .autumn: return isDarkMode ? "autumn-bg-dark" : "theme-autumn-preview"
+        case .spring: return isDarkMode ? "spring-bg-dark" : "theme-spring-preview"
+        case .winter: return isDarkMode ? "winter-bg-dark" : "theme-winter-preview"
+        case .summer: return isDarkMode ? "summer-bg-dark" : "theme-summer-preview"
         }
     }
 }
@@ -285,5 +291,3 @@ struct StartButton: View {
             .accessibility(label: Text("start_button".appLocalized))
     }
 }
-
-

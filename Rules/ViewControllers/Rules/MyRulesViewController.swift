@@ -18,6 +18,10 @@ struct MyRulesView: View {
         case .beach:     return .beachTheme
         case .desert:    return .desertTheme
         case .forest:    return .forestTheme
+        case .autumn:   return .autumnTheme
+        case .winter:   return .winterTheme
+        case .spring:   return .springTheme
+        case .summer:   return .summerTheme
         }
     }
 
@@ -83,6 +87,7 @@ struct MyRulesView: View {
                isPresented: $showingRuleDetail,
                presenting: selectedRule) { _ in
             Button("ok_button".appLocalized, role: .cancel) { }
+                .buttonStyle(.plain)
         } message: { rule in
             Text(rule.description)
         }

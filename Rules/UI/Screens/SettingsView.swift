@@ -2,7 +2,7 @@ import SwiftUI
 import Foundation
 import AVFoundation
 import UIKit
-import StoreKit  // ⬅️ [PAYWALL] StoreKit 2
+import StoreKit
 
 // MARK: - Background music (bez zmian)
 var audioPlayer: AVAudioPlayer?
@@ -31,12 +31,19 @@ final class PurchaseManager: ObservableObject {
     private let premiumProductID = "com.mlynarski.travelrules.premium.monthly"
     private let premiumYearlyProductID = "com.mlynarski.travelrules.premium.yearly"
     
-    @Published var premiumProduct: Product?            // domyślnie monthly
+    @Published var premiumProduct: Product?
     @Published var premiumMonthlyProduct: Product?
     @Published var premiumYearlyProduct: Product?
     
     @Published var isPurchasing = false
     @Published var lastError: String?
+    
+    // aktywna subskrypcja (do UI)
+    @Published var activeProductID: String?
+    var isYearlyActive: Bool? {
+        guard let id = activeProductID else { return nil }
+        return id == premiumYearlyProductID
+    }
     
     private var transactionListenerTask: Task<Void, Never>?
     deinit { transactionListenerTask?.cancel() }
@@ -64,15 +71,16 @@ final class PurchaseManager: ObservableObject {
     
     func updatePurchased(hasPremiumBinding: Binding<Bool>) async {
         var hasPremium = false
+        activeProductID = nil
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
                (transaction.productID == premiumProductID || transaction.productID == premiumYearlyProductID) {
                 hasPremium = true
-                break
+                activeProductID = transaction.productID
             }
         }
         hasPremiumBinding.wrappedValue = hasPremium
-        print("🔐 Premium status updated ->", hasPremium)
+        print("🔐 Premium status updated ->", hasPremium, " | active:", activeProductID ?? "nil")
     }
     
     func purchase(product: Product?, hasPremiumBinding: Binding<Bool>) async {
@@ -123,10 +131,9 @@ final class PurchaseManager: ObservableObject {
         transactionListenerTask = Task.detached(priority: .background) { [weak self] in
             for await result in Transaction.updates {
                 guard let self else { continue }
-                // ✅ [POPRAWKA] wyciągamy Transaction z VerificationResult, a potem transaction.finish()
-                guard case .verified(let transaction) = result else { continue } // ← zamiast update.finish()
+                guard case .verified(let transaction) = result else { continue }
                 await self.updatePurchased(hasPremiumBinding: hasPremiumBinding)
-                await transaction.finish() // ← poprawny obiekt do finish()
+                await transaction.finish()
             }
         }
     }
@@ -137,50 +144,78 @@ struct SettingsView: View {
     @Binding var showSettings: Bool
     @AppStorage("isDarkMode") var isDarkMode = false
     @AppStorage("isMusicEnabled") var isMusicEnabled = true
+    @AppStorage("reduceEffects") private var reduceEffects: Bool = false
+    @AppStorage("reduceTransparency") private var reduceTransparency: Bool = false
     @State private var showThemeSelector = false
     @StateObject private var languageManager = LanguageManager.shared
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
-    
-    // [KATEGORIE + PAYWALL]
     @AppStorage("selectedCategoryKey") private var selectedCategoryKey: String = "all"
     @AppStorage("hasPremium") private var hasPremium: Bool = false
     @StateObject private var purchaseManager = PurchaseManager()
     @State private var showPaywallSheet = false
-    
-    // tymczasowy wybór do cofnięcia po paywallu
     @State private var tempSelectedCategoryKey: String = "all"
-    
-    // wybór planu
     @State private var selectedPlanIsYearly: Bool = false
+    @State private var langRefreshToken: Int = 0
+    @State private var showRedeemNotice: Bool = false
+    @State private var redeemNoticeText: String = ""
+    @State private var showRedeemOptions: Bool = false
     
     private var themeColors: ThemeColors {
         switch ThemeStyle(rawValue: selectedTheme) ?? .classic {
-        case .classic: return ThemeColors.classicTheme
+        case .classic:  return ThemeColors.classicTheme
         case .mountain: return ThemeColors.mountainTheme
-        case .beach: return ThemeColors.beachTheme
-        case .desert: return ThemeColors.desertTheme
-        case .forest: return ThemeColors.forestTheme
+        case .beach:    return ThemeColors.beachTheme
+        case .desert:   return ThemeColors.desertTheme
+        case .forest:   return ThemeColors.forestTheme
+        case .autumn:   return ThemeColors.autumnTheme
+        case .winter:   return ThemeColors.winterTheme
+        case .spring:   return ThemeColors.springTheme
+        case .summer:   return ThemeColors.summerTheme
         }
     }
     
     private var isSmallDevice: Bool { UIScreen.main.bounds.height <= 667 } // iPhone 7/8/SE
     
+    private var appVersionString: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+        if let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String, !build.isEmpty {
+            return "\(version) (\(build))"
+        }
+        return version
+    }
+
+    // Dodatkowa kompensacja dla urządzeń bez notcha (np. iPhone SE/8)
+    private var topSafeInset: CGFloat {
+        let scene = UIApplication.shared.connectedScenes.first { $0.activationState == .foregroundActive } as? UIWindowScene
+        let window = scene?.windows.first { $0.isKeyWindow }
+        return window?.safeAreaInsets.top ?? 0
+    }
+    private var headerExtraTopPadding: CGFloat {
+        // na SE/8 topSafeInset ≈ 20; na urządzeniach z notchem ≈ 44+
+        return topSafeInset < 30 ? 24 : 0
+    }
+    
     var body: some View {
         NavigationView {
             ZStack {
-                themeColors.secondary.ignoresSafeArea()
+                // Używa zasobów z Asset Catalog: jasny -> "theme-*-preview", ciemny -> "*-bg-dark"
+                BackgroundArtwork(
+                    selectedTheme: selectedTheme,
+                    isDarkMode: isDarkMode,
+                    fallbackColor: themeColors.secondary,
+                    reduceTransparency: reduceTransparency,
+                    isSmallDevice: isSmallDevice
+                )
                 
                 ScrollView {
                     VStack(spacing: isSmallDevice ? 10 : 16) {
-                        HeaderBar(themeColors: themeColors, isSmallDevice: isSmallDevice) {
-                            showSettings = false
-                        }
-                        
                         VStack(spacing: isSmallDevice ? 16 : 20) {
                             AppearanceCard(
                                 themeColors: themeColors,
                                 isDarkMode: $isDarkMode,
-                                isMusicEnabled: $isMusicEnabled
+                                isMusicEnabled: $isMusicEnabled,
+                                reduceEffects: $reduceEffects,
+                                reduceTransparency: $reduceTransparency
                             )
                             
                             ThemeLangCard(
@@ -202,6 +237,7 @@ struct SettingsView: View {
                                 themeColors: themeColors,
                                 isSmallDevice: isSmallDevice,
                                 hasPremium: hasPremium,
+                                activePlanIsYearly: purchaseManager.isYearlyActive,
                                 selectedPlanIsYearly: $selectedPlanIsYearly,
                                 monthlyProduct: purchaseManager.premiumMonthlyProduct,
                                 yearlyProduct: purchaseManager.premiumYearlyProduct,
@@ -218,6 +254,19 @@ struct SettingsView: View {
                                 restoreTapped: {
                                     Task { await purchaseManager.restore(hasPremiumBinding: $hasPremium) }
                                 },
+                                manageTapped: {
+                                    openManageSubscriptions()
+                                },
+                                redeemTapped: {
+#if targetEnvironment(simulator)
+                                    // Na symulatorze od razu fallback do App Store
+                                    redeemNoticeText = "redeem_opening_store".appLocalized
+                                    showRedeemNotice = true
+                                    openOfferCodeRedeemPage()
+#else
+                                    showRedeemOptions = true
+#endif
+                                },
                                 lastError: purchaseManager.lastError
                             )
                             
@@ -232,12 +281,29 @@ struct SettingsView: View {
                                     .shadow(color: themeColors.cardShadow, radius: 4)
                             }
                             .padding(.horizontal)
+                            .buttonStyle(.plain)
                             
                             ActionsCard(themeColors: themeColors, shareApp: shareApp, rateApp: rateApp, sendFeedback: sendFeedback)
+                            
+                            LegalLinksCard(
+                                themeColors: themeColors,
+                                isSmallDevice: isSmallDevice,
+                                privacyURL: URL(string: "https://www.travelrules.eu/polityka-prywatnosci.html")!,
+                                termsURL: URL(string: "https://www.travelrules.eu/warunki-korzystania.html")!
+                            )
+                            
+                            VersionFooter(
+                                themeColors: themeColors,
+                                versionText: "version".appLocalized + " " + appVersionString
+                            )
+                            .padding(.bottom, 8)
                         }
                         .padding(.horizontal, isSmallDevice ? 12 : 16)
+                        .padding(.top, isSmallDevice ? 64 : 76)
                     }
                 }
+                .id(langRefreshToken)
+                .scrollIndicators(.hidden)
                 
                 if purchaseManager.isPurchasing {
                     ZStack {
@@ -248,6 +314,13 @@ struct SettingsView: View {
                     }
                     .transition(.opacity)
                 }
+            }
+            .safeAreaInset(edge: .top) {
+                HeaderBar(themeColors: themeColors, isSmallDevice: isSmallDevice) {
+                    showSettings = false
+                }
+                .padding(.horizontal, isSmallDevice ? 12 : 16)
+                .padding(.top, headerExtraTopPadding)
             }
         }
         .sheet(isPresented: $showThemeSelector) { ThemeSelectionView() }
@@ -280,15 +353,69 @@ struct SettingsView: View {
                 }
             )
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
+            langRefreshToken &+= 1
+        }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             Task { await purchaseManager.updatePurchased(hasPremiumBinding: $hasPremium) }
+        }
+        .alert("redeem_title".appLocalized, isPresented: $showRedeemNotice) {
+            Button("ok".appLocalized, role: .cancel) { }
+        } message: {
+            Text(redeemNoticeText)
+        }
+        .confirmationDialog("redeem_title".appLocalized, isPresented: $showRedeemOptions, titleVisibility: .visible) {
+            Button("redeem_in_app".appLocalized) {
+                presentRedeemCodeSheet()
+            }
+            Button("redeem_in_store".appLocalized) {
+                redeemNoticeText = "redeem_opening_store".appLocalized
+                showRedeemNotice = true
+                openOfferCodeRedeemPage()
+            }
+            Button("cancel".appLocalized, role: .cancel) { }
         }
     }
     
     // MARK: - Helpers
+    @MainActor
+    private func presentRedeemCodeSheet() {
+        DispatchQueue.main.async {
+#if targetEnvironment(simulator)
+            redeemNoticeText = "redeem_opening_store".appLocalized
+            showRedeemNotice = true
+            openOfferCodeRedeemPage()
+            return
+#else
+            if #available(iOS 14.0, *) {
+                SKPaymentQueue.default().presentCodeRedemptionSheet()
+            } else {
+                redeemNoticeText = "redeem_opening_store".appLocalized
+                showRedeemNotice = true
+                openOfferCodeRedeemPage()
+            }
+#endif
+        }
+    }
+    private func openOfferCodeRedeemPage() {
+        let candidates = [
+            "itms-apps://apps.apple.com/redeem?ctx=offercodes",
+            "https://apps.apple.com/redeem?ctx=offercodes"
+        ]
+        for link in candidates {
+            if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+                return
+            }
+        }
+        print("⚠️ Nie udało się otworzyć strony realizacji kodu.")
+    }
+
     private func currentCategoryTitle(for key: String) -> String {
         if key == "all" { return "category.all.title".appLocalized }
-        if let cat = RuleCategory.allCases.first(where: { $0.rawValue == key }) { return cat.localizedTitle }
+        if let cat = RuleCategory.allCases.first(where: { $0.rawValue == key }) {
+            return cat.rawValue.appLocalized
+        }
         return "category.all.title".appLocalized
     }
     
@@ -328,6 +455,28 @@ struct SettingsView: View {
         }
     }
     
+    private func openManageSubscriptions() {
+        if #available(iOS 15.0, *) {
+            if let scene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first(where: { $0.activationState == .foregroundActive }) {
+                Task {
+                    do {
+                        try await AppStore.showManageSubscriptions(in: scene)
+                    } catch {
+                        if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+                            await UIApplication.shared.open(url)
+                        }
+                    }
+                }
+            } else if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+                UIApplication.shared.open(url)
+            }
+        } else if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+            UIApplication.shared.open(url)
+        }
+    }
+    
     private func resetApplication() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let rootViewController = windowScene.windows.first?.rootViewController?.topmostViewController() else { return }
@@ -350,6 +499,41 @@ struct SettingsView: View {
                 UserDefaults.standard.removeObject(forKey: "dailyRulesCount")
                 UserDefaults.standard.removeObject(forKey: "totalRulesDrawn")
                 UserDefaults.standard.removeObject(forKey: "totalRulesSaved")
+                // Zresetuj osiągnięcia – usuń wpis, manager wczyta domyślne
+                UserDefaults.standard.removeObject(forKey: "achievements")
+                UserDefaults.standard.removeObject(forKey: "savedLocations")
+                UserDefaults.standard.removeObject(forKey: "checklistItems")
+                
+                // Usuń ewentualne pliki z zapisanymi danymi (lokalizacje / checklisty) w Documents
+                do {
+                    let fm = FileManager.default
+                    if let docs = fm.urls(for: .documentDirectory, in: .userDomainMask).first {
+                        let candidates = [
+                            "savedLocations.json",
+                            "locations.json",
+                            "locationData.json",
+                            "SavedLocations.json",
+                            "checklistItems.json",
+                            "Checklist.json",
+                            "my_checklist.json"
+                        ]
+                        for name in candidates {
+                            let url = docs.appendingPathComponent(name)
+                            if fm.fileExists(atPath: url.path) {
+                                try? fm.removeItem(at: url)
+                            }
+                        }
+                        // Dodatkowo usuń dowolny plik zawierający „location” lub „checklist” w nazwie
+                        if let urls = try? fm.contentsOfDirectory(at: docs, includingPropertiesForKeys: nil) {
+                            for url in urls {
+                                let lower = url.lastPathComponent.lowercased()
+                                if lower.contains("location") || lower.contains("checklist") {
+                                    try? fm.removeItem(at: url)
+                                }
+                            }
+                        }
+                    }
+                }
                 
                 // [PAYWALL/KATEGORIE] Reset
                 UserDefaults.standard.set("all", forKey: "selectedCategoryKey")
@@ -364,15 +548,11 @@ struct SettingsView: View {
                 
                 self.showSettings = false
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    NotificationCenter.default.post(name: NSNotification.Name("AppReset"), object: nil)
-                    let restartAlert = UIAlertController(
-                        title: "reset_complete".appLocalized,
-                        message: "please_restart_app".appLocalized,
-                        preferredStyle: .alert
-                    )
-                    restartAlert.addAction(UIAlertAction(title: "ok".appLocalized, style: .default, handler: nil))
-                    rootViewController.present(restartAlert, animated: true)
+                // Odśwież aplikację bez potrzeby ręcznego restartu
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                   let window = windowScene.windows.first {
+                    window.rootViewController = UIHostingController(rootView: ContentView())
+                    window.makeKeyAndVisible()
                 }
             }))
         
@@ -381,13 +561,13 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Pod-widoki (bez zmian merytorycznych)
+// MARK: - Pod-widoki
 
 private struct HeaderBar: View {
     let themeColors: ThemeColors
     let isSmallDevice: Bool
     let onClose: () -> Void
-    
+
     var body: some View {
         HStack {
             Spacer()
@@ -402,7 +582,10 @@ private struct HeaderBar: View {
                     .foregroundColor(themeColors.primaryText)
                     .padding()
             }
+            .buttonStyle(.plain)
         }
+        .padding(.horizontal, isSmallDevice ? 8 : 12)
+        .background(Color.clear)
     }
 }
 
@@ -410,6 +593,8 @@ private struct AppearanceCard: View {
     let themeColors: ThemeColors
     @Binding var isDarkMode: Bool
     @Binding var isMusicEnabled: Bool
+    @Binding var reduceEffects: Bool
+    @Binding var reduceTransparency: Bool
     
     var body: some View {
         SettingsCard(themeColors: themeColors) {
@@ -419,6 +604,17 @@ private struct AppearanceCard: View {
                 .foregroundColor(themeColors.primaryText)
                 .onChange(of: isMusicEnabled) { _, newValue in
                     newValue ? playBackgroundMusic() : stopBackgroundMusic()
+                }
+            /// Dodatkowe przełączniki aplikacji – działają *wspólnie* z ustawieniami systemowymi (Reduce Motion/Transparency)
+            Toggle("accessibility_reduce_effects".appLocalized, isOn: $reduceEffects)
+                .foregroundColor(themeColors.primaryText)
+                .onChange(of: reduceEffects) { _, _ in
+                    NotificationCenter.default.post(name: NSNotification.Name("AccessibilityPrefsChanged"), object: nil)
+                }
+            Toggle("accessibility_reduce_transparency".appLocalized, isOn: $reduceTransparency)
+                .foregroundColor(themeColors.primaryText)
+                .onChange(of: reduceTransparency) { _, _ in
+                    NotificationCenter.default.post(name: NSNotification.Name("AccessibilityPrefsChanged"), object: nil)
                 }
         }
     }
@@ -438,6 +634,7 @@ private struct ThemeLangCard: View {
                     Image(systemName: "chevron.right").foregroundColor(themeColors.secondaryText)
                 }
             }
+            .buttonStyle(.plain)
             Divider().background(themeColors.secondaryText)
             HStack {
                 Text("language".appLocalized).foregroundColor(themeColors.primaryText)
@@ -491,7 +688,7 @@ private struct CategoryCard: View {
                     Picker(selection: $tempSelectedCategoryKey) {
                         Text("category.all.title".appLocalized).tag("all")
                         ForEach(RuleCategory.allCases) { cat in
-                            Text(cat.localizedTitle).tag(cat.rawValue)
+                            Text(cat.rawValue.appLocalized).tag(cat.rawValue)
                         }
                     } label: { label }
                     .pickerStyle(MenuPickerStyle())
@@ -511,7 +708,7 @@ private struct CategoryCard: View {
     
     private func currentCategoryTitle(for key: String) -> String {
         if key == "all" { return "category.all.title".appLocalized }
-        if let cat = RuleCategory.allCases.first(where: { $0.rawValue == key }) { return cat.localizedTitle }
+        if let cat = RuleCategory.allCases.first(where: { $0.rawValue == key }) { return cat.rawValue.appLocalized }
         return "category.all.title".appLocalized
     }
 }
@@ -520,6 +717,7 @@ private struct PremiumCard: View {
     let themeColors: ThemeColors
     let isSmallDevice: Bool
     let hasPremium: Bool
+    let activePlanIsYearly: Bool?
     @Binding var selectedPlanIsYearly: Bool
     let monthlyProduct: Product?
     let yearlyProduct: Product?
@@ -527,85 +725,123 @@ private struct PremiumCard: View {
     let isPurchasing: Bool
     let buyTapped: () -> Void
     let restoreTapped: () -> Void
+    let manageTapped: () -> Void
+    let redeemTapped: () -> Void
     let lastError: String?
     
+    // Lokalizacja ceny wg ustawień regionu urządzenia (np. PLN w PL)
+    private func localizedPrice(_ product: Product?) -> String {
+        guard let product else { return "—" }
+        let style = product.priceFormatStyle.locale(Locale.current)
+        return product.price.formatted(style)
+    }
+
     var body: some View {
         SettingsCard(themeColors: themeColors) {
+            // Header
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "crown.fill")
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(themeColors.primary)
                     .padding(.top, 2)
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("premium_title".appLocalized)
-                        .font(.system(size: isSmallDevice ? 18 : 20, weight: .bold))
-                        .foregroundColor(themeColors.primaryText)
-                    Text("premium_subtitle".appLocalized)
+                    HStack(spacing: 8) {
+                        Text(hasPremium ? "premium_active".appLocalized : "premium_title".appLocalized)
+                            .font(.system(size: isSmallDevice ? 18 : 20, weight: .bold))
+                            .foregroundColor(themeColors.primaryText)
+                        
+                        // Pigułka z typem planu, jeśli premium aktywne
+                        if hasPremium, let isYearly = activePlanIsYearly {
+                            Text(isYearly ? "yearly".appLocalized : "monthly".appLocalized)
+                                .font(.system(size: 12, weight: .bold))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(themeColors.primary.opacity(0.15))
+                                .foregroundColor(themeColors.primary)
+                                .cornerRadius(8)
+                        }
+                    }
+                    
+                    Text(hasPremium ? "premium_subtitle".appLocalized : "premium_subtitle".appLocalized)
                         .font(.system(size: 14))
                         .foregroundColor(themeColors.secondaryText)
                 }
                 Spacer()
             }
             
-            VStack(alignment: .leading, spacing: 4) {
-                if let mp = monthlyProduct?.displayPrice {
-                    Text("• " + "monthly".appLocalized + ": \(mp)")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(themeColors.primaryText)
-                }
-                if let yp = yearlyProduct?.displayPrice {
-                    Text("• " + "yearly".appLocalized + ": \(yp)")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(themeColors.primaryText)
-                }
-                if monthlyProduct == nil && yearlyProduct == nil, let price = defaultProduct?.displayPrice {
-                    Text("premium_price".appLocalized + " \(price)")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(themeColors.primaryText)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            HStack(spacing: 12) {
-                PlanPill(
-                    title: "monthly".appLocalized,
-                    subtitle: monthlyProduct?.displayPrice ?? "—",
-                    selected: !selectedPlanIsYearly,
-                    themeColors: themeColors
-                ) { selectedPlanIsYearly = false }
-                
-                PlanPill(
-                    title: "yearly".appLocalized,
-                    subtitle: yearlyProduct?.displayPrice ?? "—",
-                    selected: selectedPlanIsYearly,
-                    themeColors: themeColors
-                ) { selectedPlanIsYearly = true }
-            }
-            
-            HStack {
-                Button(action: buyTapped) {
-                    Text(hasPremium ? "premium_owned".appLocalized : "premium_buy".appLocalized)
-                        .font(.system(size: isSmallDevice ? 16 : 18, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: isSmallDevice ? 44 : 50)
-                        .background(themeColors.primary)
-                        .cornerRadius(12)
-                }
-                .disabled(hasPremium || isPurchasing)
-                
-                Button(action: restoreTapped) {
-                    Text("premium_restore".appLocalized)
-                        .font(.system(size: isSmallDevice ? 14 : 16, weight: .bold))
-                        .foregroundColor(themeColors.primary)
-                        .frame(height: isSmallDevice ? 44 : 50)
-                        .padding(.horizontal, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(themeColors.primary, lineWidth: 2)
-                        )
+            if hasPremium {
+                // 🔒 Użytkownik ma premium – tylko „Zarządzaj subskrypcją”
+                Button(action: manageTapped) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "person.badge.key.fill")
+                        Text("premium_manage".appLocalized) // dodaj w Localizable
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .foregroundColor(themeColors.primary)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: isSmallDevice ? 44 : 48)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(themeColors.primary.opacity(0.8), lineWidth: 1.5)
+                    )
                 }
                 .disabled(isPurchasing)
+                .buttonStyle(.plain)
+                
+            } else {
+                // 🛒 Brak premium – wybór planu + kup/restore
+                HStack(spacing: 14) {
+                    PlanPill(
+                        title: "monthly".appLocalized,
+                        subtitle: localizedPrice(monthlyProduct),
+                        selected: !selectedPlanIsYearly,
+                        themeColors: themeColors
+                    ) { selectedPlanIsYearly = false }
+                    
+                    PlanPill(
+                        title: "yearly".appLocalized,
+                        subtitle: localizedPrice(yearlyProduct),
+                        selected: selectedPlanIsYearly,
+                        themeColors: themeColors
+                    ) { selectedPlanIsYearly = true }
+                }
+                
+                HStack {
+                    Button(action: buyTapped) {
+                        Text("premium_buy".appLocalized)
+                            .font(.system(size: isSmallDevice ? 16 : 18, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: isSmallDevice ? 44 : 50)
+                            .background(themeColors.primary)
+                            .cornerRadius(12)
+                    }
+                    .disabled(isPurchasing)
+                    .buttonStyle(.plain)
+                    
+                    Button(action: restoreTapped) {
+                        Text("premium_restore".appLocalized)
+                            .font(.system(size: isSmallDevice ? 14 : 16, weight: .bold))
+                            .foregroundColor(themeColors.primary)
+                            .frame(height: isSmallDevice ? 44 : 50)
+                            .padding(.horizontal, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(themeColors.primary, lineWidth: 2)
+                            )
+                    }
+                    .disabled(isPurchasing)
+                    .buttonStyle(.plain)
+                }
+                Button(action: redeemTapped) {
+                    Text("redeem_code".appLocalized) // ⚠️ dodaj klucz lokalizacji w Localizable.strings
+                        .font(.system(size: 12, weight: .semibold))
+                        .underline()
+                        .foregroundColor(themeColors.secondaryText)
+                        .frame(maxWidth: .infinity)
+                }
+                .padding(.top, 4)
+                .buttonStyle(.plain)
             }
             
             if let error = lastError {
@@ -700,22 +936,26 @@ struct PlanPill: View {
     
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: 2) {
-                Text(title).font(.system(size: 12, weight: .semibold))
-                Text(subtitle).font(.system(size: 11))
+            VStack(spacing: 4) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold))
+                Text(subtitle)
+                    .font(.system(size: 13, weight: .medium))
             }
             .foregroundColor(selected ? .white : themeColors.primaryText)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 10)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 14)
             .background(
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 14)
                     .fill(selected ? themeColors.primary : themeColors.cardBackground)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(selected ? themeColors.primary : themeColors.secondaryText.opacity(0.4), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(selected ? themeColors.primary : themeColors.secondaryText.opacity(0.4), lineWidth: 1.5)
             )
+            .contentShape(RoundedRectangle(cornerRadius: 14))
         }
+        .buttonStyle(.plain)
     }
 }
 
@@ -758,6 +998,160 @@ private struct ActionsCard: View {
     }
 }
 
+// MARK: - NOWE: LegalLinksCard (linki na dół ustawień)
+private struct LegalLinksCard: View {
+    let themeColors: ThemeColors
+    let isSmallDevice: Bool
+    let privacyURL: URL
+    let termsURL: URL
+    
+    var body: some View {
+        SettingsCard(themeColors: themeColors) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("legal.title".appLocalized) // dodaj np. „Informacje prawne”
+                    .font(.system(size: isSmallDevice ? 16 : 18, weight: .semibold))
+                    .foregroundColor(themeColors.primaryText)
+                
+                Button {
+                    UIApplication.shared.open(privacyURL)
+                } label: {
+                    HStack {
+                        Image(systemName: "hand.raised.fill")
+                            .foregroundColor(themeColors.primary)
+                        Text("privacy_policy".appLocalized) // „Polityka prywatności”
+                            .foregroundColor(themeColors.primaryText)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .foregroundColor(themeColors.secondaryText)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                
+                Divider().background(themeColors.secondaryText.opacity(0.4))
+                
+                Button {
+                    UIApplication.shared.open(termsURL)
+                } label: {
+                    HStack {
+                        Image(systemName: "doc.text.fill")
+                            .foregroundColor(themeColors.primary)
+                        Text("terms_of_use".appLocalized) // „Warunki korzystania”
+                            .foregroundColor(themeColors.primaryText)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .foregroundColor(themeColors.secondaryText)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+}
+
+// MARK: - NOWE: stopka wersji
+private struct VersionFooter: View {
+    let themeColors: ThemeColors
+    let versionText: String
+    
+    var body: some View {
+        Text(versionText)
+            .font(.system(size: 12))
+            .foregroundColor(themeColors.secondaryText)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
+            .accessibilityLabel(versionText)
+    }
+}
+
+// MARK: - Tła ilustracyjne dla motywów (jasny/ciemny)
+private struct BackgroundArtwork: View {
+    let selectedTheme: String
+    let isDarkMode: Bool
+    let fallbackColor: Color
+    let reduceTransparency: Bool
+    let isSmallDevice: Bool
+
+    private var imageName: String? {
+        // Mapowanie na zasoby istniejące w Asset Catalog:
+        //  - jasny: "theme-*-preview"
+        //  - ciemny: "*-bg-dark"
+        let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
+        let light: (ThemeStyle) -> String = { theme in
+            switch theme {
+            case .classic:  return "theme-classic-preview"
+            case .mountain: return "theme-mountain-preview"
+            case .beach:    return "theme-beach-preview"
+            case .desert:   return "theme-desert-preview"
+            case .forest:   return "theme-forest-preview"
+            case .autumn:   return "theme-autumn-preview"
+            case .winter:   return "theme-winter-preview"
+            case .spring:   return "theme-spring-preview"
+            case .summer:   return "theme-summer-preview"
+            }
+        }
+        let dark: (ThemeStyle) -> String = { theme in
+            switch theme {
+            case .classic:  return "classic-bg-dark"
+            case .mountain: return "mountain-bg-dark"
+            case .beach:    return "beach-bg-dark"
+            case .desert:   return "desert-bg-dark"
+            case .forest:   return "forest-bg-dark"
+            case .autumn:   return "autumn-bg-dark"
+            case .winter:   return "winter-bg-dark"
+            case .spring:   return "spring-bg-dark"
+            case .summer:   return "summer-bg-dark"
+            }
+        }
+        return isDarkMode ? dark(theme) : light(theme)
+    }
+
+    var body: some View {
+        ZStack {
+            if let name = imageName, UIImage(named: name) != nil {
+                Image(name)
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                    .accessibilityHidden(true)
+                    // delikatne przyciemnienie/rozjaśnienie dla czytelności kart
+                    .overlay(
+                        LinearGradient(
+                            colors: overlayColors,
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    )
+                    // redukcja parallax/blur jeśli użytkownik ogranicza efekty
+                    .overlay(
+                        Group {
+                            if reduceTransparency {
+                                Color.black.opacity(isDarkMode ? 0.35 : 0.12)
+                            } else {
+                                Color.clear
+                            }
+                        }
+                        .ignoresSafeArea()
+                    )
+            } else {
+                fallbackColor.ignoresSafeArea()
+            }
+        }
+    }
+
+    private var overlayColors: [Color] {
+        // Subtelna warstwa poprawiająca kontrast treści
+        if isDarkMode {
+            return [Color.black.opacity(0.25), Color.black.opacity(isSmallDevice ? 0.45 : 0.35)]
+        } else {
+            return [Color.white.opacity(0.06), Color.white.opacity(isSmallDevice ? 0.18 : 0.12)]
+        }
+    }
+}
+
 // MARK: - Paywall Sheet
 struct PaywallSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -766,6 +1160,31 @@ struct PaywallSheet: View {
     let isPurchasing: Bool
     let buyAction: () -> Void
     let restoreAction: () -> Void
+    // ⬇️ Legal links (App Review 3.1.2)
+    private let privacyURL = URL(string: "https://www.travelrules.eu/polityka-prywatnosci.html")!
+    private let termsURL = URL(string: "https://www.travelrules.eu/warunki-korzystania.html")!
+
+    // Krótki opis długości subskrypcji (lokalnie: używa istniejących kluczy "monthly"/"yearly")
+    private func subscriptionLengthText(for product: Product?) -> String? {
+        guard let period = product?.subscription?.subscriptionPeriod else { return nil }
+        switch period.unit {
+        case .month: return "monthly".appLocalized
+        case .year:  return "yearly".appLocalized
+        case .week:
+            return "weekly".appLocalized // UWAGA: jeśli brak klucza, wyświetli się surowy tekst
+        case .day:
+            return "daily".appLocalized  // UWAGA: jeśli brak klucza, wyświetli się surowy tekst
+        @unknown default:
+            return nil
+        }
+    }
+    
+    // Cena sformatowana wg regionu urządzenia (np. PLN w PL)
+    private func localizedPriceString(_ product: Product?) -> String? {
+        guard let product else { return nil }
+        let style = product.priceFormatStyle.locale(Locale.current)
+        return product.price.formatted(style)
+    }
     
     var body: some View {
         NavigationView {
@@ -784,14 +1203,19 @@ struct PaywallSheet: View {
                         .multilineTextAlignment(.center)
                         .foregroundColor(themeColors.primaryText.opacity(0.8))
                         .padding(.horizontal)
-                    
-                    if let price = product?.displayPrice {
+
+                    if let price = localizedPriceString(product) {
                         Text("premium_price".appLocalized + " \(price)")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(themeColors.primaryText)
                             .padding(.top, 6)
                     }
-                    
+                    if let periodText = subscriptionLengthText(for: product) {
+                        Text(periodText)
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(themeColors.secondaryText)
+                    }
+
                     VStack(spacing: 12) {
                         Button(action: buyAction) {
                             Text("premium_buy".appLocalized)
@@ -803,7 +1227,8 @@ struct PaywallSheet: View {
                                 .cornerRadius(12)
                         }
                         .disabled(isPurchasing)
-                        
+                        .buttonStyle(.plain)
+
                         Button(action: restoreAction) {
                             Text("premium_restore".appLocalized)
                                 .font(.system(size: 16, weight: .bold))
@@ -816,9 +1241,33 @@ struct PaywallSheet: View {
                                 )
                         }
                         .disabled(isPurchasing)
+                        .buttonStyle(.plain)
                     }
                     .padding(.horizontal)
-                    
+
+                    // ⬇️ Legal footer required by 3.1.2
+                    HStack(spacing: 16) {
+                        Button {
+                            UIApplication.shared.open(privacyURL)
+                        } label: {
+                            Text("privacy_policy".appLocalized)
+                                .font(.system(size: 12))
+                                .underline()
+                                .foregroundColor(themeColors.secondaryText)
+                        }
+                        .buttonStyle(.plain)
+                        Button {
+                            UIApplication.shared.open(termsURL)
+                        } label: {
+                            Text("terms_of_use".appLocalized)
+                                .font(.system(size: 12))
+                                .underline()
+                                .foregroundColor(themeColors.secondaryText)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.top, 6)
+
                     Spacer()
                 }
             }
@@ -829,6 +1278,7 @@ struct PaywallSheet: View {
                         dismiss()
                     }
                     .foregroundColor(themeColors.primary)
+                    .buttonStyle(.plain)
                 }
             }
         }

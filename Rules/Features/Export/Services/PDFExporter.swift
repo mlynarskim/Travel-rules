@@ -42,7 +42,7 @@ class PDFExporter {
                 dateFormatter.timeStyle = .none
                 let headerText = "\(dateFormatter.string(from: data.date)) | \(data.category)"
                 
-                if let logo = UIImage(named: "AppIcon") {
+                if let logo = UIImage(named: "AppIcon40x40") {
                     let logoSize = CGSize(width: 40, height: 40)
                     let logoRect = CGRect(x: configuration.margins.left,
                                           y: configuration.margins.top,

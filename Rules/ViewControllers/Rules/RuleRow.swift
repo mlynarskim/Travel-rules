@@ -22,7 +22,7 @@ struct RuleItemView: View {
                         .truncationMode(.tail) // "..." jeśli tekst jest za długi
                         .padding(.leading, 16) // Padding dla lepszego wyglądu
                         .frame(maxWidth: .infinity, alignment: .leading)
-                }
+                }.buttonStyle(.plain)
             } else {
                 Text(rule.name)
                     .font(.headline)
@@ -37,7 +37,7 @@ struct RuleItemView: View {
                 Image(systemName: "trash")
                     .foregroundColor(Color(themeColors.accent))
                     .padding(.trailing, 16) // Padding dla przycisku kosza
-            }
+            }.buttonStyle(.plain)
         }
         //.frame(height: 40) // Stała wysokość komórki
         .padding(.vertical, 8)

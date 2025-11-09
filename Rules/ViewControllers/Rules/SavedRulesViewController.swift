@@ -22,6 +22,11 @@ struct SavedRulesView: View {
         case .beach: return ThemeColors.beachTheme
         case .desert: return ThemeColors.desertTheme
         case .forest: return ThemeColors.forestTheme
+        case .autumn: return ThemeColors.autumnTheme
+        case .spring:   return ThemeColors.springTheme
+         case .winter:   return ThemeColors.winterTheme
+         case .summer:   return ThemeColors.summerTheme
+
         }
     }
     
@@ -65,6 +70,7 @@ struct SavedRulesView: View {
         }
         .alert("rule_details".appLocalized, isPresented: $showRuleDetail) {
             Button("OK", role: .cancel) { }
+                .buttonStyle(.plain)
         } message: {
             Text(selectedRule?.name ?? "")
         }

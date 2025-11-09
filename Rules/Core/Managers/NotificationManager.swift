@@ -38,7 +38,7 @@ class NotificationManager {
         content.sound = .default
         
         var dateComponents = DateComponents()
-        dateComponents.hour = 11
+        dateComponents.hour = 16
         
         let trigger  = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         let request  = UNNotificationRequest(identifier: "daily_rule_notification", content: content, trigger: trigger)
@@ -66,7 +66,6 @@ class NotificationManager {
             .removePendingNotificationRequests(withIdentifiers: [identifier])
     }
     
-    // ⚙️ Nowa, bezpieczna metoda czyszczenia badge
     func resetBadgeCount() {
         if #available(iOS 17, *) {
             UNUserNotificationCenter.current()

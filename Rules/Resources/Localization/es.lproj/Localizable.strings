@@ -301,6 +301,8 @@
 "theme_beach" = "Playa";
 "theme_desert" = "Desierto";
 "theme_forest" = "Bosque";
+"theme_autumn" = "Otoño";
+
 "theme_classic_description" = "Tema estándar de la aplicación";
 "theme_mountain_description" = "Inspirado en caminatas por montañas";
 "theme_beach_description" = "Ambiente de playa vacacional";
@@ -412,3 +414,28 @@
 "premium_owned" = "Comprado";
 "product_unavailable" = "Producto no disponible";
 "close" = "Cerrar";
+
+"monthly" = "Mensual";
+"yearly"  = "Anual";
+
+"premium" = "Premium";
+"premium_required_title" = "Se requiere Premium";
+"premium_required_message" = "Este PDF está disponible con Premium. Ve a Ajustes → Premium para desbloquear.";
+"premium_manage" = "Administrar suscripción";
+"premium_renew_off" = "Renovación desactivada";
+"version" = "Versión";
+"legal.title" = "Información legal";
+"privacy_policy" = "Política de privacidad";
+"terms_of_use" = "Términos de uso";
+"redeem_code" = "Canjear código";
+"redeem_title" = "Canjear código";
+"redeem_in_app" = "Canjear en la aplicación";
+"redeem_in_store" = "Canjear en App Store";
+"accessibility_reduce_effects" = "Reducir efectos";
+"accessibility_reduce_transparency" = "Reducir transparencia";
+"daily_rule_notification_title" = "¡La regla de hoy!";
+"themes_section_standard" = "Estándar";
+"themes_section_seasonal" = "Estacionales";
+"theme_winter" = "Invierno";
+"theme_spring" = "Primavera";
+"theme_summer" = "Verano";

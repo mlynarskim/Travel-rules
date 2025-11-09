@@ -15,6 +15,7 @@
 		07211A1A2D2F699800B501B9 /* KeyboardResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A192D2F699800B501B9 /* KeyboardResponder.swift */; };
 		07211A1C2D2FFDB000B501B9 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07211A1B2D2FFDAD00B501B9 /* LocationManager.swift */; };
 		0725C6052D65C9D5000A1DA9 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0725C6042D65C9D1000A1DA9 /* NotificationManager.swift */; };
+		073199602E912223002D8701 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0731995F2E912223002D8701 /* PrivacyInfo.xcprivacy */; };
 		073A7B622D26F6CB0030C39B /* ThemeStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073A7B612D26F6C60030C39B /* ThemeStyle.swift */; };
 		073A7B652D26F7260030C39B /* ThemeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073A7B642D26F7220030C39B /* ThemeSelectionView.swift */; };
 		073E03482D268917002BD119 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073E03472D268915002BD119 /* PDFExporter.swift */; };
@@ -422,6 +423,7 @@
 		07211A1B2D2FFDAD00B501B9 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		0725C6042D65C9D1000A1DA9 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		072ECB322D26728B00BC81F0 /* Rules.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rules.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0731995F2E912223002D8701 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		073A7B612D26F6C60030C39B /* ThemeStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeStyle.swift; sourceTree = "<group>"; };
 		073A7B642D26F7220030C39B /* ThemeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionView.swift; sourceTree = "<group>"; };
 		073E03472D268915002BD119 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
@@ -523,6 +525,7 @@
 		0707D9982A1453D800186248 = {
 			isa = PBXGroup;
 			children = (
+				0731995F2E912223002D8701 /* PrivacyInfo.xcprivacy */,
 				07F01DC72D51FC44003CA72E /* LaunchScreen.storyboard */,
 				07F01DC52D51D979003CA72E /* Property List.plist */,
 				0741A6A12D4CD8AC00DB6E37 /* Config.xcconfig */,
@@ -1121,6 +1124,7 @@
 				07DD83752D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 in Resources */,
 				07DD83772D267182004C5C5F /* Lato-Black.ttf in Resources */,
 				07DD83782D267182004C5C5F /* Lato-LightItalic.ttf in Resources */,
+				073199602E912223002D8701 /* PrivacyInfo.xcprivacy in Resources */,
 				07DD837A2D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 in Resources */,
 				07DD837C2D267182004C5C5F /* Lato-BoldItalic.ttf in Resources */,
 				07DD837D2D267182004C5C5F /* Preview Assets.xcassets in Resources */,
@@ -1447,7 +1451,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 2.0;
+				MARKETING_VERSION = 2.3;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1539,7 +1543,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 2.0;
+				MARKETING_VERSION = 2.3;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";

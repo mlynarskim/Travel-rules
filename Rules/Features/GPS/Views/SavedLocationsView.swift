@@ -22,6 +22,11 @@ struct SavedLocationsView: View {
         case .beach:     imageName = isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
         case .desert:    imageName = isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
         case .forest:    imageName = isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
+        case .autumn:    imageName = isDarkMode ? "autumn-bg-dark" : "theme-autumn-preview"
+        case .spring:    imageName = isDarkMode ? "spring-bg-dark" : "theme-spring-preview"
+        case .winter:   imageName = isDarkMode ? "winter-bg-dark" : "theme-winter-preview"
+        case .summer:   imageName = isDarkMode ? "summer-bg-dark" : "theme-summer-preview"
+
         }
         return Image(imageName)
             .resizable()
@@ -63,15 +68,19 @@ struct SavedLocationsView: View {
                 openMapsApp(with: .googleMaps)
                 HapticManager.shared.impact(style: .medium)
             }
+            .buttonStyle(.plain)
             Button("open_apple_maps".localized) {
                 openMapsApp(with: .appleMaps)
                 HapticManager.shared.impact(style: .medium)
             }
+            .buttonStyle(.plain)
             Button("delete".localized, role: .destructive) {
                 deleteSelectedLocation()
                 HapticManager.shared.notification(type: .success)
             }
+            .buttonStyle(.plain)
             Button("cancel".localized, role: .cancel) {}
+            .buttonStyle(.plain)
         } message: {
             Text(selectedLocation?.description ?? "")
         }
@@ -109,21 +118,25 @@ struct SavedLocationCard: View {
                         .frame(width: 10, height: 10)
                     Text(location.description)
                         .font(.system(.headline, design: .rounded))
-                        .foregroundColor(.white)
+                        .foregroundColor(ThemeManager.colors.primaryText)
                         .multilineTextAlignment(.center)
                 }
             }
             // Współrzędne w jednej linii
             Text(formatCoordinates(latitude: location.latitude, longitude: location.longitude))
                 .font(.system(.subheadline, design: .rounded))
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(ThemeManager.colors.secondaryText)
                 .minimumScaleFactor(0.5)
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(hex: "#29606D"))
+        .background(ThemeManager.colors.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 15)
+                .stroke(ThemeManager.colors.secondary.opacity(0.15), lineWidth: 1)
+        )
         .cornerRadius(15)
-        .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+        .shadow(color: ThemeManager.colors.cardShadow, radius: 5, x: 0, y: 2)
     }
     
     private func formatCoordinates(latitude: Double, longitude: Double) -> String {
@@ -150,7 +163,7 @@ struct SavedLocationCard: View {
         case "blue": return .blue
         case "orange": return .orange
         case "purple": return .purple
-        default: return .red
+        default: return ThemeManager.colors.accent
         }
     }
 }
@@ -160,16 +173,20 @@ struct EmptyStateView: View {
         VStack(spacing: 20) {
             Image(systemName: "location.slash")
                 .font(.system(size: 50))
-                .foregroundColor(.white)
+                .foregroundColor(ThemeManager.colors.primaryText)
             Text("no_saved_locations".localized)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(ThemeManager.colors.primaryText)
                 .multilineTextAlignment(.center)
                 .minimumScaleFactor(0.5)
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(hex: "#29606D").opacity(0.8))
+        .background(ThemeManager.colors.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 15)
+                .stroke(ThemeManager.colors.secondary.opacity(0.15), lineWidth: 1)
+        )
         .cornerRadius(15)
 
     }
@@ -190,4 +207,3 @@ struct SavedLocationsViewPreviewContainer: View {
         }
     }
 }
-

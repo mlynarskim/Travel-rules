@@ -17,6 +17,10 @@ struct ThemeManager {
         case .beach: return ThemeColors.beachTheme
         case .desert: return ThemeColors.desertTheme
         case .forest: return ThemeColors.forestTheme
+        case .autumn: return ThemeColors.autumnTheme
+        case .winter: return ThemeColors.winterTheme
+        case .spring: return ThemeColors.springTheme
+        case .summer: return ThemeColors.summerTheme
         }
     }
 }
@@ -29,11 +33,15 @@ struct AppThemeModifier: ViewModifier {
     var backgroundImage: String {
         let theme = ThemeStyle(rawValue: selectedTheme) ?? .classic
         switch theme {
-        case .classic: return colorScheme == .dark ? "classic-bg-dark" : "theme-classic-preview"
+        case .classic:  return colorScheme == .dark ? "classic-bg-dark"  : "theme-classic-preview"
         case .mountain: return colorScheme == .dark ? "mountain-bg-dark" : "theme-mountain-preview"
-        case .beach: return colorScheme == .dark ? "beach-bg-dark" : "theme-beach-preview"
-        case .desert: return colorScheme == .dark ? "desert-bg-dark" : "theme-desert-preview"
-        case .forest: return colorScheme == .dark ? "forest-bg-dark" : "theme-forest-preview"
+        case .beach:    return colorScheme == .dark ? "beach-bg-dark"    : "theme-beach-preview"
+        case .desert:   return colorScheme == .dark ? "desert-bg-dark"   : "theme-desert-preview"
+        case .forest:   return colorScheme == .dark ? "forest-bg-dark"   : "theme-forest-preview"
+        case .autumn:   return colorScheme == .dark ? "autumn-bg-dark"   : "theme-autumn-preview"
+        case .winter:   return colorScheme == .dark ? "winter-bg-dark"   : "theme-winter-preview"
+        case .spring:   return colorScheme == .dark ? "spring-bg-dark"   : "theme-spring-preview"
+        case .summer:   return colorScheme == .dark ? "summer-bg-dark"   : "theme-summer-preview"
         }
     }
     
@@ -86,10 +94,10 @@ struct ModernCard: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(ThemeManager.layout.spacing.medium)
-            .background(Color.white.opacity(0.95))
+            .background(ThemeManager.colors.cardBackground)
             .cornerRadius(ThemeManager.layout.cornerRadius.medium)
             .shadow(
-                color: Color.black.opacity(0.1),
+                color: ThemeManager.colors.cardShadow,
                 radius: 5,
                 x: 0,
                 y: 2
@@ -106,7 +114,7 @@ struct ModernButton: ViewModifier {
             .background(ThemeManager.colors.primary)
             .cornerRadius(ThemeManager.layout.cornerRadius.medium)
             .shadow(
-                color: Color.black.opacity(0.1),
+                color: ThemeManager.colors.cardShadow,
                 radius: 5,
                 x: 0,
                 y: 2

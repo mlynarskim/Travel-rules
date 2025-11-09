@@ -17,7 +17,7 @@ struct TravelChecklist: View {
     }
     
     var body: some View {
-        let theme = getThemeColors(for: selectedTheme)
+        let theme = ThemeManager.colors // spójne kolory z aktywnym motywem (w tym sezonowe)
         
         GeometryReader { geometry in
             VStack(spacing: 0) {
@@ -77,7 +77,7 @@ struct TravelChecklist: View {
                         }
                         .padding(.vertical, adaptiveVerticalPadding(geometry))
                     }
-                    .onChange(of: selectedTab) { newValue in
+                    .onChange(of: selectedTab) { _, newValue in
                         if let type = newValue, scrollToTop {
                             withAnimation {
                                 scrollViewProxy.scrollTo(type.rawValue, anchor: .top)
@@ -109,20 +109,6 @@ struct TravelChecklist: View {
         completedItems.removeAll()
         saveCompletedItems()
     }
-    
-    private func getThemeColors(for theme: String) -> ThemeColors {
-        switch theme {
-        case "mountain": return ThemeColors.mountainTheme
-        case "beach": return ThemeColors.beachTheme
-        case "desert": return ThemeColors.desertTheme
-        case "forest": return ThemeColors.forestTheme
-        default: return ThemeColors.classicTheme
-        }
-    }
-
-
-
-  
     
     private func adaptiveDividerPadding(_ geometry: GeometryProxy) -> CGFloat {
         geometry.size.height <= 667 ? 4 : 8
@@ -170,8 +156,6 @@ struct TravelChecklist: View {
         UserDefaults.standard.set(data, forKey: "CompletedItems")
     }
     
-    
-    
     func getListItems(for type: ListItem) -> [String] {
         switch type {
         case .BathroomItems: return getBathroomItems()
@@ -197,13 +181,13 @@ struct CategoryButton: View {
         Button(action: action) {
             Text(listItem.title.appLocalized)
                 .font(.system(size: geometry.size.width <= 375 ? 13 : 15))
-                .foregroundColor(theme.primaryText)
+                .foregroundColor(selectedTab == listItem.type ? theme.lightText : theme.primaryText)
                 .padding(.vertical, 8)
                 .padding(.horizontal, geometry.size.width <= 375 ? 12 : 16)
                //tło przycisku kategorii
                 .background(
                     Capsule()
-                        .fill(selectedTab == listItem.type ? theme.secondary : theme.secondary.opacity(0.5))
+                        .fill(selectedTab == listItem.type ? theme.accent : theme.secondary.opacity(0.35))
                 )
         }
         .buttonStyle(PlainButtonStyle())
@@ -265,24 +249,26 @@ struct ChecklistItem: View {
         HStack {
             Button(action: toggleAction) {
                 Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isCompleted ? theme.success : theme.primaryText)
+                    .foregroundColor(isCompleted ? theme.accent : theme.secondaryText)
                     .font(.system(size: geometry.size.width <= 375 ? 18 : 20))
             }
             
             .padding(.leading, geometry.size.width <= 375 ? 12 : 16)
             
             Text(item.appLocalized)
-                .foregroundColor(theme.lightText) 
+                .foregroundColor(theme.primaryText)
                 .font(.system(size: geometry.size.width <= 375 ? 14 : 16))
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
             Spacer()
         }
         .frame(height: geometry.size.height <= 667 ? 36 : 44)
-        .background(theme.primary
-            .shadow(color: theme.cardShadow, radius: 5, x: 0, y: 2)
-)
+        .background(theme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(theme.secondary.opacity(0.15), lineWidth: 1)
+        )
         .cornerRadius(12)
+        .shadow(color: theme.cardShadow, radius: 5, x: 0, y: 2)
     }
 }
-

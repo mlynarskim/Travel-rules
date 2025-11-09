@@ -28,6 +28,7 @@ struct CountryInfoView: View {
                     ForEach(countryInfo.usefulLinks, id: \.url) { link in
                         Link(link.title, destination: URL(string: link.url)!)
                             .foregroundColor(.white)
+                            .buttonStyle(.plain)
                     }
                 }
                 .listRowBackground(Color(hex: "#29606D").opacity(0.8))

@@ -51,6 +51,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         // ✅ Rejestracja zadań w tle
         registerBackgroundTasks()
+        
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let authorized: Bool
+            if #available(iOS 16.0, *) {
+                authorized = settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional
+            } else {
+                authorized = settings.authorizationStatus == .authorized
+            }
+            if authorized, UserDefaults.standard.bool(forKey: "isNotificationEnabled") {
+                self.scheduleDailyRandomRuleNotificationAppWide() // harmonogram z losową zasadą
+            }
+        }
 
         return true
     }
@@ -93,7 +105,53 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        completionHandler([.banner, .sound])
+        completionHandler([.banner, .sound, .list, .badge]) // pokazuj baner również w foreground
+    }
+    
+    // App-wide scheduler to ensure dzienne powiadomienie działa nawet bez wchodzenia w PushView
+    private func scheduleDailyRandomRuleNotificationAppWide() {
+        let content = UNMutableNotificationContent()
+        content.title = "daily_rule_notification_title".appLocalized
+        content.body = randomRuleForCurrentLanguageAppWide()
+        content.sound = .default
+
+        var dateComponents = DateComponents()
+        dateComponents.hour = 9
+        dateComponents.minute = 0
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        let request = UNNotificationRequest(identifier: "daily_rule_notification", content: content, trigger: trigger)
+
+        // usuń poprzedni harmonogram o tym samym ID aby uniknąć duplikatów
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["daily_rule_notification"])
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("daily_rule_notification_error".appLocalized, error)
+            }
+        }
+    }
+
+    // Wybór losowej zasady z pamięci (te same tablice: RulesList / PL / ES)
+    private func randomRuleForCurrentLanguageAppWide() -> String {
+        let code = currentLanguageCodeNormalized()
+        let fallback = String(localized: "random_rule_fallback")
+        switch code {
+        case "pl":
+            return RulesListPL.randomElement() ?? fallback
+        case "es":
+            return RulesListES.randomElement() ?? fallback
+        default:
+            return RulesList.randomElement() ?? fallback
+        }
+    }
+
+    // Normalizacja kodu języka do pierwszego subtagu (np. "en-US" -> "en")
+    private func currentLanguageCodeNormalized() -> String {
+        if let selected = UserDefaults.standard.string(forKey: "selectedLanguageCode") {
+            return selected.components(separatedBy: CharacterSet(charactersIn: "-_")).first ?? selected
+        }
+        let sysCode = Locale.current.language.languageCode?.identifier ?? "pl"
+        return sysCode.components(separatedBy: CharacterSet(charactersIn: "-_")).first ?? sysCode
     }
 }
 

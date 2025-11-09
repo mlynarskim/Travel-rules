@@ -15,7 +15,7 @@ extension View {
 }
 
 // MARK: - Model
-struct TravelItem: Identifiable, Codable, Equatable {    
+struct TravelItem: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var name: String
     var isCompleted: Bool = false
@@ -45,6 +45,12 @@ struct MyChecklistView: View {
         case .beach:    return ThemeColors.beachTheme
         case .desert:   return ThemeColors.desertTheme
         case .forest:   return ThemeColors.forestTheme
+        case .autumn:   return ThemeColors.autumnTheme
+        case .spring:   return ThemeColors.springTheme
+        case .winter:   return ThemeColors.winterTheme
+        case .summer:   return ThemeColors.summerTheme
+
+
         }
     }
 
@@ -57,6 +63,11 @@ struct MyChecklistView: View {
         case .beach:     imageName = isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
         case .desert:    imageName = isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
         case .forest:    imageName = isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
+        case .autumn:    imageName = isDarkMode ? "autumn-bg-dark" : "theme-autumn-preview"
+        case .spring:    imageName = isDarkMode ? "spring-bg-dark" : "theme-spring-preview"
+        case .winter:   imageName = isDarkMode ? "winter-bg-dark" : "theme-winter-preview"
+        case .summer:   imageName = isDarkMode ? "summer-bg-dark" : "theme-summer-preview"
+
         }
         return Image(imageName)
             .resizable()
@@ -73,8 +84,7 @@ struct MyChecklistView: View {
                 backgroundImageView
                 
                 VStack(spacing: 16) {
-                    Spacer()
-                        .frame(height: 40)
+                    Spacer().frame(height: 40)
                     
                     SegmentedPicker(selectedTab: $selectedTab, themeColors: themeColors)
                         .padding(.horizontal)
@@ -102,6 +112,7 @@ struct MyChecklistView: View {
                         .font(.system(size: isSmallDevice ? 18 : 20))
                         .foregroundColor(.white)
                 }
+                .buttonStyle(.plain)
             )
             .sheet(isPresented: $showExportSheet) {
                 ExportView(
@@ -109,13 +120,9 @@ struct MyChecklistView: View {
                     themeColors: themeColors
                 )
             }
-
-
             .onAppear(perform: loadItems)
             .onDisappear(perform: saveItems)
-            .onChangeCompat(travelItems) {
-                saveItems()
-            }
+            .onChangeCompat(travelItems) { saveItems() }
             .onChangeCompat(scenePhase) {
                 if scenePhase == .background { saveItems() }
             }
@@ -155,6 +162,7 @@ struct ChecklistItemRow: View {
                     .font(.system(size: isSmallDevice ? 18 : 20))
             }
             .padding(.leading, isSmallDevice ? 12 : 16)
+            .buttonStyle(.plain)
             
             Text(item.name)
                 .foregroundColor(themeColors.lightText)
@@ -171,6 +179,7 @@ struct ChecklistItemRow: View {
                     .font(.system(size: isSmallDevice ? 14 : 16))
             }
             .padding(.trailing, 8)
+            .buttonStyle(.plain)
         }
         .frame(height: isSmallDevice ? 32 : 36)
         .background(themeColors.primary)
@@ -245,7 +254,7 @@ struct AddItemView: View {
                 .onSubmit(addAction)
             
             Button("add".appLocalized, action: addAction)
-                .buttonStyle(AddButtonStyle(themeColors: themeColors, isSmallDevice: isSmallDevice))
+                .buttonStyle(AddButtonStyle(themeColors: themeColors, isSmallDevice: isSmallDevice)) // NIE dodajemy .buttonStyle(.plain), aby nie nadpisać niestandardowego AddButtonStyle
         }
         .padding(.horizontal)
         .padding(.vertical, isSmallDevice ? 8 : 10)
@@ -288,20 +297,20 @@ struct SegmentedPicker: View {
     }
 }
 
-// MARK: - ExportView
+// MARK: - ExportView (z blokadą Premium dla statycznych PDF-ów)
 struct ExportView: View {
-    let items: [String]                // lista z Twojej zakładki “Moja lista”
+    let items: [String]
     let themeColors: ThemeColors
     @Environment(\.dismiss) private var dismiss
 
-    @State private var showShareSheet = false
-    @State private var shareItems: [Any] = []
+    @State private var sharePayload: SharePayload?
     @State private var showingError = false
+
+    @AppStorage("hasPremium") private var hasPremium: Bool = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                // 1) Dynamiczny eksport “Moja lista”
                 ExportButtonView(
                     items: items,
                     title: "myTravelList".appLocalized,
@@ -309,51 +318,31 @@ struct ExportView: View {
                     fileName: "My Travel Checklist.pdf"
                 )
                 .padding(.horizontal)
+                .buttonStyle(.plain)
 
-                // 2) Statyczny PDF - English
-                Button(action: { exportBundle(named: "Travel Rules Checklist English") }) {
-                    HStack {
-                        Image(systemName: "doc.richtext")
-                            .font(.system(size: 18))
-                        Text("Travel Rules Checklist English")
-                    }
-                    .padding()
-                    .background(themeColors.accent)
-                    .foregroundColor(themeColors.lightText)
-                    .cornerRadius(10)
-                    .shadow(color: themeColors.cardShadow, radius: 5)
-                }
+                PremiumLockedButton(
+                    hasPremium: hasPremium,
+                    title: "Travel Rules Checklist English",
+                    themeColors: themeColors
+                ) { exportBundle(named: "Travel Rules Checklist English") }
                 .padding(.horizontal)
+                .buttonStyle(.plain)
 
-                // 3) Statyczny PDF - Polish
-                Button(action: { exportBundle(named: "Travel Rules Checklist Polish") }) {
-                    HStack {
-                        Image(systemName: "doc.richtext")
-                            .font(.system(size: 18))
-                        Text("Travel Rules Checklist Polish")
-                    }
-                    .padding()
-                    .background(themeColors.accent)
-                    .foregroundColor(themeColors.lightText)
-                    .cornerRadius(10)
-                    .shadow(color: themeColors.cardShadow, radius: 5)
-                }
+                PremiumLockedButton(
+                    hasPremium: hasPremium,
+                    title: "Travel Rules Checklist Polish",
+                    themeColors: themeColors
+                ) { exportBundle(named: "Travel Rules Checklist Polish") }
                 .padding(.horizontal)
+                .buttonStyle(.plain)
 
-                // 4) Statyczny PDF - Spanish
-                Button(action: { exportBundle(named: "Travel Rules Checklist Spanish") }) {
-                    HStack {
-                        Image(systemName: "doc.richtext")
-                            .font(.system(size: 18))
-                        Text("Travel Rules Checklist Spanish")
-                    }
-                    .padding()
-                    .background(themeColors.accent)
-                    .foregroundColor(themeColors.lightText)
-                    .cornerRadius(10)
-                    .shadow(color: themeColors.cardShadow, radius: 5)
-                }
+                PremiumLockedButton(
+                    hasPremium: hasPremium,
+                    title: "Travel Rules Checklist Spanish",
+                    themeColors: themeColors
+                ) { exportBundle(named: "Travel Rules Checklist Spanish") }
                 .padding(.horizontal)
+                .buttonStyle(.plain)
 
                 Spacer()
             }
@@ -363,29 +352,80 @@ struct ExportView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("exit".appLocalized) { dismiss() }
                         .foregroundColor(themeColors.primaryText)
+                        .buttonStyle(.plain)
                 }
             }
-            // wspólny sheet i alert dla statycznych przycisków
-            .sheet(isPresented: $showShareSheet) {
-                ActivityView(activityItems: shareItems)
+            .sheet(item: $sharePayload) { payload in
+                ActivityView(activityItems: payload.items)
             }
             .alert("Export error", isPresented: $showingError) {
                 Button("OK", role: .cancel) { }
+                .buttonStyle(.plain)
             } message: {
                 Text("error_pdf".appLocalized)
             }
         }
     }
 
+    @MainActor
     private func exportBundle(named resource: String) {
-        guard let fileURL = Bundle.main.url(
-                forResource: resource,
-                withExtension: "pdf")
-        else {
+        guard let fileURL = Bundle.main.url(forResource: resource, withExtension: "pdf") else {
             showingError = true
             return
         }
-        shareItems = [fileURL]
-        showShareSheet = true
+        sharePayload = SharePayload(items: [fileURL])
+    }
+}
+
+private struct SharePayload: Identifiable {
+    let id = UUID()
+    let items: [Any]
+}
+
+
+// MARK: - PremiumLockedButton (przycisk z paywallem)
+struct PremiumLockedButton: View {
+    let hasPremium: Bool
+    let title: String
+    let themeColors: ThemeColors
+    let action: () -> Void
+
+    @State private var showLockedAlert = false
+
+    var body: some View {
+        Button(action: {
+            if hasPremium {
+                action()
+            } else {
+                showLockedAlert = true
+            }
+        }) {
+            HStack {
+                Image(systemName: "doc.richtext")
+                    .font(.system(size: 18))
+                Text(title)
+                    .font(.system(size: 16, weight: .semibold))
+                Spacer()
+                if !hasPremium {
+                    HStack(spacing: 6) {
+                        Image(systemName: "lock.fill")
+                        Text("premium".appLocalized)
+                    }
+                    .font(.system(size: 12, weight: .bold))
+                }
+            }
+            .padding()
+            .background(hasPremium ? themeColors.accent : themeColors.accent.opacity(0.6))
+            .foregroundColor(themeColors.lightText)
+            .cornerRadius(10)
+            .shadow(color: themeColors.cardShadow, radius: 5)
+            .buttonStyle(.plain)
+        }
+        .alert("premium_required_title".appLocalized, isPresented: $showLockedAlert) {
+            Button("ok".appLocalized, role: .cancel) { }
+            .buttonStyle(.plain)
+        } message: {
+            Text("premium_required_message".appLocalized)
+        }
     }
 }

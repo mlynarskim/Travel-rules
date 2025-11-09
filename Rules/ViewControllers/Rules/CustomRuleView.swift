@@ -74,6 +74,10 @@ struct AddRuleView: View {
         case .beach: return .beachTheme
         case .desert: return .desertTheme
         case .forest: return .forestTheme
+        case .autumn: return .autumnTheme
+        case .winter:   return .winterTheme
+          case .spring:   return .springTheme
+          case .summer:   return .summerTheme
         }
     }
     
@@ -110,6 +114,7 @@ struct AddRuleView: View {
                     .background(themeColors.primary)
                     .cornerRadius(15)
                     .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
+                    .buttonStyle(.plain)
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .padding(.bottom, 50)
@@ -222,6 +227,7 @@ struct ActionButton: View {
                 .cornerRadius(15)
                 .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
         }
+        .buttonStyle(.plain)
     }
 }
 

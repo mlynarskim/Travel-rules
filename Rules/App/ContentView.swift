@@ -8,7 +8,7 @@ import AVFoundation
 import CoreLocation
 import MapKit
 import GoogleMobileAds
-import UIKit // dla UIImage w generateImage()
+import UIKit 
 
 // MARK: - Rewarded Ad Delegate
 class RewardedAdDelegate: NSObject, FullScreenContentDelegate {
@@ -16,12 +16,16 @@ class RewardedAdDelegate: NSObject, FullScreenContentDelegate {
     var adDidFail: ((Error) -> Void)?
     
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+#if DEBUG
         print("✅ Rewarded ad został zamknięty")
+#endif
         adDidDismiss?()
     }
     
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+#if DEBUG
         print("❌ Błąd prezentacji rewarded ad: \(error.localizedDescription)")
+#endif
         adDidFail?(error)
     }
 }
@@ -41,6 +45,10 @@ struct ContentView: View {
         case .beach: return isDarkMode ? "beach-bg-dark" : "theme-beach-preview"
         case .desert: return isDarkMode ? "desert-bg-dark" : "theme-desert-preview"
         case .forest: return isDarkMode ? "forest-bg-dark" : "theme-forest-preview"
+        case .autumn: return isDarkMode ? "autumn-bg-dark" : "theme-autumn-preview"
+        case .spring: return isDarkMode ? "spring-bg-dark" : "theme-spring-preview"
+            case .winter: return isDarkMode ? "winter-bg-dark" : "theme-winter-preview"
+            case .summer: return isDarkMode ? "summer-bg-dark" : "theme-summer-preview"
         }
     }
     
@@ -128,9 +136,10 @@ struct MenuButton: View {
                 .background(
                     Circle()
                         .fill(Color.white.opacity(0.2))
-                        .shadow(color: ThemeManager.colors.cardShadow, radius: 5)
+                        .shadow(color: ThemeManager.colors.cardShadow, radius: UIScreen.main.nativeBounds.height <= 1334 ? 2 : 5)
                 )
         }
+        .buttonStyle(.plain)
     }
 }
 
@@ -145,6 +154,7 @@ struct ShareButton: View {
                 .padding(14)
         }
         .offset(x: ScreenMetrics.adaptiveWidth(32), y: -8)
+        .buttonStyle(.plain)
     }
 }
 
@@ -166,9 +176,10 @@ struct MainActionButton: View {
             .background(
                 RoundedRectangle(cornerRadius: ThemeManager.layout.cornerRadius.medium)
                     .fill(ThemeManager.colors.primary)
-                    .shadow(color: ThemeManager.colors.cardShadow, radius: 5)
+                    .shadow(color: ThemeManager.colors.cardShadow, radius: UIScreen.main.nativeBounds.height <= 1334 ? 2 : 5)
             )
         }
+        .buttonStyle(.plain)
     }
 }
 
@@ -205,7 +216,7 @@ struct NextView: View {
     @AppStorage("hasPremium") private var hasPremium: Bool = false
     
     // 🕒 przechowywanie daty oraz limitu dziennego
-    @AppStorage("lastRulesDate") private var lastRulesDate: Double = Date().timeIntervalSince1970
+    @AppStorage("lastRulesDate") private var lastRulesDate: Double = 0
     @AppStorage("dailyRulesCount") private var dailyRulesCount: Int = 0
     
     @State private var usedRulesIndices: [Int] = []
@@ -223,6 +234,11 @@ struct NextView: View {
     @State private var rewardedAd: RewardedAd?
     @State private var rewardedAdDelegate = RewardedAdDelegate()
     @AppStorage("totalRulesShared") private var totalRulesShared: Int = 0
+
+    // 🔧 Wydajność: prosty wskaźnik „starszego” urządzenia (iPhone 7/8/SE)
+    private var isLowEndDevice: Bool {
+        UIScreen.main.nativeBounds.height <= 1334
+    }
 
     // [KATEGORIE]
     @AppStorage("selectedCategoryKey") private var selectedCategoryKey: String = "all"
@@ -265,20 +281,21 @@ struct NextView: View {
                                         .font(.system(size: 20, weight: .semibold))
                                         .foregroundColor(ThemeManager.colors.lightText)
                                 }
+                                .buttonStyle(.plain)
                             }
                         }
                         .padding(ThemeManager.layout.spacing.medium)
                         .background(
                             RoundedRectangle(cornerRadius: ThemeManager.layout.cornerRadius.medium)
                                 .fill(ThemeManager.colors.primary)
-                                .shadow(color: ThemeManager.colors.cardShadow, radius: 5)
+                                .shadow(color: ThemeManager.colors.cardShadow, radius: isLowEndDevice ? 2 : 5)
                         )
                         .padding(.horizontal)
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: ThemeManager.layout.cornerRadius.medium)
-                                .fill(ThemeManager.colors.cardBackground) // 🔁 [ZMIANA] było: Color.white – dostosowanie do motywu
-                                .shadow(color: ThemeManager.colors.cardShadow, radius: 8)
+                                .fill(ThemeManager.colors.cardBackground)
+                                .shadow(color: ThemeManager.colors.cardShadow, radius: isLowEndDevice ? 3 : 8)
                             
                             VStack {
                                 Text(randomRule)
@@ -307,7 +324,7 @@ struct NextView: View {
                         HStack {
                             MainActionButton(title: "draw".appLocalized, icon: "dice.fill") {
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                                    resetDailyStateIfNeeded()
+                                    refreshDailyStateIfNeeded()
                                     
                                     // 🟡 PREMIUM: brak alertu i limitu
                                     if !hasPremium && dailyRulesCount >= allowedRules {
@@ -357,15 +374,11 @@ struct NextView: View {
             }
             .onAppear {
                 rebuildCategorizedRules()
-                resetDailyStateIfNeeded()
+                refreshDailyStateIfNeeded()
                 loadSavedRules()
                 loadUsedRulesIndices()
                 loadLastDrawnRule()
-                
-                // 🟡 PREMIUM: nie ładuj rewarded ad, jeśli Premium
-                if !hasPremium {
-                    loadRewardedAd()
-                }
+                // 🟡 PREMIUM: nie ładuj rewarded ad na starcie, by przyspieszyć uruchamianie
             }
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
                 rebuildCategorizedRules()
@@ -384,14 +397,13 @@ struct NextView: View {
                 loadLastDrawnRule()
             }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                resetDailyStateIfNeeded()
+                refreshDailyStateIfNeeded()
             }
-            .onChange(of: selectedCategoryKey) { _ in
+            .onChange(of: selectedCategoryKey) {
                 loadUsedRulesIndices()
                 loadLastDrawnRule()
             }
-            // 🟡 PREMIUM: jeśli status premium się zmieni „w locie”, schowaj reklamy i odblokuj limit natychmiast
-            .onChange(of: hasPremium) { newValue in
+            .onChange(of: hasPremium, initial: false) { _, newValue in
                 if newValue {
                     showAlert = false
                     rewardedPacks = 0
@@ -410,7 +422,9 @@ struct NextView: View {
         let request = Request()
         RewardedAd.load(with: rewardedAdUnitID, request: request) { ad, error in
             if let error = error {
+#if DEBUG
                 print("❌ Nie udało się załadować rewarded ad: \(error.localizedDescription)")
+#endif
                 return
             }
             self.rewardedAd = ad
@@ -418,10 +432,14 @@ struct NextView: View {
                 self.loadRewardedAd()
             }
             rewardedAdDelegate.adDidFail = { error in
+#if DEBUG
                 print("❌ Rewarded ad failed: \(error.localizedDescription)")
+#endif
             }
             self.rewardedAd?.fullScreenContentDelegate = rewardedAdDelegate
+#if DEBUG
             print("✅ Rewarded ad załadowana")
+#endif
         }
     }
     
@@ -429,17 +447,31 @@ struct NextView: View {
         // 🟡 PREMIUM: nie pokazujemy rewarded ad
         guard !hasPremium else { return }
         
-        if let rewardedAd = rewardedAd,
-           let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+        // Lazy load: jeśli nie mamy reklamy, załaduj i spróbuj później
+        guard let rewardedAd = rewardedAd else {
+#if DEBUG
+            print("ℹ️ Brak załadowanej reklamy – inicjuję ładowanie i przerwę pokaz.")
+#endif
+            loadRewardedAd()
+            return
+        }
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootViewController = windowScene.windows.first?.rootViewController {
             rewardedAd.present(from: rootViewController) {
+#if DEBUG
                 print("✅ Użytkownik obejrzał reklamę do końca – dodajemy +5 zasad")
+#endif
                 rewardedPacks += 1
+#if DEBUG
                 print("🎁 rewardedPacks zwiększony do \(rewardedPacks)")
+#endif
                 loadRewardedAd()
             }
         } else {
-            print("❌ Rewarded ad nie jest dostępna – ładuję ponownie...")
+#if DEBUG
+            print("❌ Brak okna do prezentacji – ponawiam ładowanie rewarded ad")
+#endif
             loadRewardedAd()
         }
     }
@@ -506,7 +538,7 @@ struct NextView: View {
     }
     
     private func getRandomRule() {
-        resetDailyStateIfNeeded()
+        refreshDailyStateIfNeeded()
         
         let currentRules = eligibleTexts
         let allIndices = Set(0..<currentRules.count)
@@ -558,30 +590,53 @@ struct NextView: View {
         }
     }
 
-    /// Reset stanu dnia o północy
-    private func resetDailyStateIfNeeded() {
-        let tz = TimeZone.current
-        var cal = Calendar.current
-        cal.timeZone = tz
-        
-        let now = Date()
-        let stored = Date(timeIntervalSince1970: lastRulesDate)
-        let startNow = cal.startOfDay(for: now)
-        let startStored = cal.startOfDay(for: stored)
-        
-        if startNow > startStored {
-            print("🔁 Reset stanu dnia. Nowy dzień od: \(startNow)")
+    // MARK: - Dzienny limit (rolling 24h)
+    /// Reset stanu limitu, jeśli minęło 24h od lastRulesDate
+    @discardableResult
+    private func refreshDailyStateIfNeeded(now: Date = Date()) -> Bool {
+        migrateLastRulesDateIfNeeded()
+        let elapsed = now.timeIntervalSince1970 - lastRulesDate
+        if elapsed >= 24 * 60 * 60 || lastRulesDate == 0 {
+#if DEBUG
+            print("🔁 Reset stanu (rolling 24h). elapsed=\(elapsed)")
+#endif
             dailyRulesCount = 0
             usedRulesIndices = []
             lastRulesDate = now.timeIntervalSince1970
             saveUsedRulesIndices()
             UserDefaults.standard.removeObject(forKey: "lastDrawnRule")
-            rewardedPacks = 0 // 🔁 [ZMIANA] reset bonusów reklamowych co 24h
+            rewardedPacks = 0 // reset bonusów reklamowych co 24h
+            return true
         } else {
-            let comps = cal.dateComponents([.year, .month, .day], from: now)
-            print("ℹ️ Brak zmiany dnia: \(comps)")
+#if DEBUG
+            let remaining = Int(24*60*60 - elapsed)
+            print("ℹ️ Brak resetu. Pozostało \(remaining)s do resetu.")
+#endif
+            return false
         }
     }
+
+    /// Migracja ms→s, jeśli kiedyś zapisano w milisekundach
+    private func migrateLastRulesDateIfNeeded() {
+        // jeśli wartość wygląda na ms (większa niż ~01-01-2100 w sekundach)
+        if lastRulesDate > 4102444800 { // 2100-01-01 w sekundach
+            lastRulesDate = lastRulesDate / 1000.0
+        }
+    }
+
+    /// Ile sekund zostało do resetu 24h
+    private func secondsUntilReset(now: Date = Date()) -> Int {
+        migrateLastRulesDateIfNeeded()
+        let elapsed = now.timeIntervalSince1970 - lastRulesDate
+        return max(0, Int(24*60*60 - elapsed))
+    }
+
+#if DEBUG
+    /// Narzędzie do testów: cofnij znacznik lastRulesDate o X godzin
+    private func debugBackdate(hours: Double) {
+        lastRulesDate = Date().addingTimeInterval(-hours * 3600).timeIntervalSince1970
+    }
+#endif
     
     func shareRule() {
         guard let image = generateImage() else {
@@ -592,17 +647,29 @@ struct NextView: View {
             activityItems: [image],
             applicationActivities: nil
         )
+
+        // ✅ Achievement i licznik tylko po faktycznym udostępnieniu
+        activityViewController.completionWithItemsHandler = { _, completed, _, _ in
+            if completed {
+                totalRulesShared &+= 1
+                achievementManager.recordShareAction() // odblokuj 'first_share'
+                achievementManager.checkAchievements(
+                    rulesDrawn: totalRulesDrawn,
+                    rulesSaved: totalRulesSaved,
+                    rulesShared: totalRulesShared,
+                    locationsSaved: 0
+                )
+            } else {
+#if DEBUG
+                print("ℹ️ Udostępnianie anulowane")
+#endif
+            }
+        }
+
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let viewController = windowScene.windows.first?.rootViewController {
             viewController.present(activityViewController, animated: true)
         }
-        totalRulesShared += 1
-        achievementManager.checkAchievements(
-            rulesDrawn: totalRulesDrawn,
-            rulesSaved: totalRulesSaved,
-            rulesShared: totalRulesShared,
-            locationsSaved: 0
-        )
     }
     
     func generateImage() -> UIImage? {
@@ -704,45 +771,60 @@ struct NextView: View {
     }
     
     private func saveUsedRulesIndices() {
-        if let encoded = try? JSONEncoder().encode(usedRulesIndices) {
-            UserDefaults.standard.set(encoded, forKey: usedIndicesStorageKey)
+        let indices = usedRulesIndices
+        Task.detached(priority: .utility) {
+            if let encoded = try? JSONEncoder().encode(indices) {
+                await MainActor.run {
+                    UserDefaults.standard.set(encoded, forKey: usedIndicesStorageKey)
+                }
+            }
         }
     }
     
     private func loadUsedRulesIndices() {
-        if let data = UserDefaults.standard.data(forKey: usedIndicesStorageKey),
-           let decoded = try? JSONDecoder().decode([Int].self, from: data) {
-            usedRulesIndices = decoded
-            return
+        Task(priority: .utility) {
+            if let data = UserDefaults.standard.data(forKey: usedIndicesStorageKey),
+               let decoded = try? JSONDecoder().decode([Int].self, from: data) {
+                self.usedRulesIndices = decoded
+                return
+            }
+            if let data = UserDefaults.standard.data(forKey: "usedRulesIndices"),
+               let decoded = try? JSONDecoder().decode([Int].self, from: data) {
+                self.usedRulesIndices = decoded
+                if let encoded = try? JSONEncoder().encode(decoded) {
+                    UserDefaults.standard.set(encoded, forKey: usedIndicesStorageKey)
+                }
+                return
+            }
+            self.usedRulesIndices = []
         }
-        if let data = UserDefaults.standard.data(forKey: "usedRulesIndices"),
-           let decoded = try? JSONDecoder().decode([Int].self, from: data) {
-            usedRulesIndices = decoded
-            saveUsedRulesIndices()
-            return
-        }
-        usedRulesIndices = []
     }
     
     private func saveRules() {
-        do {
-            let data = try JSONEncoder().encode(savedRules)
-            UserDefaults.standard.set(data, forKey: "savedRules")
-        } catch {
-            showAlert = true
+        let rules = savedRules
+        Task.detached(priority: .utility) {
+            if let data = try? JSONEncoder().encode(rules) {
+                await MainActor.run {
+                    UserDefaults.standard.set(data, forKey: "savedRules")
+                }
+            } else {
+                await MainActor.run { self.showAlert = true }
+            }
         }
     }
     
     private func loadSavedRules() {
-        if let data = UserDefaults.standard.data(forKey: "savedRules"),
-           let decoded = try? JSONDecoder().decode([Int].self, from: data) {
-            savedRules = decoded
+        Task.detached(priority: .utility) {
+            if let data = UserDefaults.standard.data(forKey: "savedRules"),
+               let decoded = try? JSONDecoder().decode([Int].self, from: data) {
+                await MainActor.run { self.savedRules = decoded }
+            }
         }
     }
 }
 
 extension NextView {
-    // brak
+    
 }
 
 // MARK: - Navigation Components
@@ -777,6 +859,14 @@ struct NavigationButton<Destination: View>: View {
             return ThemeColors.desertTheme
         case .forest:
             return ThemeColors.forestTheme
+        case .autumn:
+            return ThemeColors.autumnTheme
+        case .winter:
+            return ThemeColors.winterTheme
+        case .summer:
+            return ThemeColors.summerTheme
+        case .spring:
+            return ThemeColors.springTheme
         }
     }
     
@@ -786,14 +876,15 @@ struct NavigationButton<Destination: View>: View {
                 .padding(.all, 5)
                 .foregroundColor(themeColors.secondary)
                 .frame(width: ScreenMetrics.adaptiveWidth(20), height: ScreenMetrics.adaptiveWidth(20))
-                .shadow(color: themeColors.cardShadow, radius: 5)
+                .shadow(color: themeColors.cardShadow, radius: UIScreen.main.nativeBounds.height <= 1334 ? 2 : 5)
                 .overlay(
                     Image(systemName: icon)
                         .foregroundColor(themeColors.primaryText)
                         .font(.system(size: 40))
                 )
         }
-        .buttonStyle(ScaleButtonStyle())
+        .contentShape(Rectangle())
+        .buttonStyle(.plain)
         .transition(.asymmetric(
             insertion: .scale.combined(with: .opacity),
             removal: .scale.combined(with: .opacity)
@@ -808,3 +899,4 @@ struct ScaleButtonStyle: ButtonStyle {
             .animation(.spring(), value: configuration.isPressed)
     }
 }
+    

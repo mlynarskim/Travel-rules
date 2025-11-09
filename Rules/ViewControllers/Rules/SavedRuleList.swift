@@ -48,11 +48,7 @@ struct SavedRuleList: View {
                     title: Text(alertTitle),
                     message: Text(alertMessage),
                     primaryButton: .cancel(Text("cancel".appLocalized)),
-                    secondaryButton: .destructive(Text("delete".appLocalized)) {
-                        if let ruleIndex = selectedRuleIndex {
-                            deleteRule(ruleIndex)
-                        }
-                    }
+                    secondaryButton: .destructive(Text("delete".appLocalized)) { if let ruleIndex = selectedRuleIndex { deleteRule(ruleIndex) } }
                 )
             }
         }

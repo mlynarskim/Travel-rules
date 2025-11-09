@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "theme-spring-preview.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
