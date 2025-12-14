@@ -450,3 +450,9 @@
 "theme_winter" = "Winter";
 "theme_spring" = "Spring";
 "theme_summer" = "Summer";
+
+
+"ai_travel_title" = "AI Travel Assistant";
+"ai_travel_placeholder" = "Tell me where you travel or what you need...";
+"ai_travel_hint" = "Example: \"I'm planning a 7-day van trip in Spain, what do you recommend?\"";
+"ai_travel_error" = "Something went wrong. Please try again.";

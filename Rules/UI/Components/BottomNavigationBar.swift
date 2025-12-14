@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import CoreLocation
+
 struct BottomNavigationBar: View {
     @Binding var savedRules: [Int]
     @StateObject private var ruleList = RuleList()
@@ -29,16 +30,7 @@ struct BottomNavigationBar: View {
                         )
                 }
                 .buttonStyle(.plain)
-                //NavigationLink(destination: PeopleTabView(user: NearbyUser(
-                //id: UUID(),
-                // name: "Użytkownik",
-                // status: .available,
-                //  category: .social,
-                // location: CLLocationCoordinate2D(latitude: 52.237049, longitude: 21.017532),
-                //  distance: 0,
-                //   shareLevel: .approximate,
-                //   description: nil
-                //))) {
+                
                 NavigationLink(destination: MyChecklistView()) {
                     RoundedRectangle(cornerRadius: 15)
                         .padding(.all, 5)
@@ -62,6 +54,21 @@ struct BottomNavigationBar: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
                     .overlay(
                         Image(systemName: "signpost.right.and.left")
+                            .foregroundColor(.black)
+                            .font(.system(size: 40))
+                    )
+            }
+            .buttonStyle(.plain)
+            
+            // NOWY PRZYCISK – AI TRAVEL ASSISTANT
+            NavigationLink(destination: AiTravelAssistantView()) { 
+                RoundedRectangle(cornerRadius: 15)
+                    .padding(.all, 5)
+                    .foregroundColor(Color(hex: "#DDAA4F"))
+                    .frame(width: 80, height: 80)
+                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                    .overlay(
+                        Image(systemName: "sparkles")
                             .foregroundColor(.black)
                             .font(.system(size: 40))
                     )

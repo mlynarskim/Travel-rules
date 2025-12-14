@@ -449,3 +449,8 @@
 "theme_winter" = "Zima";
 "theme_spring" = "Wiosna";
 "theme_summer" = "Lato";
+
+"ai_travel_title" = "Asystent podróży AI";
+"ai_travel_placeholder" = "Napisz, dokąd jedziesz lub o co chcesz zapytać...";
+"ai_travel_hint" = "Przykład: „Planuję 7-dniową podróż kamperem po Hiszpanii, co polecasz?”";
+"ai_travel_error" = "Coś poszło nie tak. Spróbuj ponownie.";

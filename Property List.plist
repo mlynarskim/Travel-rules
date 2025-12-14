@@ -2,15 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.travelrules.app.refresh</string>
-	</array>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-5307701268996147~2371937539</string>
-	<key>GIDClientID</key>
-	<string>1037418769624-hk1a1p8q56bctrs539kcpim2k9e02fk4.apps.googleusercontent.com</string>
-	<key>SKAdNetworkItems</key>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.travelrules.app.refresh</string>
+    </array>
+    <key>GADApplicationIdentifier</key>
+    <string>ca-app-pub-5307701268996147~2371937539</string>
+    <key>GIDClientID</key>
+    <string>1037418769624-hk1a1p8q56bctrs539kcpim2k9e02fk4.apps.googleusercontent.com</string>
+    <key>SKAdNetworkItems</key>
     <array>
       <dict>
         <key>SKAdNetworkIdentifier</key>
@@ -181,9 +181,15 @@
         <string>3qcr597p9d.skadnetwork</string>
       </dict>
     </array>
-	<key>UIBackgroundModes</key>
-	<array/>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
+    <key>UIBackgroundModes</key>
+    <array/>
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <true/>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Aplikacja używa rozpoznawania mowy, aby umożliwić dyktowanie wiadomości w asystencie SAM.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Aplikacja potrzebuje dostępu do mikrofonu, aby nagrywać głos użytkownika podczas dyktowania.</string>
+    <key>GEMINI_API_KEY</key>
+    <string>$(GEMINI_API_KEY)</string>
 </dict>
 </plist>

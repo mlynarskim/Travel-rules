@@ -258,14 +258,7 @@ struct SettingsView: View {
                                     openManageSubscriptions()
                                 },
                                 redeemTapped: {
-#if targetEnvironment(simulator)
-                                    // Na symulatorze od razu fallback do App Store
-                                    redeemNoticeText = "redeem_opening_store".appLocalized
-                                    showRedeemNotice = true
-                                    openOfferCodeRedeemPage()
-#else
                                     showRedeemOptions = true
-#endif
                                 },
                                 lastError: purchaseManager.lastError
                             )
@@ -364,13 +357,10 @@ struct SettingsView: View {
         } message: {
             Text(redeemNoticeText)
         }
-        .confirmationDialog("redeem_title".appLocalized, isPresented: $showRedeemOptions, titleVisibility: .visible) {
-            Button("redeem_in_app".appLocalized) {
-                presentRedeemCodeSheet()
-            }
+        .confirmationDialog("redeem_title".appLocalized,
+                            isPresented: $showRedeemOptions,
+                            titleVisibility: .visible) {
             Button("redeem_in_store".appLocalized) {
-                redeemNoticeText = "redeem_opening_store".appLocalized
-                showRedeemNotice = true
                 openOfferCodeRedeemPage()
             }
             Button("cancel".appLocalized, role: .cancel) { }
@@ -378,37 +368,23 @@ struct SettingsView: View {
     }
     
     // MARK: - Helpers
-    @MainActor
-    private func presentRedeemCodeSheet() {
-        DispatchQueue.main.async {
-#if targetEnvironment(simulator)
-            redeemNoticeText = "redeem_opening_store".appLocalized
-            showRedeemNotice = true
-            openOfferCodeRedeemPage()
-            return
-#else
-            if #available(iOS 14.0, *) {
-                SKPaymentQueue.default().presentCodeRedemptionSheet()
-            } else {
-                redeemNoticeText = "redeem_opening_store".appLocalized
-                showRedeemNotice = true
-                openOfferCodeRedeemPage()
-            }
-#endif
-        }
-    }
     private func openOfferCodeRedeemPage() {
-        let candidates = [
-            "itms-apps://apps.apple.com/redeem?ctx=offercodes",
-            "https://apps.apple.com/redeem?ctx=offercodes"
-        ]
-        for link in candidates {
-            if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url)
-                return
+        let appStoreURL = URL(string: "itms-apps://apps.apple.com/redeem")
+        let webURL = URL(string: "https://apps.apple.com/redeem")
+
+        if let url = appStoreURL {
+            UIApplication.shared.open(url, options: [:]) { success in
+                if success { return }
+                if let web = webURL {
+                    UIApplication.shared.open(web)
+                }
             }
+            return
         }
-        print("⚠️ Nie udało się otworzyć strony realizacji kodu.")
+
+        if let web = webURL {
+            UIApplication.shared.open(web)
+        }
     }
 
     private func currentCategoryTitle(for key: String) -> String {

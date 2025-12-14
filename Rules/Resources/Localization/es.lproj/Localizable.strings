@@ -439,3 +439,8 @@
 "theme_winter" = "Invierno";
 "theme_spring" = "Primavera";
 "theme_summer" = "Verano";
+
+"ai_travel_title" = "Asistente de viaje IA";
+"ai_travel_placeholder" = "Escribe adónde viajas o qué necesitas...";
+"ai_travel_hint" = "Ejemplo: \"Planeo un viaje de 7 días en furgoneta por España, ¿qué recomiendas?\"";
+"ai_travel_error" = "Algo salió mal. Inténtalo de nuevo.";

@@ -837,6 +837,7 @@ struct BottomNavigationMenu: View {
             NavigationButton(destination: MyChecklistView(), icon: "checkmark.circle")
             NavigationButton(destination: GPSView(), icon: "signpost.right.and.left")
             NavigationButton(destination: RulesListView(), icon: "list.star")
+            NavigationButton(destination: AiTravelAssistantView(), icon: "shareplay")
         }
         .padding(.horizontal)
     }

@@ -290,7 +290,7 @@ let rulesListPL: [String] = [
     "284. Korzystaj z aplikacji pogodowych, ale miej własne oczy – chmury mówią wiele.",
     "285. Jeśli widzisz, że komuś trudniej – zapytaj, czy nie potrzebuje pomocy.",
     "286. Przed dłuższą trasą zawsze sprawdź ciśnienie w oponach.",
-    "287. Gdy masz zły dzień – przypomnij sobie, dlaczego ruszyłeś w tę drogę.",
+    "287. Przed ruszeniem w drogę upewnij się, że szafki i okna są zamknięte, gaz zakręcony, stopień schowany, a wszystkie luźne przedmioty zabezpieczone",
     "288. Zachowuj lokalne przysmaki w notatniku – smak też jest wspomnieniem.",
     "289. Przetrzyj panele solarne – brudna powierzchnia to mniej energii.",
     "290. Przechowuj worki na śmieci w kilku miejscach – zawsze się przydadzą.",
