@@ -24,6 +24,9 @@
 		075B0D1C2D57ED0000F47C1D /* RuleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */; };
 		076C07192D60A12100C12DB1 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076C07182D60A11A00C12DB1 /* ActivityView.swift */; };
 		076C071B2D60A36200C12DB1 /* MyChecklistExportButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076C071A2D60A36000C12DB1 /* MyChecklistExportButtonView.swift */; };
+		076CECC42F1FBB1F00F260AF /* GPSView+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076CECC32F1FBB1C00F260AF /* GPSView+Helpers.swift */; };
+		076CECC62F1FBB3200F260AF /* GPSExploreMapTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076CECC52F1FBB3100F260AF /* GPSExploreMapTab.swift */; };
+		076CECC82F1FBB5800F260AF /* GPSPlanBuilderTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076CECC72F1FBB5500F260AF /* GPSPlanBuilderTab.swift */; };
 		076EAA862E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 076EAA832E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf */; };
 		076EAA872E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 076EAA852E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf */; };
 		076EAA882E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 076EAA842E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf */; };
@@ -43,7 +46,6 @@
 		07DD83712D267182004C5C5F /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83222D267182004C5C5F /* Lato-Bold.ttf */; };
 		07DD83732D267182004C5C5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83502D267182004C5C5F /* Assets.xcassets */; };
 		07DD83742D267182004C5C5F /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 07DD832A2D267182004C5C5F /* OFL.txt */; };
-		07DD83752D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83332D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 */; };
 		07DD83772D267182004C5C5F /* Lato-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83202D267182004C5C5F /* Lato-Black.ttf */; };
 		07DD83782D267182004C5C5F /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83262D267182004C5C5F /* Lato-LightItalic.ttf */; };
 		07DD837A2D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 07DD83342D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 */; };
@@ -439,6 +441,9 @@
 		075B0D1B2D57ECBF00F47C1D /* RuleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleRow.swift; sourceTree = "<group>"; };
 		076C07182D60A11A00C12DB1 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		076C071A2D60A36000C12DB1 /* MyChecklistExportButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyChecklistExportButtonView.swift; sourceTree = "<group>"; };
+		076CECC32F1FBB1C00F260AF /* GPSView+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GPSView+Helpers.swift"; sourceTree = "<group>"; };
+		076CECC52F1FBB3100F260AF /* GPSExploreMapTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSExploreMapTab.swift; sourceTree = "<group>"; };
+		076CECC72F1FBB5500F260AF /* GPSPlanBuilderTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSPlanBuilderTab.swift; sourceTree = "<group>"; };
 		076EAA832E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Travel Rules Checklist English.pdf"; sourceTree = "<group>"; };
 		076EAA842E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Travel Rules Checklist Polish.pdf"; sourceTree = "<group>"; };
 		076EAA852E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Travel Rules Checklist Spanish.pdf"; sourceTree = "<group>"; };
@@ -492,7 +497,6 @@
 		07DD832E2D267182004C5C5F /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		07DD832F2D267182004C5C5F /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		07DD83322D267182004C5C5F /* ambient-wave-48-tribute-17243.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ambient-wave-48-tribute-17243.mp3"; sourceTree = "<group>"; };
-		07DD83332D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "grunge-bounce-drum-loop-40464.mp3"; sourceTree = "<group>"; };
 		07DD83342D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "lofi-ambient-pianoline-116134.mp3"; sourceTree = "<group>"; };
 		07DD83372D267182004C5C5F /* BannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerView.swift; sourceTree = "<group>"; };
 		07DD83382D267182004C5C5F /* BottomNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavigationBar.swift; sourceTree = "<group>"; };
@@ -676,7 +680,6 @@
 				07D8EF0F2EEA0CC90027F75B /* Storage */,
 				07D8EF0C2EEA0C9D0027F75B /* Models */,
 				07D8EF0B2EEA0C930027F75B /* Views */,
-				07D8EF052ED756CB0027F75B /* AiTravelAssistantView.swift */,
 			);
 			path = AiAssistant;
 			sourceTree = "<group>";
@@ -684,6 +687,7 @@
 		07D8EF0B2EEA0C930027F75B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				07D8EF052ED756CB0027F75B /* AiTravelAssistantView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -847,6 +851,9 @@
 		07DD830F2D267182004C5C5F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				076CECC72F1FBB5500F260AF /* GPSPlanBuilderTab.swift */,
+				076CECC52F1FBB3100F260AF /* GPSExploreMapTab.swift */,
+				076CECC32F1FBB1C00F260AF /* GPSView+Helpers.swift */,
 				07DD830D2D267182004C5C5F /* SavedLocationsView.swift */,
 				07DD830E2D267182004C5C5F /* GPSView.swift */,
 			);
@@ -958,7 +965,6 @@
 			isa = PBXGroup;
 			children = (
 				07DD83322D267182004C5C5F /* ambient-wave-48-tribute-17243.mp3 */,
-				07DD83332D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 */,
 				07DD83342D267182004C5C5F /* lofi-ambient-pianoline-116134.mp3 */,
 			);
 			path = Sounds;
@@ -1172,7 +1178,6 @@
 				076EAA862E0C8A9C00AFDECE /* Travel Rules Checklist English.pdf in Resources */,
 				076EAA872E0C8A9C00AFDECE /* Travel Rules Checklist Spanish.pdf in Resources */,
 				076EAA882E0C8A9C00AFDECE /* Travel Rules Checklist Polish.pdf in Resources */,
-				07DD83752D267182004C5C5F /* grunge-bounce-drum-loop-40464.mp3 in Resources */,
 				07DD83772D267182004C5C5F /* Lato-Black.ttf in Resources */,
 				07DD83782D267182004C5C5F /* Lato-LightItalic.ttf in Resources */,
 				073199602E912223002D8701 /* PrivacyInfo.xcprivacy in Resources */,
@@ -1244,6 +1249,7 @@
 			files = (
 				07211A1C2D2FFDB000B501B9 /* LocationManager.swift in Sources */,
 				07211A042D29B04100B501B9 /* RulesListViewController.swift in Sources */,
+				076CECC62F1FBB3200F260AF /* GPSExploreMapTab.swift in Sources */,
 				07DD838A2D267182004C5C5F /* CountryInfoService.swift in Sources */,
 				07211A062D29B0C000B501B9 /* SavedRulesViewController.swift in Sources */,
 				07DD838C2D267182004C5C5F /* AchievementManager.swift in Sources */,
@@ -1254,9 +1260,11 @@
 				07DD83902D267182004C5C5F /* LanguageManager.swift in Sources */,
 				07DD83912D267182004C5C5F /* MyChecklistView.swift in Sources */,
 				073E034A2D26893C002BD119 /* ExportButtonView.swift in Sources */,
+				076CECC82F1FBB5800F260AF /* GPSPlanBuilderTab.swift in Sources */,
 				07DD83922D267182004C5C5F /* RuleListES.swift in Sources */,
 				07DD83932D267182004C5C5F /* AchievementsView.swift in Sources */,
 				076C071B2D60A36200C12DB1 /* MyChecklistExportButtonView.swift in Sources */,
+				076CECC42F1FBB1F00F260AF /* GPSView+Helpers.swift in Sources */,
 				07DD83942D267182004C5C5F /* RulesList.swift in Sources */,
 				075B0D1C2D57ED0000F47C1D /* RuleRow.swift in Sources */,
 				07DD83962D267182004C5C5F /* SavedRuleList.swift in Sources */,
@@ -1512,7 +1520,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 2.4;
+				MARKETING_VERSION = 2.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1603,7 +1611,7 @@
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/Pods/**",
 				);
-				MARKETING_VERSION = 2.4;
+				MARKETING_VERSION = 2.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "Mateusz-Mlynarski.Rules";
 				PRODUCT_NAME = "$(TARGET_NAME)";

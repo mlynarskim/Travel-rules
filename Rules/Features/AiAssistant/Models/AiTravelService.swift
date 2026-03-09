@@ -5,22 +5,156 @@ import NaturalLanguage
 actor AiTravelService {
     static let shared = AiTravelService()
 
-    
     private let apiKey: String = {
         let raw = (Bundle.main.object(forInfoDictionaryKey: "GEMINI_API_KEY") as? String) ?? ""
         let value = raw.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // Protect against empty value or not-expanded xcconfig placeholder
         if value.isEmpty { return "" }
         if value.contains("$(") { return "" }
 
         return value
     }()
-    // Gemini Developer API - generateContent endpoint (model: gemini-2.5-flash)
-    private let endpoint = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")!
+
+    private let endpoint = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent")!
+
+    static let demoModeKey = "ai_demo_mode"
+
+    static var isDemoMode: Bool {
+        get { UserDefaults.standard.bool(forKey: demoModeKey) }
+        set { UserDefaults.standard.set(newValue, forKey: demoModeKey) }
+    }
+
+    private func demoResponse(languageCode: String, prompt: String) -> String {
+        // Długi, markdownowy tekst do testowania: nagłówki, listy, linki, akapity.
+        // Ważne: celowo zawiera sekcje + listy, żeby łatwo sprawdzić formatowanie i animacje.
+        switch languageCode {
+        case "pl":
+            return """
+            ## Plan (DEMO)
+
+            Oto przykładowa odpowiedź testowa (bez API). Poniżej masz strukturę z akapitami, listami i linkami.
+
+            ### 1) Szybkie pytania
+
+            - **Kierunek:** gdzie jedziesz?
+            - **Terminy:** kiedy start i ile dni?
+            - **Styl:** budżet / komfort / mix
+
+            ### 2) Propozycja wstępna
+
+            1. Dzień 1: dojazd + lekki spacer
+            2. Dzień 2: główna trasa (wcześnie rano)
+            3. Dzień 3: plan B na złą pogodę
+
+            ### 3) Checklista
+
+            - Dokumenty
+            - Woda + przekąski
+            - Powerbank
+            - Kurtka przeciwdeszczowa
+
+            ### 4) Linki (test)
+
+            - [Google Maps](https://www.google.com/maps)
+            - [Booking](https://www.booking.com)
+            - [Airbnb](https://www.airbnb.com)
+
+            ---
+
+            **Twoje zapytanie (DEMO):** \(prompt)
+            """
+        case "es":
+            return """
+            ## Plan (DEMO)
+
+            Esta es una respuesta de prueba (sin API). Incluye párrafos, listas y enlaces.
+
+            ### 1) Preguntas rápidas
+
+            - **Destino:** ¿a dónde vas?
+            - **Fechas:** ¿cuándo y cuántos días?
+            - **Estilo:** presupuesto / comodidad / mixto
+
+            ### 2) Propuesta inicial
+
+            1. Día 1: llegada + paseo corto
+            2. Día 2: ruta principal (temprano)
+            3. Día 3: plan B si llueve
+
+            ### 3) Checklist
+
+            - Documentos
+            - Agua + snacks
+            - Power bank
+            - Chaqueta impermeable
+
+            ### 4) Enlaces (test)
+
+            - [Google Maps](https://www.google.com/maps)
+            - [Booking](https://www.booking.com)
+            - [Airbnb](https://www.airbnb.com)
+
+            ---
+
+            **Tu mensaje (DEMO):** \(prompt)
+            """
+        default:
+            return """
+            ## 3-Day Spain City Break 
+
+            Here’s a clean, easy plan you can follow without overthinking — perfect for a short trip.
+
+            ### Day 1 — Arrival + Old Town
+            1. Check-in and drop bags
+            2. Walk the historic center (easy pace)
+            3. Sunset viewpoint + dinner
+
+            ### Day 2 — Highlights + Local Food
+            1. Main sights in the morning (avoid crowds)
+            2. Lunch in a local market
+            3. Relaxing afternoon: park / beach / museum
+            4. Evening: tapas route (2–3 spots)
+
+            ### Day 3 — Slow Morning + Departure
+            1. Coffee + quick souvenir stop
+            2. Short walk (30–60 min)
+            3. Head to the airport with buffer time
+
+            ## Transport
+            - Use public transport for the center (fast + cheap)
+            - If renting a car: check parking rules and toll roads
+            - Keep offline maps in case of poor signal
+
+            ## Stays (examples)
+            - Central hotel (walk everywhere)
+            - Quiet apartment (better sleep)
+            - Budget hostel (great for short stays)
+
+            ## Quick Checklist
+            - Passport/ID + travel insurance
+            - Power bank + charging cable
+            - Light rain jacket (weather changes fast)
+            - Small daypack + reusable water bottle
+
+            ## Next step
+            Tell me your city (Barcelona / Valencia / Málaga / Madrid) and your budget — I’ll tailor the exact routes and timing.
+
+            **Your prompt (DEMO):** \(prompt)
+            """
+        }
+    }
 
     func send(prompt: String, history: [AiMessage]) async throws -> String {
-        print("🔑 Gemini API key loaded:", apiKey.isEmpty ? "❌ EMPTY" : "✅ OK")
+        let detectedLanguage: String = {
+            let recognizer = NLLanguageRecognizer()
+            recognizer.processString(prompt)
+            return recognizer.dominantLanguage?.rawValue ?? "en"
+        }()
+
+        if Self.isDemoMode {
+            return normalizeAssistantText(demoResponse(languageCode: detectedLanguage, prompt: prompt))
+        }
+
         guard !apiKey.isEmpty else {
             throw AiError.invalid
         }
@@ -30,86 +164,41 @@ actor AiTravelService {
         request.addValue(apiKey, forHTTPHeaderField: "x-goog-api-key")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        // Language detection based on user's prompt
-        let detectedLanguage: String = {
-            if #available(iOS 12.0, *) {
-                let recognizer = NLLanguageRecognizer()
-                recognizer.processString(prompt)
-                if let lang = recognizer.dominantLanguage {
-                    return lang.rawValue   // e.g. "pl", "en", "es"
-                }
-            }
-            return "en" // fallback
-        }()
-
-        // System prompt — AI wie, jak się zachowywać
         let systemContent = """
-        You are SAM, an AI travel assistant inside a mobile app called Travel Rules.
-        Your expertise is strictly limited to travel-related topics.
+        You are SAM, a travel assistant in the Travel Rules mobile app.
+        ONLY answer travel-related questions (trips, accommodation, transport, packing, camping, vanlife, border crossings, visas, budget, routes).
+        Refuse anything off-topic with: "I can only help with travel topics."
 
-        You MUST focus only on topics related to transportation, trip planning, accommodation, safety, logistics and outdoor travel activities.
-        DO NOT answer questions outside the travel domain.
+        RESPONSE LENGTH — CRITICAL:
+        - Keep answers SHORT and SCANNABLE on a phone screen.
+        - Max ~250 words total. If more is needed, summarise and offer to expand.
+        - Use at most 2-3 sections per answer.
+        - Never repeat yourself.
 
-        Allowed topics include (but are not limited to):
-        - vanlife, campervans, RVs
-        - motorhomes, caravans, camping trailers
-        - tents, wild camping, campgrounds, parking spots
-        - travel by: car, camper, motorcycle, bicycle, train, airplane, bus, ferry, hitchhiking, on foot
-        - routes, itineraries, road conditions, distances, planning multi‑day trips
-        - border crossings, toll roads, vignette systems, fuel planning
-        - packing lists, checklists, essential gear, equipment maintenance
-        - safety, weather preparation, emergency kits, first aid items
-        - navigation apps, offline maps, GPS usage
-        - budget travel, cost estimation, saving tips
-        - accommodations: hotels, hostels, Airbnb, guesthouses, Booking, campgrounds, glamping
-        - cooking while traveling, portable stoves, food storage
-        - travel with pets
-        - eco‑travel, sustainable solutions
-        - ferries, cruises, island hopping
-        - travel documentation, insurance, visas
-        - photography while traveling, travel journaling
-        - travel tips specific to European countries
+        FORMATTING:
+        - Markdown only: ## headings, - bullets, 1. numbered, **bold** key terms.
+        - Blank line before/after every heading and list.
+        - Links: [Label](https://url) — one per line. Use real, working booking/maps links where possible.
+        - End sentences with proper punctuation.
 
-        Absolutely forbidden topics:
-        - politics, religion, finance, medicine, legal advice unrelated to travel
-        - technology unrelated to travel
-        - relationships or psychology
-        - programming, math, science unrelated to travel
-        - general chit‑chat outside travel context
+        FOR TRIP PLANNING use this structure (max 3 sections):
 
-        Your personality:
-        - You are SAM: friendly, practical and highly knowledgeable.
-        - Your answers must always be clear, structured and easy to read on a smartphone screen.
-        - Always use headings, bullet points and step-by-step sections when helpful.
-        - Use emojis sparingly to highlight main themes (e.g., ✈️ 🚐 🏕️ 🏨 🌍 ⚠️), but never overuse them.
-        - When planning a trip, always provide:
-          • structured daily itinerary
-          • transportation tips
-          • recommended accommodations (with direct links to Booking / Airbnb)
-          • top-rated attractions with short descriptions
-          • practical safety and budgeting advice
-        - When asked about accommodation in a specific location:
-          • provide 3–5 top-rated hotels or stays
-          • include direct URLs (Booking or Airbnb)
-          • mention why each option is recommended
-        - When the user needs travel help (vanlife, car, train, plane, bus, ferry, hiking):
-          • give concrete steps
-          • include checklists
-          • highlight important warnings or preparations
-        - Avoid long paragraphs, complex jargon or filler text.
-        - Your goal is to deliver quick, actionable, pleasant-to-read travel guidance.
+        ## Plan
+        Day-by-day or step-by-step (brief).
 
-        The user message language code is "\(detectedLanguage)".
-        ALWAYS answer strictly in the same language as the user's message.
-        If the user writes in Polish — answer in Polish.
-        If the user writes in English — answer in English.
-        If the user writes in Spanish — answer in Spanish.
-        Do NOT translate unless the user explicitly asks.
+        ## Stay & Transport
+        2-3 accommodation links + main transport tip.
 
-        Be practical, concise and helpful.
+        ## Tips
+        Top 3 practical points only.
+
+        FOR SIMPLE QUESTIONS (one topic):
+        Answer directly in 3-6 bullet points or 2-3 short paragraphs. No sections needed.
+
+        Language: detect from user message and reply in the SAME language (Polish/English/Spanish/other).
+        User language code: "\(detectedLanguage)".
         """
 
-        // Historia czatu w formacie Gemini: role: user/model, parts: [ { text: ... } ]
         let historyContents: [[String: Any]] = history.map { msg in
             [
                 "role": msg.isUser ? "user" : "model",
@@ -135,7 +224,8 @@ actor AiTravelService {
             ],
             "contents": historyContents + [userContent],
             "generationConfig": [
-                "temperature": 0.7
+                "temperature": 0.7,
+                "maxOutputTokens": 600
             ]
         ]
 
@@ -146,10 +236,6 @@ actor AiTravelService {
         guard let httpRes = response as? HTTPURLResponse else {
             throw AiError.invalid
         }
-
-        // DEBUG (opcjonalnie):
-        // print("Gemini status: \\(httpRes.statusCode)")
-        // print(String(data: data, encoding: .utf8) ?? "no body")
 
         guard (200..<300).contains(httpRes.statusCode) else {
             throw AiError.httpError(httpRes.statusCode)
@@ -166,6 +252,31 @@ actor AiTravelService {
             throw AiError.empty
         }
 
+        let normalized = normalizeAssistantText(text)
+
+        return normalized
+    }
+
+    private func normalizeAssistantText(_ input: String) -> String {
+        var text = input.replacingOccurrences(of: "\r\n", with: "\n")
+        
+        // 1. Naprawa sklejonych zdań: "Spain?For" -> "Spain? For"
+        if let regex = try? NSRegularExpression(pattern: "([.!?])([A-ZŁŚĆŻŹĄĘŃ])", options: []) {
+            let range = NSRange(text.startIndex..., in: text)
+            text = regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "$1 $2")
+        }
+        
+        // 2. Usuń nadmiarowe puste linie (max 2 nowe linie z rzędu)
+        while text.contains("\n\n\n") {
+            text = text.replacingOccurrences(of: "\n\n\n", with: "\n\n")
+        }
+        
+        // 3. Upewnij się, że nagłówki mają pustą linię przed sobą (jeśli jej nie ma)
+        if let regex = try? NSRegularExpression(pattern: "([^\n])(\n)(#{1,3} )", options: []) {
+            let range = NSRange(text.startIndex..., in: text)
+            text = regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "$1\n\n$3")
+        }
+        
         return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

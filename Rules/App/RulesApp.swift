@@ -141,7 +141,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         case "es":
             return RulesListES.randomElement() ?? fallback
         default:
-            return RulesList.randomElement() ?? fallback
+            return rulesListEN.randomElement() ?? fallback
         }
     }
 

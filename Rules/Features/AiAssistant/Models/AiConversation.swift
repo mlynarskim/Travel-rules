@@ -12,7 +12,6 @@ struct AiConversation: Identifiable, Codable, Equatable {
 }
 
 extension AiConversation {
-    /// Tytuł na podstawie pierwszej wiadomości
     static func makeTitle(from text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty { return "Nowa rozmowa" }

@@ -79,9 +79,6 @@ extension Bundle {
         return self
     }
     
-    func localizedString(forKey key: String, value: String?, table tableName: String?) -> String {
-        return localizedBundle.localizedString(forKey: key, value: value, table: tableName)
-    }
 }
 
 extension String {

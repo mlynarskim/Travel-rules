@@ -346,15 +346,15 @@ struct PushView: View {
                 return RulesListES.randomElement() ?? String(localized: "random_rule_fallback")
             }
         case "en":
-            if !RulesList.isEmpty {
-                return RulesList.randomElement() ?? String(localized: "random_rule_fallback")
+            if !rulesListEN.isEmpty {
+                return rulesListEN.randomElement() ?? String(localized: "random_rule_fallback")
             }
         default:
             break
         }
         // Robust fallback chain
-        if !RulesList.isEmpty {
-            return RulesList.randomElement() ?? String(localized: "random_rule_fallback")
+        if !rulesListEN.isEmpty {
+            return rulesListEN.randomElement() ?? String(localized: "random_rule_fallback")
         }
         if !RulesListPL.isEmpty {
             return RulesListPL.randomElement() ?? String(localized: "random_rule_fallback")

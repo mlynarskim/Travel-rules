@@ -421,7 +421,7 @@
 "premium_restore" = "Przywróć";
 "premium_owned" = "Posiadane";
 "product_unavailable" = "Produkt niedostępny";
-"close" = "Zamknij";
+"close" = "X";
 
 "monthly" = "Miesięcznie";
 "yearly"  = "Rocznie";
@@ -451,6 +451,111 @@
 "theme_summer" = "Lato";
 
 "ai_travel_title" = "Asystent podróży AI";
-"ai_travel_placeholder" = "Napisz, dokąd jedziesz lub o co chcesz zapytać...";
-"ai_travel_hint" = "Przykład: „Planuję 7-dniową podróż kamperem po Hiszpanii, co polecasz?”";
+"ai_travel_placeholder" = "Napisz, dokąd jedziesz...";
 "ai_travel_error" = "Coś poszło nie tak. Spróbuj ponownie.";
+
+"ai_new_conversation" = "Nowa rozmowa";
+
+"ai_history_title" = "Historia";
+"ai_history_empty" = "Brak historii";
+"ai_history_conversations" = "Rozmowy";
+"ai_history_recent_prompts" = "Ostatnie zapytania";
+
+"ai_delete" = "Usuń";
+"ai_cancel" = "Anuluj";
+"ai_clear" = "Wyczyść";
+
+"ai_history_clear_all_title" = "Wyczyścić historię?";
+"ai_history_clear_all_message" = "Usunie to wszystkie rozmowy i ostatnie zapytania. Tej operacji nie da się cofnąć.";
+
+"ai_history_delete_conversation_title" = "Usunąć rozmowę?";
+"ai_history_delete_prompt_title" = "Usunąć wpis?";
+"ai_history_delete_irreversible" = "Ta operacja jest nieodwracalna.";
+
+"ai_sam_welcome_6" = "Cześć! Jestem SAM, Twój wirtualny asystent podróży 😊 W czym mogę Ci dziś pomóc?";
+"ai_sam_welcome_1" = "Cześć! Jestem SAM. Twój asystent podróży 🚐✈️ W czym mogę pomóc?";
+"ai_sam_welcome_2" = "Hej! SAM tutaj 🙂 Dokąd dziś lecimy / jedziemy?";
+"ai_sam_welcome_3" = "Witaj! Jestem SAM. Opowiedz mi o planie podróży, a ułożę go krok po kroku 🗺️";
+"ai_sam_welcome_4" = "Cześć! Potrzebujesz planu, checklisty czy polecajek miejsc? ";
+"ai_sam_welcome_5" = "Hej! SAM na pokładzie 🚐🌍 Napisz gdzie i kiedy jedziesz. Ogarniemy resztę!";
+
+"ai_example_plan_spain" = "Plan Hiszpania 10 dni";
+"ai_example_checklist_mountains" = "Checklista w góry";
+"ai_example_free_spots_europe" = "Darmowe spoty kamperowe Europa";
+"ai_example_mountain_trip" = "Wyprawa w góry";
+"ai_example_plane_packing" = "Co zabrać do samolotu";
+"ai_example_cheapest_flights" = "Znajdź najtańsze loty";
+"ai_example_pretrip_checklist" = "Lista przed podróżą kamperem";
+"ai_example_weekend_trip" = "Wyjazd na weekend";
+"ai_example_roadtrip_plan" = "Plan podróży autem";
+"ai_example_camper_sleep_spots" = "Gdzie spać kamperem";
+"ai_example_budget_travel" = "Tanie podróżowanie";
+"ai_example_documents_check" = "Dokumenty przed wyjazdem";
+
+/* Tabs */
+"gps_tab_info" = "Info";
+"gps_tab_explore" = "Mapa";
+"gps_tab_plan" = "Plan";
+
+/* Explore */
+"gps_explore_filters_title" = "Filtry";
+"gps_explore_radius" = "Promień";
+"gps_explore_radius_viewport" = "W widoku mapy";
+"gps_explore_no_location" = "Brak lokalizacji — włącz dostęp do GPS.";
+"gps_explore_categories" = "Kategorie";
+"gps_explore_select_all" = "Zaznacz wszystko";
+"gps_explore_clear" = "Wyczyść";
+"gps_explore_hint" = "Niektóre wyniki mogą być dopasowane automatycznie. Zawsze sprawdź szczegóły w Mapach.";
+"gps_explore_disclaimer" = "Informacje mogą się zmieniać — sprawdź godziny i zasady w Mapach.";
+"open_apple_maps" = "Otwórz w Mapach";
+
+/* Categories */
+"gps_cat_attractions" = "Atrakcje";
+"gps_cat_must_see" = "Co warto zobaczyć";
+"gps_cat_restaurants" = "Restauracje";
+"gps_cat_cafes" = "Kawiarnie";
+"gps_cat_parking" = "Parkingi";
+"gps_cat_pet_friendly" = "Przyjazne zwierzętom";
+"gps_cat_kids" = "Dla dzieci";
+"gps_cat_shops" = "Sklepy";
+"gps_cat_accommodation" = "Noclegi";
+"gps_cat_camper_service" = "Serwis kampera";
+"gps_cat_toilets" = "Toalety";
+"gps_cat_water" = "Woda";
+"gps_cat_gas" = "Stacje paliw";
+
+/* Plan */
+"gps_plan_title" = "Twórz plan";
+"gps_plan_desc" = "Wybierz typ planu, a aplikacja podpowie miejsca w pobliżu.";
+"gps_plan_choose" = "Typ planu";
+"gps_plan_generate" = "Generuj plan";
+"gps_plan_next" = "Kolejne miejsca";
+"gps_plan_radius" = "Promień";
+"gps_plan_generating" = "Generuję…";
+"gps_plan_result_title" = "Plan";
+"gps_plan_result_empty" = "Kliknij „Generuj plan”, aby zobaczyć propozycje.";
+"gps_plan_error_no_location" = "Brak lokalizacji — włącz GPS.";
+"gps_plan_error_no_results" = "Brak wyników w okolicy — zwiększ promień lub zmień typ planu.";
+"gps_plan_exhausted_title" = "Brak nowych miejsc";
+"gps_plan_exhausted_message" = "Brak nowych miejsc w tym promieniu. Zwiększ zakres wyszukiwania.";
+
+/* Plan types */
+"plan_walk" = "Spacer";
+"plan_bike" = "Rower";
+"plan_sunset" = "Zachód słońca";
+"plan_with_dog" = "Z psem";
+"plan_with_kids" = "Z dzieckiem";
+"plan_vanlife_stop" = "Postój vanlife";
+"plan_chill" = "Chill";
+"plan_nature" = "Natura";
+
+/* Plan steps */
+"gps_plan_step_coffee" = "Kawa";
+"gps_plan_step_walk" = "Spacer";
+"gps_plan_step_start" = "Start";
+"gps_plan_step_view" = "Widok";
+"gps_plan_step_food" = "Jedzenie";
+"gps_plan_step_kids" = "Dla dzieci";
+"gps_plan_step_parking" = "Parking";
+"gps_plan_step_gas" = "Paliwo";
+"gps_plan_step_sleep" = "Nocleg";

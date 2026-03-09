@@ -810,7 +810,7 @@ private struct PremiumCard: View {
                     .buttonStyle(.plain)
                 }
                 Button(action: redeemTapped) {
-                    Text("redeem_code".appLocalized) // ⚠️ dodaj klucz lokalizacji w Localizable.strings
+                    Text("redeem_code".appLocalized)
                         .font(.system(size: 12, weight: .semibold))
                         .underline()
                         .foregroundColor(themeColors.secondaryText)
@@ -1255,6 +1255,7 @@ struct PaywallSheet: View {
                     }
                     .foregroundColor(themeColors.primary)
                     .buttonStyle(.plain)
+                    
                 }
             }
         }

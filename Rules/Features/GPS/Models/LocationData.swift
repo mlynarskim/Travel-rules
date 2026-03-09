@@ -2,11 +2,11 @@ import Foundation
 import CoreLocation
 
 struct LocationData: Identifiable, Codable {
-    var id = UUID() // nie zmieniamy nazwy, zostaw komentarz
+    var id = UUID() 
     var latitude: Double
     var longitude: Double
     var description: String
-    var markerColor: String = "red" // nowa właściwość, domyślnie "red"
+    var markerColor: String = "red"
 }
 
 enum MapProvider {

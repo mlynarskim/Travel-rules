@@ -60,8 +60,8 @@ struct BottomNavigationBar: View {
             }
             .buttonStyle(.plain)
             
-            // NOWY PRZYCISK – AI TRAVEL ASSISTANT
-            NavigationLink(destination: AiTravelAssistantView()) { 
+            // AI TRAVEL ASSISTANT – SAM
+            NavigationLink(destination: AiTravelAssistantView()) {
                 RoundedRectangle(cornerRadius: 15)
                     .padding(.all, 5)
                     .foregroundColor(Color(hex: "#DDAA4F"))

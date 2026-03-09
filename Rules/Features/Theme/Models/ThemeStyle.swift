@@ -91,7 +91,7 @@ struct ThemeColors {
         overlay: Color.black.opacity(0.3),
         success: Color(hex: "#48A999"),
         warning: Color(hex: "#FF9F1C"),
-        error: Color(hex: "#D7263D"), 
+        error: Color(hex: "#D7263D"),
         buttonHighlight: Color.white.opacity(0.25)
     )
 

@@ -2,19 +2,49 @@
 import SwiftUI
 import CoreLocation
 import MapKit
+import UIKit
+
+// Bottom bar tabs for GPS screen
+private enum GPSBottomTab: String, CaseIterable {
+    // ✅ kolejność: mapa -> plan -> info
+    case explore
+    case plan
+    case info
+
+    var systemImage: String {
+        switch self {
+        case .info: return "info.circle"
+        case .explore: return "map"
+        case .plan: return "sparkles"
+        }
+    }
+
+    // NOTE: Add these keys to Localizable.strings (PL/EN/ES)
+    var titleKey: String {
+        switch self {
+        case .info: return "gps_tab_info"
+        case .explore: return "gps_tab_explore"
+        case .plan: return "gps_tab_plan"
+        }
+    }
+}
 
 struct GPSView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var description = ""
     @State private var currentLocation: CLLocation?
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-    )
     @AppStorage("isDarkMode") var isDarkMode = false
     @AppStorage("selectedTheme") private var selectedTheme = ThemeStyle.classic.rawValue
     @StateObject private var languageManager = LanguageManager.shared
     @State private var isCountryInfoExpanded = false
+
+    // ✅ mapa jako pierwszy ekran
+    @State private var selectedBottomTab: GPSBottomTab = .explore
+
+    @State private var followUserOnMap: Bool = true
+    @State private var hasSetInitialRegion: Bool = false
+    @State private var exploreRefreshID: UUID = UUID()
+    @State private var infoMapPosition: MapCameraPosition = .automatic
 
     // 🔥 licznik zapisanych miejsc + osiągnięcia
     @AppStorage("totalLocationsSaved") private var totalLocationsSaved: Int = 0
@@ -29,8 +59,8 @@ struct GPSView: View {
         case .forest: return ThemeColors.forestTheme
         case .autumn: return ThemeColors.autumnTheme
         case .winter: return ThemeColors.winterTheme
-            case .summer: return ThemeColors.summerTheme
-            case .spring: return ThemeColors.springTheme
+        case .summer: return ThemeColors.summerTheme
+        case .spring: return ThemeColors.springTheme
         }
     }
 
@@ -44,72 +74,21 @@ struct GPSView: View {
                 Image(isDarkMode ? themeColors.darkBackground : themeColors.background)
                     .resizable()
                     .ignoresSafeArea()
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: isSmallDevice ? 12 : 16) {
-                        CurrentLocationCard(
-                            currentLocation: currentLocation,
-                            themeColors: themeColors,
-                            isSmallDevice: isSmallDevice
-                        )
-                        .transition(AnyTransition.scale)
 
-                        // Map z dodanymi markerami zapisanych lokalizacji (iOS 16+ kompatybilny)
-                        Map(
-                            coordinateRegion: $region,
-                            interactionModes: .all,
-                            showsUserLocation: true,
-                            annotationItems: locationManager.locationData
-                        ) { item in
-                            MapAnnotation(
-                                coordinate: CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longitude)
-                            ) {
-                                Image(systemName: "mappin.circle.fill")
-                                    .resizable()
-                                    .foregroundColor(colorForMarker(item.markerColor))
-                                    .frame(width: 30, height: 30)
-                            }
-                        }
-                        .frame(height: isSmallDevice ? 150 : 200)
-                        .frame(maxWidth: isSmallDevice ? 300 : 380)
-                        .cornerRadius(15)
-                        .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
-
-                        if !locationManager.currentCountry.isEmpty {
-                            CountryInfoCard(
-                                countryName: locationManager.currentCountry,
-                                isExpanded: $isCountryInfoExpanded,
-                                countryInfo: locationManager.countryInfoService.countryInfo,
-                                themeColors: themeColors,
-                                isSmallDevice: isSmallDevice
-                            )
-                        }
-
-                        // Panel wprowadzania lokalizacji
-                        LocationInputPanel(
-                            description: $description,
-                            currentLocation: currentLocation,
-                            locationManager: locationManager,
-                            themeColors: themeColors,
-                            isSmallDevice: isSmallDevice,
-                            // ✅ po zapisie miejsca – zwiększ licznik i odpal osiągnięcie
-                            onSaved: {
-                                totalLocationsSaved &+= 1
-                                // zarejestruj liczbę zapisanych lokalizacji (wewnętrzna logika progu 1+)
-                                achievementManager.recordLocationsCount(totalLocationsSaved)
-                                // dodatkowe, jawne sprawdzenie osiągnięć po stronie managera (tylko lokalizacje)
-                                achievementManager.checkAchievements(
-                                    rulesDrawn: 0,
-                                    rulesSaved: 0,
-                                    rulesShared: 0,
-                                    locationsSaved: totalLocationsSaved
-                                )
-                            }
-                        )
+                // Main content depends on the selected bottom tab
+                Group {
+                    switch selectedBottomTab {
+                    case .info:
+                        infoTabContent
+                    case .explore:
+                        exploreTabContent
+                    case .plan:
+                        planTabContent
                     }
-                    .padding(.top, isSmallDevice ? 8 : 16)
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
                 }
+            }
+            .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0) {
+                bottomBar
             }
             .navigationBarHidden(false)
         }
@@ -127,16 +106,179 @@ struct GPSView: View {
             locationManager.stopUpdatingLocation()
         }
         .onReceive(locationManager.$lastLocation) { location in
-            if let location = location {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    currentLocation = location
-                    region = MKCoordinateRegion(
-                        center: location.coordinate,
-                        span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
-                    )
+            guard let location else { return }
+
+            currentLocation = location
+
+            // Ustaw region tylko na starcie lub gdy użytkownik chce śledzić lokalizację.
+            if followUserOnMap || !hasSetInitialRegion {
+                hasSetInitialRegion = true
+                let newRegion = MKCoordinateRegion(
+                    center: location.coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+                )
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    infoMapPosition = .region(newRegion)
                 }
             }
         }
+    }
+
+    // MARK: - Tabs content
+
+    private var infoTabContent: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: isSmallDevice ? 12 : 16) {
+                CurrentLocationCard(
+                    currentLocation: currentLocation,
+                    themeColors: themeColors,
+                    isSmallDevice: isSmallDevice
+                )
+                .transition(AnyTransition.scale)
+
+                Map(position: $infoMapPosition) {
+                    UserAnnotation()
+                    ForEach(locationManager.locationData) { item in
+                        Annotation(
+                            item.description,
+                            coordinate: CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longitude)
+                        ) {
+                            Image(systemName: "mappin.circle.fill")
+                                .resizable()
+                                .foregroundColor(colorForMarker(item.markerColor))
+                                .frame(width: 30, height: 30)
+                        }
+                    }
+                }
+                .frame(height: isSmallDevice ? 150 : 200)
+                .frame(maxWidth: isSmallDevice ? 300 : 380)
+                .cornerRadius(15)
+                .shadow(color: themeColors.cardShadow, radius: 5, x: 0, y: 2)
+                .disabled(true)
+
+                if !locationManager.currentCountry.isEmpty {
+                    CountryInfoCard(
+                        countryName: locationManager.currentCountry,
+                        isExpanded: $isCountryInfoExpanded,
+                        countryInfo: locationManager.countryInfoService.countryInfo,
+                        themeColors: themeColors,
+                        isSmallDevice: isSmallDevice
+                    )
+                }
+
+                // Panel wprowadzania lokalizacji
+                LocationInputPanel(
+                    description: $description,
+                    currentLocation: currentLocation,
+                    locationManager: locationManager,
+                    themeColors: themeColors,
+                    isSmallDevice: isSmallDevice,
+                    // ✅ po zapisie miejsca – zwiększ licznik i odpal osiągnięcie
+                    onSaved: {
+                        totalLocationsSaved &+= 1
+                        // zarejestruj liczbę zapisanych lokalizacji (wewnętrzna logika progu 1+)
+                        achievementManager.recordLocationsCount(totalLocationsSaved)
+                        // dodatkowe, jawne sprawdzenie osiągnięć po stronie managera (tylko lokalizacje)
+                        achievementManager.checkAchievements(
+                            rulesDrawn: 0,
+                            rulesSaved: 0,
+                            rulesShared: 0,
+                            locationsSaved: totalLocationsSaved
+                        )
+                    }
+                )
+            }
+            .padding(.top, isSmallDevice ? 8 : 16)
+            .padding(.horizontal)
+            .padding(.bottom, 20)
+        }
+    }
+
+    private var exploreTabContent: some View {
+        ExploreMapTab(
+            currentLocation: currentLocation,
+            savedLocations: locationManager.locationData,
+            themeColors: themeColors,
+            isSmallDevice: isSmallDevice,
+            isDarkMode: isDarkMode,
+            followUserOnMap: $followUserOnMap
+        )
+        .id(exploreRefreshID)
+    }
+
+    private var planTabContent: some View {
+        PlanBuilderTab(
+            themeColors: themeColors,
+            isSmallDevice: isSmallDevice,
+            isDarkMode: isDarkMode,
+            currentLocation: currentLocation
+        )
+    }
+
+    // MARK: - Bottom bar (mniejszy + poprawny kontrast w każdym motywie)
+
+    private var bottomBar: some View {
+        VStack(spacing: 0) {
+            Divider()
+                .background((isDarkMode ? Color.white.opacity(0.12) : Color.black.opacity(0.08)))
+
+            HStack {
+                ForEach(GPSBottomTab.allCases, id: \.self) { tab in
+                    bottomBarButton(for: tab)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .padding(.horizontal, isSmallDevice ? 8 : 12)
+            .padding(.top, isSmallDevice ? 6 : 8)
+            .padding(.bottom, isSmallDevice ? 6 : 8)
+            .background(themeColors.cardBackground)
+            .shadow(color: themeColors.cardShadow, radius: 6, x: 0, y: -2)
+        }
+    }
+
+    private func bottomBarButton(for tab: GPSBottomTab) -> some View {
+        let isSelected = (selectedBottomTab == tab)
+
+        // ✅ kontrast zależny od realnego tła, nie od isDarkMode
+        let lightBG = isLightColor(themeColors.cardBackground)
+        let selectedColor: Color = lightBG ? .black : .white
+        let unselectedColor: Color = lightBG ? .black.opacity(0.65) : .white.opacity(0.85)
+
+        return Button {
+            withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+                selectedBottomTab = tab
+            }
+
+            if tab == .explore {
+                // Wymuś odświeżenie mapy po wejściu w zakładkę.
+                exploreRefreshID = UUID()
+            }
+            if tab == .info {
+                followUserOnMap = true
+            }
+
+            HapticManager.shared.impact(style: .light)
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: tab.systemImage)
+                    .font(.system(size: isSmallDevice ? 18 : 20, weight: .semibold))
+                    .foregroundColor(isSelected ? selectedColor : unselectedColor)
+
+                Text(tab.titleKey.appLocalized)
+                    .font(.system(size: isSmallDevice ? 11 : 12, weight: .semibold))
+                    .foregroundColor(isSelected ? selectedColor : unselectedColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+
+                Capsule()
+                    .fill(isSelected ? themeColors.primary : Color.clear)
+                    .frame(width: isSmallDevice ? 22 : 26, height: 3)
+                    .padding(.top, 1)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private func colorForMarker(_ marker: String) -> Color {
@@ -402,8 +544,6 @@ struct LocationInputPanel: View {
             description = ""
             locationManager.saveLocations()
             HapticManager.shared.impact(style: .medium)
-
-            // 🔔 powiadom rodzica – tu odpalą się osiągnięcia/licznik
             onSaved()
         }
     }
