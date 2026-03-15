@@ -1,80 +1,440 @@
 # Travel Rules
 
-## Introduction
-The "Travel Rules" application is designed to provide users with a collection of daily rules and guidelines for living the vanlife lifestyle. With this application, users can explore a new rule every day, add custom rules, and view a list of saved rules. The app offers an intuitive and visually appealing user interface, making it easy to navigate and interact with the rules.
+Travel Rules is a mobile travel assistant designed for travelers, vanlifers, road-trippers and digital nomads.  
+The app helps users plan trips, stay organized, and access useful travel information in one place.
 
-## Features
-The "Travel Rules" application offers the following key features:
+Instead of using multiple apps for planning, checklists, travel tips and local information, Travel Rules combines everything into a single, simple experience.
 
-### Rule Display
-- The application presents users with a new rule, providing insights and recommendations for living the vanlife lifestyle.
-- Users can access the rule directly from the main screen of the app.
-- Each rule is displayed with its name and description, allowing users to quickly grasp the essence of the rule.
+---
 
-### Adding Custom Rules
-- The application allows users to create and add their own custom rules.
-- Users can specify a name and description for each custom rule they add.
-- Custom rules are saved within the app, allowing users to refer to them later.
+# 🚐 Overview
 
-### Viewing Saved Rules
-- The app provides a dedicated "Saved Rules" section where users can view all the rules they have saved, including both the daily rules and their custom rules.
-- Saved rules are displayed in a visually appealing format, with the rule names presented in a scrollable list.
-- Users can tap on a saved rule to view its details, including the rule's name and description.
+Travel Rules provides daily travel tips, packing checklists, trip planning tools, location-based services and an AI travel assistant.
 
-### Rule Details Presentation
-- When a user taps on a saved rule, the application presents a modal view displaying the rule's details.
-- The rule details include the rule's name as the title and the description as the main content.
-- Users can dismiss the rule details view by tapping the "OK" button.
+The goal of the application is to **reduce travel stress and help users stay prepared wherever they go.**
 
-### Custom Travel Checklist
-- The application allows users to create a personalized travel checklist.
-- Users can add items to the checklist, such as essential supplies and equipment needed for their vanlife journey.
-- The checklist can be customized and modified based on the user's preferences and requirements.
+The app is especially useful for:
 
-### Sharing Selected Rules on Social Media
-- Users have the option to share their favorite rules on social media platforms.
-- By selecting a rule from the saved rules list, users can share it with their friends and followers on platforms like Facebook, Instagram, or Twitter.
-- Sharing options are available within the app, providing a seamless and convenient way to spread vanlife inspiration.
+- Vanlife travelers
+- Camper van owners
+- Road trip travelers
+- Backpackers
+- Digital nomads
+- Frequent flyers
 
-### 
-The GPS data retrieval and location saving function allows the user to read the current location from the GPS device and save it within the application. This enables the user to easily track and store their geographic location.
+---
 
-## Usage
-Here's a step-by-step guide on how to use the "Travel Rules" application:
+# ✨ Features
 
-1. Upon launching the app, users are presented with the main screen.
-2. The main screen displays the current rule, including its name and description.
-3. Users can read and reflect upon the daily rule.
-4. To add a custom rule, users can enter the name and description of the rule in the designated text fields.
-5. After entering the details, users can tap the "ADD" button to add the custom rule.
-6. The custom rule will be saved within the app and can be viewed later in the "Saved Rules" section.
-7. To view the list of saved rules, users can tap the "Show Rules" button.
-8. The "Saved Rules" section will display all the saved rules.
-9. Users can scroll through the list of saved rules and tap on a rule to view its details.
-10. When viewing a rule's details, users can read the rule's name and description.
-11. To dismiss the rule details view, users can tap the "OK" button.
-12. To create a personalized travel checklist, users can navigate to the "Checklist" section of the app.
-13. Within the checklist section, users can add items by entering their names and descriptions.
-14. Users can customize the checklist by adding, editing, or removing items as needed.
-15. The checklist serves as a handy tool for users to ensure they have all the necessary items for their vanlife adventure.
-16. To share selected rules on social media, users can navigate to the "Saved Rules" section.
-17. Within the saved rules list, users can select a rule they wish to share.
-18. By tapping the share button, users can choose the desired social media platform and post the selected rule.
-19. This feature allows users to inspire others with their favorite rules and foster a sense of community among vanlife enthusiasts.
+## Daily Travel Rules
 
-## Conclusion
-The "Travel Rules" application offers a convenient and informative way for users to explore daily rules and guidelines related to the vanlife lifestyle. With its user-friendly interface and customizable features, the app provides a valuable resource for vanlife enthusiasts to enhance their experience and make the most out of their journey.
+The core feature of the app is a collection of travel rules and best practices.
 
-<div style="display: flex;">
-  <img src="https://github.com/mlynarskim/Travel-rules/blob/main/Screenshots/Simulator%20screenshots1.png" width="400" alt="Screenshot1">
-  <img src="https://github.com/mlynarskim/Travel-rules/blob/main/Screenshots/Simulator%20screenshots2.png" width="400" alt="Screenshot2">
-  <img src="https://github.com/mlynarskim/Travel-rules/blob/main/Screenshots/Simulator%20screenshots3.png" width="400" alt="Screenshot3">
-</div>
+The app contains **hundreds of travel rules** designed to help users travel smarter and safer.
 
+Users receive:
 
+- **5 free rules per day**
+- additional rules unlocked by watching an ad
+- unlimited rules in the premium version
 
+Each rule contains:
 
+- title
+- description
+- category
 
-Please note that this documentation provides a general overview of the application's features and usage. For more detailed information, please refer to the application itself and any accompanying documentation.
+Examples:
 
-All Rights Reserved 2025
+- Always carry a backup power bank
+- Keep digital copies of your documents
+- Never drive while tired
+- Learn basic local emergency numbers
+
+---
+
+## Rule Categories
+
+Travel rules are organized into categories:
+
+- Vanlife
+- Road Trips
+- Air Travel
+- Safety
+- Budget Travel
+- Navigation
+- Packing
+- Documents
+- Outdoor Travel
+- International Travel
+
+Premium users can unlock all categories.
+
+---
+
+## Saved Rules
+
+Users can save any rule for later reference.
+
+Saved rules include:
+
+- daily rules
+- user-created rules
+
+Features:
+
+- quick access to saved rules
+- clean scrollable list
+- detailed rule view
+- ability to remove saved rules
+
+---
+
+## Custom Rules
+
+Users can create their own personal travel rules.
+
+Each rule contains:
+
+- title
+- description
+
+Example:
+
+Title:
+Always check tire pressure
+
+Description:
+Before every long trip check tire pressure to avoid dangerous situations.
+
+---
+
+# 📦 Travel Checklists
+
+Travel Rules includes a powerful checklist system for trip preparation.
+
+Users can:
+
+- create custom checklists
+- modify checklist items
+- mark items as completed
+
+---
+
+## Pre-made Checklists
+
+The app includes ready-to-use packing lists such as:
+
+Vanlife checklist
+- water tank
+- power cables
+- solar controller
+- leveling blocks
+
+Flight checklist
+- passport
+- boarding pass
+- headphones
+- charger
+
+---
+
+## Custom Checklists
+
+Users can create unlimited personal lists.
+
+Example:
+
+Trip to Spain
+
+- passport
+- sunscreen
+- travel adapter
+
+---
+
+## Checklist Export
+
+Premium users can export checklists to **PDF** for printing.
+
+---
+
+# 🗺 Trip Planning
+
+Travel Rules allows users to create travel plans.
+
+A trip plan may contain:
+
+- trip name
+- travel dates
+- destinations
+- route notes
+- custom notes
+
+Example:
+
+Italy Road Trip
+
+Day 1 – Venice  
+Day 2 – Florence  
+Day 3 – Rome
+
+---
+
+# 📍 Location Features
+
+The app uses GPS to enhance travel planning.
+
+Location-based features include:
+
+- nearby places
+- local attractions
+- saved locations
+
+---
+
+## Points of Interest (POI)
+
+Users can quickly find important locations nearby.
+
+Categories include:
+
+Infrastructure
+- gas stations
+- EV chargers
+- rest areas
+
+Health
+- hospitals
+- clinics
+- pharmacies
+- veterinarians
+
+Family
+- playgrounds
+- amusement parks
+- aquariums
+
+Food
+- restaurants
+- cafés
+- bars
+
+Tourism
+- viewpoints
+- parks
+- tourist attractions
+
+---
+
+## Save Location
+
+Users can save locations directly from GPS.
+
+Example:
+
+Spot name:
+Lake camping spot
+
+Note:
+Beautiful sunset view.
+
+---
+
+# 🌍 Country Information
+
+Travel Rules provides important information about the country where the user is located.
+
+Information includes:
+
+- emergency numbers
+- healthcare information
+- embassy contacts
+
+---
+
+# 📅 Document Expiration Reminders
+
+The app helps users track important documents.
+
+Supported documents:
+
+- passport
+- ID card
+- driver license
+- travel insurance
+- visa
+
+Users receive reminders:
+
+- 90 days before expiration
+- 30 days before expiration
+- 7 days before expiration
+
+---
+
+# 🤖 AI Travel Assistant
+
+Travel Rules includes an AI-powered travel assistant.
+
+The assistant helps users with:
+
+Trip planning  
+Destination ideas  
+Travel recommendations  
+Road trip routes  
+Daily itineraries  
+
+Examples:
+
+"Plan 3 days in Barcelona"
+
+"What should I see near me?"
+
+"Create a road trip route in Italy"
+
+---
+
+## Personalized Travel Suggestions
+
+The AI assistant adapts recommendations based on user preferences such as:
+
+- travel style
+- budget
+- family travel
+- vanlife travel
+
+---
+
+# 📲 Social Sharing
+
+Users can share travel rules directly to social media platforms.
+
+Supported platforms include:
+
+- Instagram
+- Facebook
+- Twitter / X
+
+---
+
+# 🌐 Supported Languages
+
+The application supports three languages:
+
+- English
+- Polish
+- Spanish
+
+---
+
+# 🎨 Themes
+
+Travel Rules includes multiple color themes allowing users to customize the look of the application.
+
+---
+
+# 💰 Monetization
+
+Travel Rules uses two monetization methods.
+
+---
+
+## Advertisements
+
+Two types of ads are used:
+
+Banner Ads  
+Small banner displayed on the main screen.
+
+Rewarded Ads  
+Users can watch a full-screen ad to unlock additional travel rules.
+
+---
+
+## Premium Subscription
+
+Users can upgrade to a premium subscription.
+
+Pricing:
+
+Monthly  
+$4.99
+
+Yearly  
+$29.99
+
+---
+
+## Premium Benefits
+
+Premium removes limitations and unlocks additional features.
+
+Benefits include:
+
+- no advertisements
+- unlimited travel rules
+- all rule categories
+- PDF checklist export
+- access to ready-made printable checklists
+- unlimited AI assistant usage
+
+---
+
+# 📱 Platforms
+
+Travel Rules is designed as a mobile application.
+
+Current platform:
+
+iOS
+
+Planned platform:
+
+Android
+
+---
+
+# 🎯 Mission
+
+Travel Rules aims to become a **complete travel companion**, combining multiple travel tools into one simple and powerful app.
+
+Instead of installing several apps, travelers can manage everything in one place:
+
+- travel tips
+- packing lists
+- trip planning
+- location tools
+- document reminders
+- AI travel assistant
+
+---
+
+# 👤 Target Users
+
+Travel Rules is designed for:
+
+- vanlife travelers
+- camper travelers
+- backpackers
+- digital nomads
+- road trip enthusiasts
+- international travelers
+
+---
+
+# 🚀 Future Development
+
+Planned improvements include:
+
+- improved AI travel planning
+- more POI integrations
+- Android version
+- offline travel tools
+- community travel rules
+
+---
+
+# License
+
+This project is currently under development.
